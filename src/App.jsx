@@ -1,45 +1,81 @@
 import { useState, useEffect, useCallback, useRef } from "react";
+import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 
 // ─── CONFIG ───────────────────────────────────────────────────────────────────
-const STRIPE_LINK    = "https://buy.stripe.com/test_dRm8wRb6e4Hu4Rm3ib2VG00";
-const TRIAL_DAYS     = 14;
-const SOFT_LOCK_DAYS = 5;
-const ADMIN_PASSWORD = "listobid2026";
-const GOOGLE_API_KEY = "YOUR_GOOGLE_PLACES_API_KEY"; // Replace with your key
+const STRIPE_LINK      = "https://buy.stripe.com/test_dRm8wRb6e4Hu4Rm3ib2VG00";
+const TRIAL_DAYS       = 14;
+const SOFT_LOCK_DAYS   = 5;
+const ADMIN_PASSWORD   = "listobid2026";
+const GOOGLE_API_KEY   = "AIzaSyD-biCG8bnGAyf0u9cgP0E1SXMRZ6yhYfg";
+const SUPABASE_URL     = "https://ljtvktacmabgixjbsdii.supabase.co";
+const SUPABASE_ANON    = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxqdHZrdGFjbWFiZ2l4amJzZGlpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3MDQwNDksImV4cCI6MjA5NDI4MDA0OX0.y7qIYZsAJGiPhIUGWvRj8_akHys71MPgScjpHZCEDvQ";
+
+// ─── SUPABASE CLIENT ──────────────────────────────────────────────────────────
+const sb = createClient(SUPABASE_URL, SUPABASE_ANON);
 
 // ─── INDUSTRY TEMPLATES ───────────────────────────────────────────────────────
 const INDUSTRY_TEMPLATES = {
   landscaping: {
     en: { name: "Landscaping", icon: "🌵" }, es: { name: "Jardinería", icon: "🌵" },
-    jobs: [
-      { id: 1, name: "Weekly Maintenance", hours: 1.5, materials: 0 },
-      { id: 2, name: "Full Cleanup",        hours: 3,   materials: 20 },
-      { id: 3, name: "Desert Install",      hours: 6,   materials: 150 },
-      { id: 4, name: "Irrigation Check",    hours: 1,   materials: 10 },
-      { id: 5, name: "Tree Trimming",       hours: 2.5, materials: 0 },
-    ],
+    jobs: {
+      en: [
+        { id: 1, name: "Weekly Maintenance", hours: 1.5, materials: 0 },
+        { id: 2, name: "Full Cleanup",        hours: 3,   materials: 20 },
+        { id: 3, name: "Desert Install",      hours: 6,   materials: 150 },
+        { id: 4, name: "Irrigation Check",    hours: 1,   materials: 10 },
+        { id: 5, name: "Tree Trimming",       hours: 2.5, materials: 0 },
+      ],
+      es: [
+        { id: 1, name: "Mantenimiento Semanal", hours: 1.5, materials: 0 },
+        { id: 2, name: "Limpieza Completa",      hours: 3,   materials: 20 },
+        { id: 3, name: "Instalación Desértica",  hours: 6,   materials: 150 },
+        { id: 4, name: "Revisión de Irrigación", hours: 1,   materials: 10 },
+        { id: 5, name: "Poda de Árboles",        hours: 2.5, materials: 0 },
+      ],
+    },
   },
   pool: {
     en: { name: "Pool Service", icon: "🏊" }, es: { name: "Servicio de Piscina", icon: "🏊" },
-    jobs: [
-      { id: 1, name: "Weekly Chemical Service", hours: 1,   materials: 25 },
-      { id: 2, name: "Filter Clean",             hours: 1.5, materials: 15 },
-      { id: 3, name: "Equipment Check",          hours: 1,   materials: 0 },
-      { id: 4, name: "Green Pool Recovery",      hours: 3,   materials: 60 },
-      { id: 5, name: "Acid Wash",                hours: 4,   materials: 80 },
-    ],
+    jobs: {
+      en: [
+        { id: 1, name: "Weekly Chemical Service", hours: 1,   materials: 25 },
+        { id: 2, name: "Filter Clean",             hours: 1.5, materials: 15 },
+        { id: 3, name: "Equipment Check",          hours: 1,   materials: 0 },
+        { id: 4, name: "Green Pool Recovery",      hours: 3,   materials: 60 },
+        { id: 5, name: "Acid Wash",                hours: 4,   materials: 80 },
+      ],
+      es: [
+        { id: 1, name: "Servicio Químico Semanal", hours: 1,   materials: 25 },
+        { id: 2, name: "Limpieza de Filtro",        hours: 1.5, materials: 15 },
+        { id: 3, name: "Revisión de Equipo",        hours: 1,   materials: 0 },
+        { id: 4, name: "Recuperación de Piscina",   hours: 3,   materials: 60 },
+        { id: 5, name: "Lavado con Ácido",          hours: 4,   materials: 80 },
+      ],
+    },
   },
   handyman: {
     en: { name: "Handyman", icon: "🔨" }, es: { name: "Mantenimiento", icon: "🔨" },
-    jobs: [
-      { id: 1, name: "General Labor",    hours: 2, materials: 0 },
-      { id: 2, name: "Repair Work",      hours: 3, materials: 30 },
-      { id: 3, name: "Installation",     hours: 4, materials: 50 },
-      { id: 4, name: "Painting",         hours: 5, materials: 40 },
-      { id: 5, name: "Assembly / Setup", hours: 2, materials: 20 },
-    ],
+    jobs: {
+      en: [
+        { id: 1, name: "General Labor",    hours: 2, materials: 0 },
+        { id: 2, name: "Repair Work",      hours: 3, materials: 30 },
+        { id: 3, name: "Installation",     hours: 4, materials: 50 },
+        { id: 4, name: "Painting",         hours: 5, materials: 40 },
+        { id: 5, name: "Assembly / Setup", hours: 2, materials: 20 },
+      ],
+      es: [
+        { id: 1, name: "Mano de Obra General", hours: 2, materials: 0 },
+        { id: 2, name: "Trabajo de Reparación", hours: 3, materials: 30 },
+        { id: 3, name: "Instalación",           hours: 4, materials: 50 },
+        { id: 4, name: "Pintura",               hours: 5, materials: 40 },
+        { id: 5, name: "Ensamblaje / Montaje",  hours: 2, materials: 20 },
+      ],
+    },
   },
 };
+
+// Helper to get jobs in correct language
+const getJobs = (tmpl, lang) => (tmpl.jobs[lang] || tmpl.jobs.en).map(j => ({ ...j }));
 
 const TIER_ONE_WAY = { short: 5, medium: 18, long: 35 };
 const TRUCK_MPG    = 10;
@@ -52,6 +88,7 @@ const roundUp5 = (v) => Math.ceil(v / 5) * 5;
 const roundPct = (v) => Math.round(v);
 
 function calcQuote({ laborRate, crewSize, hours, materials, exactMiles, tier, vehicles, gasPrice, margin, marginMode, targetDollar, overheadMode, overheadPct, overheadFlat }) {
+  // Note: fuel calc uses fixed 10 MPG for standard work truck
   const rate   = pf(laborRate, 0);
   const crew   = pi(crewSize, 1);
   const hrs    = pf(hours, 0);
@@ -174,6 +211,12 @@ const TX = {
     language: "Language", editProfile: "Edit Profile", manageJobs: "Job Library",
     industryLabel: "Industry",
     support: "Support", supportEmail: "support@listobid.com",
+    legal: "Legal",
+    legalTitle: "Legal Disclaimer",
+    legalText: "ListoBid is a pricing estimation tool designed to help field service operators calculate job quotes. All prices, margins, and cost estimates generated by this app are for informational purposes only and do not constitute financial, legal, or professional advice. Actual job costs and profitability may vary based on factors outside this app's control, including but not limited to labor rates, material costs, fuel prices, local regulations, and market conditions. ListoBid LLC makes no guarantees regarding the accuracy or completeness of any estimate generated. By using this app, you agree that ListoBid LLC is not liable for any financial decisions made based on app-generated quotes. Users are solely responsible for their own pricing decisions and business outcomes.",
+    legal: "Legal",
+    legalTitle: "Disclaimer",
+    legalText: "ListoBid provides pricing estimates for informational purposes only. All calculations are based on user-provided inputs and general industry averages. ListoBid LLC makes no guarantee that suggested prices will result in profit, cover actual costs, or be appropriate for any specific job or market. Users are solely responsible for verifying costs, setting prices, and the outcomes of any bids or contracts. ListoBid LLC is not liable for any financial loss, missed revenue, disputes, or damages arising from use of this application. By using ListoBid, you agree that all pricing decisions are your own. This tool is not a substitute for professional business, financial, or legal advice.", legal: "Legal & Disclaimer",
     dataWarningShort: "Data saved on this device only",
     nav_quote: "Quote", nav_log: "Log", nav_settings: "Settings",
   },
@@ -261,6 +304,12 @@ const TX = {
     language: "Idioma", editProfile: "Editar Perfil", manageJobs: "Tipos de Trabajo",
     industryLabel: "Industria",
     support: "Soporte", supportEmail: "support@listobid.com",
+    legal: "Legal",
+    legalTitle: "Aviso Legal",
+    legalText: "ListoBid es una herramienta de estimación de precios diseñada para ayudar a operadores de servicios a calcular cotizaciones de trabajos. Todos los precios, márgenes y estimaciones de costos generados por esta aplicación son únicamente para fines informativos y no constituyen asesoramiento financiero, legal o profesional. Los costos reales y la rentabilidad pueden variar según factores fuera del control de esta aplicación, incluyendo pero no limitado a tarifas laborales, costos de materiales, precios de combustible, regulaciones locales y condiciones del mercado. ListoBid LLC no garantiza la exactitud o integridad de ninguna estimación generada. Al usar esta aplicación, usted acepta que ListoBid LLC no es responsable de ninguna decisión financiera tomada con base en las cotizaciones generadas. Los usuarios son los únicos responsables de sus decisiones de precios y resultados comerciales.",
+    legal: "Legal",
+    legalTitle: "Aviso Legal",
+    legalText: "ListoBid proporciona estimaciones de precios solo con fines informativos. Todos los cálculos se basan en datos ingresados por el usuario y promedios generales de la industria. ListoBid LLC no garantiza que los precios sugeridos resulten en ganancias, cubran los costos reales, o sean apropiados para cualquier trabajo o mercado específico. Los usuarios son únicamente responsables de verificar costos, establecer precios y los resultados de cualquier oferta o contrato. ListoBid LLC no es responsable de pérdidas financieras, disputas o daños derivados del uso de esta aplicación. Al usar ListoBid, usted acepta que todas las decisiones de precios son de su exclusiva responsabilidad. Esta herramienta no reemplaza el asesoramiento profesional empresarial, financiero o legal.", legal: "Legal y Aviso Legal",
     dataWarningShort: "Datos guardados solo en este dispositivo",
     nav_quote: "Cotizar", nav_log: "Historial", nav_settings: "Ajustes",
   }
@@ -280,7 +329,8 @@ body{font-family:'Barlow',sans-serif;background:var(--g100);color:var(--g800);-w
 .app{max-width:430px;margin:0 auto;min-height:100dvh;background:var(--w);display:flex;flex-direction:column}
 .hdr{background:var(--navy);padding:13px 17px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
 .hdr-logo{display:flex;align-items:center;gap:9px}
-.lm{width:33px;height:33px;background:linear-gradient(135deg,var(--green),var(--gdk));border-radius:9px;display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:15px;color:#fff;flex-shrink:0}
+.lm{display:flex;align-items:center;flex-shrink:0}
+.lm svg{height:28px;width:auto}
 .lt{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:20px;color:#fff;letter-spacing:.4px}
 .lt span{color:var(--green)}
 .hdr-user{font-size:12px;color:rgba(255,255,255,.6);max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -384,7 +434,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
 .auth-link{font-size:13px;color:var(--gdk);font-weight:600;cursor:pointer;text-align:center;margin-top:12px}
 .auth-err{font-size:13px;color:var(--red);text-align:center;margin-top:8px;padding:8px;background:var(--rlt);border-radius:6px}
 .wlc{min-height:100dvh;background:var(--navy);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 28px;text-align:center}
-.wm{width:76px;height:76px;background:linear-gradient(135deg,var(--green),var(--gdk));border-radius:20px;display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:33px;color:#fff;margin-bottom:20px;box-shadow:0 12px 40px rgba(61,196,60,.4)}
+.wm{display:flex;align-items:center;justify-content:center;margin-bottom:20px}
 .wt{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:38px;color:#fff;margin-bottom:6px}
 .wt span{color:var(--green)}
 .wsub{font-size:15px;color:rgba(255,255,255,.45);margin-bottom:42px}
@@ -407,41 +457,81 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
 `;
 
 // ─── ICONS ────────────────────────────────────────────────────────────────────
+// ListoBid logo SVG recreated from brand asset
+// ─── LOGO COMPONENTS ─────────────────────────────────────────────────────────
+// LogoImg: actual PNG — used on white backgrounds (auth screens)
+const LogoImg = ({ width = 140 }) => (
+  <img src="/logo.PNG" alt="ListoBid"
+    style={{width, height:"auto", maxWidth:"100%", display:"block", objectFit:"contain"}} />
+);
+
+// LogoText: text wordmark — used on dark navy backgrounds (header, welcome)
+const LogoText = ({ size = 22 }) => (
+  <div style={{display:"flex",alignItems:"baseline",gap:0,lineHeight:1}}>
+    <span style={{fontFamily:"'Barlow',sans-serif",fontWeight:800,fontSize:size,color:"#ffffff",letterSpacing:-0.3}}>Listo</span>
+    <span style={{fontFamily:"'Barlow',sans-serif",fontWeight:800,fontSize:size,color:"#3DC43C",letterSpacing:-0.3}}>Bid</span>
+  </div>
+);
+
+// Component aliases
+const LogoMark     = () => <LogoText size={20}/>;
+const LogoWordmark = ({ dark = false }) => dark ? <LogoImg width={160}/> : <LogoText size={22}/>;
+const LogoCompact  = ({ size = 64 }) => <LogoImg width={size}/>;
+
+// ─── ICONS ────────────────────────────────────────────────────────────────────
+// ListoBid logo SVG recreated from brand asset
+// Auth screens (white bg) — use actual PNG
 const IcoCalc = () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="10" x2="10" y2="10"/><line x1="14" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="10" y2="14"/><line x1="14" y1="14" x2="16" y2="14"/><line x1="8" y1="18" x2="10" y2="18"/><line x1="14" y1="18" x2="16" y2="18"/></svg>;
 const IcoList = () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>;
 const IcoGear = () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>;
 
 // ─── ADDRESS AUTOCOMPLETE ─────────────────────────────────────────────────────
 function AddressInput({ value, onChange, placeholder = "123 Main St, Phoenix AZ" }) {
-  const [sugg, setSugg] = useState([]);
-  const [open, setOpen] = useState(false);
-  const timer = useRef(null);
+  const inputRef = useRef(null);
+  const autoRef  = useRef(null);
 
-  const fetch = async (input) => {
-    if (!input || input.length < 3 || GOOGLE_API_KEY === "YOUR_GOOGLE_PLACES_API_KEY") { setSugg([]); return; }
-    try {
-      const r = await window.fetch(`https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${encodeURIComponent(input)}&types=address&key=${GOOGLE_API_KEY}`);
-      const d = await r.json();
-      setSugg(d.predictions || []);
-    } catch { setSugg([]); }
-  };
+  useEffect(() => {
+    if (!inputRef.current) return;
+    const loadScript = () => {
+      if (window.google && window.google.maps && window.google.maps.places) {
+        initAutocomplete();
+        return;
+      }
+      if (document.getElementById("gmap-script")) return;
+      const script = document.createElement("script");
+      script.id = "gmap-script";
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_API_KEY}&libraries=places`;
+      script.async = true;
+      script.onload = initAutocomplete;
+      document.head.appendChild(script);
+    };
+    const initAutocomplete = () => {
+      if (!window.google || !inputRef.current) return;
+      autoRef.current = new window.google.maps.places.Autocomplete(inputRef.current, {
+        types: ["address"],
+        componentRestrictions: { country: "us" },
+      });
+      autoRef.current.addListener("place_changed", () => {
+        const place = autoRef.current.getPlace();
+        if (place && place.formatted_address) onChange(place.formatted_address);
+      });
+    };
+    loadScript();
+    return () => { if (autoRef.current) window.google?.maps?.event?.clearInstanceListeners(autoRef.current); };
+  }, []);
 
   return (
     <div className="addr-wrap">
-      <input type="text" value={value}
-        onChange={e => { onChange(e.target.value); clearTimeout(timer.current); timer.current = setTimeout(() => fetch(e.target.value), 300); setOpen(true); }}
-        onBlur={() => setTimeout(() => setOpen(false), 200)}
-        onFocus={() => setOpen(true)}
-        placeholder={placeholder} />
-      {open && sugg.length > 0 && (
-        <div className="addr-suggestions">
-          {sugg.map((s, i) => (
-            <div key={i} className="addr-item" onMouseDown={() => { onChange(s.description); setSugg([]); setOpen(false); }}>
-              📍 {s.description}
-            </div>
-          ))}
-        </div>
-      )}
+      <input
+        ref={inputRef}
+        type="text"
+        value={value}
+        onChange={e => onChange(e.target.value)}
+        placeholder={placeholder}
+        style={{width:"100%",padding:"10px 12px",border:"1.5px solid var(--g200)",borderRadius:"var(--rsm)",fontFamily:"'Barlow',sans-serif",fontSize:15,color:"var(--g800)",background:"var(--g50)",outline:"none"}}
+        onFocus={e=>{e.target.style.borderColor="var(--green)";e.target.style.background="#fff";}}
+        onBlur={e=>{e.target.style.borderColor="var(--g200)";e.target.style.background="var(--g50)";}}
+      />
     </div>
   );
 }
@@ -506,7 +596,27 @@ function AdminDashboard({ onClose }) {
   const [pass, setPass]     = useState("");
   const [err, setErr]       = useState(false);
   const [tab, setTab]       = useState("overview");
-  const [users, setUsers]   = useState(() => LS.get("lb_all_users", []));
+  const [users, setUsers] = useState([]);
+  const [loadingUsers, setLoadingUsers] = useState(true);
+
+  // Load all users from Supabase (using anon key — only works because we query profiles which has open select for now)
+  // In production this would use a service role key via edge function
+  useEffect(() => {
+    if (!authed) return;
+    setLoadingUsers(true);
+    sb.from("profiles").select("*").order("signup_date", { ascending: false }).then(({ data }) => {
+      if (data) setUsers(data.map(p => ({
+        email: p.email,
+        firstName: p.first_name,
+        industry: p.industry,
+        accountType: p.account_type,
+        signupDate: p.signup_date,
+        quotesGenerated: p.quotes_generated || 0,
+        id: p.id,
+      })));
+      setLoadingUsers(false);
+    });
+  }, [authed]);
 
   const totalMRR = users.filter(u => u.accountType === "paid").length * 19.99;
   const totalQ   = users.reduce((s, u) => s + (u.quotesGenerated || 0), 0);
@@ -520,18 +630,26 @@ function AdminDashboard({ onClose }) {
     return "locked";
   };
 
-  const updateUser = (email, updates) => {
+  const updateUser = async (email, updates) => {
     const next = users.map(u => u.email === email ? { ...u, ...updates } : u);
-    setUsers(next); LS.set("lb_all_users", next);
-    const key = `lb_user_${email.replace(/[^a-z0-9]/gi, "_")}`;
-    LS.set(key, { ...LS.get(key, {}), ...updates });
+    setUsers(next);
+    const user = users.find(u => u.email === email);
+    if (user?.id) {
+      const dbUpdates = {};
+      if (updates.accountType) dbUpdates.account_type = updates.accountType;
+      await sb.from("profiles").update(dbUpdates).eq("id", user.id);
+    }
   };
 
-  const deleteUser = (email) => {
+  const deleteUser = async (email) => {
     if (!window.confirm("Delete this user? Cannot be undone.")) return;
+    const user = users.find(u => u.email === email);
     const next = users.filter(u => u.email !== email);
-    setUsers(next); LS.set("lb_all_users", next);
-    LS.del(`lb_user_${email.replace(/[^a-z0-9]/gi, "_")}`);
+    setUsers(next);
+    if (user?.id) {
+      await sb.from("quotes").delete().eq("user_id", user.id);
+      await sb.from("profiles").delete().eq("id", user.id);
+    }
   };
 
   const statusStyle = { trial: { bg: "#EFF6FF", color: "#2563EB" }, free: { bg: "#DCFCE7", color: "#16A34A" }, paid: { bg: "#DCFCE7", color: "#16A34A" }, expired: { bg: "#FEF9C3", color: "#CA8A04" }, locked: { bg: "#FEE2E2", color: "#DC2626" } };
@@ -539,7 +657,7 @@ function AdminDashboard({ onClose }) {
   if (!authed) return (
     <div className="auth">
       <div className="auth-box">
-        <div className="auth-logo"><div className="lm" style={{ width: 64, height: 64, fontSize: 26, borderRadius: 16 }}>LB</div></div>
+        <div className="auth-logo"><LogoImg width={160}/></div>
         <div className="auth-title">Admin Portal</div>
         <div className="auth-sub">Restricted access</div>
         <div className="fi"><label className="lb">Password</label><input type="password" value={pass} onChange={e => { setPass(e.target.value); setErr(false); }} onKeyDown={e => e.key === "Enter" && (pass === ADMIN_PASSWORD ? (setAuthed(true), setErr(false)) : setErr(true))} autoFocus /></div>
@@ -554,8 +672,7 @@ function AdminDashboard({ onClose }) {
     <div style={{ minHeight: "100dvh", background: "var(--g100)", fontFamily: "'Barlow',sans-serif" }}>
       <div style={{ background: "var(--navy)", padding: "13px 20px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <div className="lm">LB</div>
-          <span className="lt">Listo<span>Bid</span></span>
+          <LogoWordmark/>
           <span style={{ fontSize: 11, fontWeight: 700, background: "rgba(61,196,60,.2)", color: "var(--green)", padding: "3px 10px", borderRadius: 20 }}>ADMIN</span>
         </div>
         <div style={{ display: "flex", gap: 8 }}>
@@ -595,7 +712,9 @@ function AdminDashboard({ onClose }) {
               <span style={{ fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 800, fontSize: 18, color: "var(--navy)" }}>All Users</span>
               <span style={{ fontSize: 13, color: "var(--g400)" }}>{users.length} total</span>
             </div>
-            {users.length === 0
+            {loadingUsers
+              ? <div className="empty">⏳ Loading users...</div>
+              : users.length === 0
               ? <div className="empty">👥 No registered users yet</div>
               : users.map(u => {
                   const s = getStatus(u);
@@ -641,6 +760,7 @@ export default function ListoBid() {
     if (u) return "welcome";
     return "welcome";
   });
+  const [sbLoading, setSbLoading] = useState(false);
 
   // ── Auth ──
   const [currentUser, setCurrentUser] = useState(() => LS.get("lb_current_user", null));
@@ -659,17 +779,24 @@ export default function ListoBid() {
   // ── Profile ──
   const defProfile = { laborRate: "", crewSize: "2", targetMargin: "40", targetDollar: "50", marginMode: "pct", zipCode: "", vehicles: "1", fuelType: "gas", overheadMode: "none", overheadPct: "15", overheadFlat: "10" };
   const [profile, setProfile] = useState(() => ({ ...defProfile, ...LS.get("lb_profile", {}) }));
-  const ps = (k, v) => { const p = { ...profile, [k]: v }; setProfile(p); LS.set("lb_profile", p); };
+  const ps = (k, v) => {
+    const p = { ...profile, [k]: v }; setProfile(p); LS.set("lb_profile", p);
+    // Sync to Supabase in background
+    if (currentUser?.id) sb.from("profiles").update({ profile_data: p }).eq("id", currentUser.id).then(() => {});
+  };
 
   // ── Job libraries ──
+  const initLang = LS.get("lb_lang", "en") || "en";
   const [allJobs, setAllJobsRaw] = useState(() => LS.get("lb_all_jobs", {
-    landscaping: INDUSTRY_TEMPLATES.landscaping.jobs.map(j => ({ ...j })),
-    pool:        INDUSTRY_TEMPLATES.pool.jobs.map(j => ({ ...j })),
-    handyman:    INDUSTRY_TEMPLATES.handyman.jobs.map(j => ({ ...j })),
+    landscaping: getJobs(INDUSTRY_TEMPLATES.landscaping, initLang),
+    pool:        getJobs(INDUSTRY_TEMPLATES.pool,        initLang),
+    handyman:    getJobs(INDUSTRY_TEMPLATES.handyman,    initLang),
   }));
   const setAllJobs = (updater) => {
     const next = typeof updater === "function" ? updater(allJobs) : updater;
     setAllJobsRaw(next); LS.set("lb_all_jobs", next);
+    // Sync to Supabase in background
+    if (currentUser?.id) sb.from("profiles").update({ jobs_data: next }).eq("id", currentUser.id).then(() => {});
   };
   const jobs    = allJobs[industry] || [];
   const setJobs = (upd) => setAllJobs(prev => ({ ...prev, [industry]: typeof upd === "function" ? upd(prev[industry] || []) : upd }));
@@ -682,7 +809,7 @@ export default function ListoBid() {
   const [exactMi, setExactMi] = useState("");
   const [vehs,    setVehs]    = useState(() => LS.get("lb_profile", { vehicles: "1" }).vehicles || "1");
   const [margin,  setMargin]  = useState(() => pf(LS.get("lb_profile", { targetMargin: "40" }).targetMargin, 40));
-  const [gasPrice, setGasPrice] = useState(() => LS.get("lb_gas_price", ""));
+  const [gasPrice, setGasPrice] = useState(() => LS.get("lb_gas_price", "0.00"));
   const [qMarginMode, setQMarginMode] = useState(() => LS.get("lb_profile", { marginMode: "pct" }).marginMode || "pct");
   const [qTargetDollar, setQTargetDollar] = useState(() => LS.get("lb_profile", { targetDollar: "50" }).targetDollar || "50");
   const [qOverheadMode, setQOverheadMode] = useState(() => LS.get("lb_profile", { overheadMode: "none" }).overheadMode || "none");
@@ -702,6 +829,7 @@ export default function ListoBid() {
 
   // ── Settings ──
   const [settView, setSettView] = useState("main");
+  const [showLegal, setShowLegal] = useState(false);
   const [showDataWarn, setShowDataWarn] = useState(false);
   const [showReminder, setShowReminder] = useState(false);
   const [reminderShown, setReminderShown] = useState(() => LS.get("lb_reminder_shown", { d10: false, d13: false }));
@@ -727,6 +855,40 @@ export default function ListoBid() {
   // ── Persist log ──
   useEffect(() => { LS.set("lb_quote_log", log); }, [log]);
 
+  // ── Restore Supabase session on mount ──
+  useEffect(() => {
+    sb.auth.getSession().then(({ data: { session } }) => {
+      if (!session) return;
+      if (LS.get("lb_current_user", null)) return; // already loaded from cache
+      setSbLoading(true);
+      sb.from("profiles").select("*").eq("id", session.user.id).single().then(({ data: profile }) => {
+        if (!profile) { setSbLoading(false); return; }
+        const user = {
+          id: session.user.id,
+          firstName: profile.first_name || "User",
+          email: session.user.email,
+          signupDate: profile.signup_date || new Date().toISOString(),
+          accountType: profile.account_type || "trial",
+          industry: profile.industry || null,
+          quotesGenerated: profile.quotes_generated || 0,
+          lastActive: new Date().toISOString(),
+        };
+        if (profile.profile_data) { const p = { ...LS.get("lb_profile", {}), ...profile.profile_data }; LS.set("lb_profile", p); setProfile(p); }
+        if (profile.jobs_data)    { LS.set("lb_all_jobs", profile.jobs_data); setAllJobsRaw(profile.jobs_data); }
+        if (user.industry)        { LS.set("lb_industry", user.industry); setIndustry(user.industry); }
+        LS.set("lb_current_user", user);
+        setCurrentUser(user);
+        const l = LS.get("lb_lang", null);
+        if (l && user.industry) setRoute("app");
+        else if (l) setRoute("industry");
+        setSbLoading(false);
+      });
+    });
+    sb.auth.onAuthStateChange((event) => {
+      if (event === "SIGNED_OUT") { LS.del("lb_current_user"); setCurrentUser(null); setRoute("login"); }
+    });
+  }, []);
+
   // ── Trial reminders ──
   useEffect(() => {
     if (!currentUser || currentUser.accountType !== "trial") return;
@@ -749,40 +911,106 @@ export default function ListoBid() {
   // ── Auth ──
   const validateEmail = (e) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);
 
-  const handleRegister = () => {
+  const handleRegister = async () => {
     setAuthErr("");
     if (!regForm.firstName.trim()) return setAuthErr("Please enter your first name");
     if (!validateEmail(regForm.email)) return setAuthErr(t.emailInvalid);
     if (regForm.password.length < 8)  return setAuthErr(t.passMin);
     if (regForm.password !== regForm.confirm) return setAuthErr(t.passMismatch);
-    const key = `lb_user_${regForm.email.toLowerCase().replace(/[^a-z0-9]/gi, "_")}`;
-    if (LS.get(key, null)) return setAuthErr(t.emailTaken);
-    const user = { firstName: regForm.firstName.trim(), email: regForm.email.toLowerCase().trim(), password: regForm.password, signupDate: new Date().toISOString(), accountType: "trial", industry: null, quotesGenerated: 0, lastActive: new Date().toISOString() };
-    LS.set(key, user); LS.set("lb_current_user", user);
-    const all = LS.get("lb_all_users", []); all.push(user); LS.set("lb_all_users", all);
-    setCurrentUser(user); setShowDataWarn(true);
-    setRoute(!lang ? "welcome" : "industry");
+    try {
+      const { data, error } = await sb.auth.signUp({
+        email: regForm.email.toLowerCase().trim(),
+        password: regForm.password,
+      });
+      if (error) {
+        if (error.message.includes("already registered")) return setAuthErr(t.emailTaken);
+        return setAuthErr(error.message);
+      }
+      const user = {
+        id: data.user.id,
+        firstName: regForm.firstName.trim(),
+        email: regForm.email.toLowerCase().trim(),
+        signupDate: new Date().toISOString(),
+        accountType: "trial",
+        industry: null,
+        quotesGenerated: 0,
+        lastActive: new Date().toISOString(),
+      };
+      // Save profile to Supabase
+      await sb.from("profiles").insert({
+        id: data.user.id,
+        first_name: user.firstName,
+        email: user.email,
+        account_type: "trial",
+        signup_date: user.signupDate,
+        profile_data: LS.get("lb_profile", {}),
+        jobs_data: allJobs,
+      });
+      // Also cache locally for fast access
+      LS.set("lb_current_user", user);
+      setCurrentUser(user);
+      setShowDataWarn(true);
+      setRoute(!lang ? "welcome" : "industry");
+    } catch (e) {
+      setAuthErr("Registration failed. Please try again.");
+    }
   };
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     setAuthErr("");
     if (!validateEmail(loginForm.email)) return setAuthErr(t.emailInvalid);
-    const key = `lb_user_${loginForm.email.toLowerCase().replace(/[^a-z0-9]/gi, "_")}`;
-    const user = LS.get(key, null);
-    if (!user || user.password !== loginForm.password) return setAuthErr(t.invalidCreds);
-    const updated = { ...user, lastActive: new Date().toISOString() };
-    LS.set(key, updated); LS.set("lb_current_user", updated);
-    setCurrentUser(updated);
-    const savedInd = LS.get("lb_industry", null);
-    setIndustry(savedInd);
-    setRoute(!lang ? "welcome" : !savedInd ? "industry" : "app");
+    try {
+      const { data, error } = await sb.auth.signInWithPassword({
+        email: loginForm.email.toLowerCase().trim(),
+        password: loginForm.password,
+      });
+      if (error) return setAuthErr(t.invalidCreds);
+      // Load profile from Supabase
+      const { data: profile } = await sb.from("profiles").select("*").eq("id", data.user.id).single();
+      const user = {
+        id: data.user.id,
+        firstName: profile?.first_name || "User",
+        email: data.user.email,
+        signupDate: profile?.signup_date || new Date().toISOString(),
+        accountType: profile?.account_type || "trial",
+        industry: profile?.industry || null,
+        quotesGenerated: profile?.quotes_generated || 0,
+        lastActive: new Date().toISOString(),
+      };
+      // Restore profile settings and jobs from Supabase
+      if (profile?.profile_data) LS.set("lb_profile", profile.profile_data);
+      if (profile?.jobs_data)    LS.set("lb_all_jobs", profile.jobs_data);
+      if (user.industry)         LS.set("lb_industry", user.industry);
+      // Update last active in Supabase
+      await sb.from("profiles").update({ last_active: new Date().toISOString() }).eq("id", data.user.id);
+      LS.set("lb_current_user", user);
+      setCurrentUser(user);
+      const savedInd = user.industry;
+      setIndustry(savedInd);
+      setRoute(!lang ? "welcome" : !savedInd ? "industry" : "app");
+    } catch (e) {
+      setAuthErr("Login failed. Please try again.");
+    }
   };
 
-  const handleLogout = () => { LS.del("lb_current_user"); setCurrentUser(null); setRoute("login"); };
+  const handleLogout = async () => {
+    await sb.auth.signOut();
+    LS.del("lb_current_user");
+    setCurrentUser(null);
+    setRoute("login");
+  };
 
-  const handleResetPass = () => {
+  const handleResetPass = async () => {
     if (!validateEmail(resetEmail)) return setAuthErr(t.emailInvalid);
-    setResetSent(true); setAuthErr("");
+    try {
+      const { error } = await sb.auth.resetPasswordForEmail(resetEmail, {
+        redirectTo: "https://listobid.com/reset",
+      });
+      if (error) return setAuthErr(error.message);
+      setResetSent(true); setAuthErr("");
+    } catch (e) {
+      setAuthErr("Could not send reset email. Try again.");
+    }
   };
 
   const incrementQuotes = useCallback(() => {
@@ -813,10 +1041,30 @@ export default function ListoBid() {
 
   const reset = () => { setSelJob(""); setHours(""); setMats(""); setTier("short"); setExactMi(""); setVehs(profile.vehicles); setMargin(pf(profile.targetMargin, 40)); setResult(null); setShowAct(false); };
 
-  const saveQuote = () => {
+  const saveQuote = async () => {
     if (!saveName.trim() || !result) return;
-    const entry = { id: Date.now(), name: saveName.trim(), notes: saveNotes.trim(), address: saveAddress.trim(), price: result.price, margin: result.margin, profit: result.profit, date: new Date().toLocaleDateString(), jobType: jobs.find(j => String(j.id) === String(selJob))?.name || "—", industry: industry || "landscaping", converted: false };
+    const entry = {
+      id: Date.now(), name: saveName.trim(), notes: saveNotes.trim(),
+      address: saveAddress.trim(), price: result.price, margin: result.margin,
+      profit: result.profit, date: new Date().toLocaleDateString(),
+      jobType: jobs.find(j => String(j.id) === String(selJob))?.name || "—",
+      industry: industry || "landscaping", converted: false,
+    };
+    // Save to local log immediately for fast UI
     const nl = [entry, ...log]; setLog(nl); LS.set("lb_quote_log", nl);
+    // Save to Supabase in background
+    if (currentUser?.id) {
+      try {
+        await sb.from("quotes").insert({
+          user_id: currentUser.id, name: entry.name, address: entry.address,
+          notes: entry.notes, price: entry.price, cost: result.cost,
+          profit: entry.profit, margin: entry.margin, job_type: entry.jobType,
+          industry: entry.industry, converted: false,
+        });
+        // Update quote count
+        await sb.from("profiles").update({ quotes_generated: (currentUser.quotesGenerated || 0) + 1 }).eq("id", currentUser.id);
+      } catch (e) { /* silent fail — local copy saved */ }
+    }
     setShowSave(false); setSaveName(""); setSaveNotes(""); setSaveAddress(""); setShowAct(false); reset();
   };
 
@@ -831,9 +1079,8 @@ export default function ListoBid() {
   if (!lang || route === "welcome") return (
     <><style>{CSS}</style>
     <div className="wlc">
-      <div className="wm">LB</div>
-      <h1 className="wt">Listo<span>Bid</span></h1>
-      <p className="wsub">Ready to Bid.</p>
+      <div style={{marginBottom:24,marginTop:8}}><LogoMark size={34}/></div>
+      <p className="wsub" style={{marginBottom:42}}>Ready to Bid.</p>
       <div className="ls">
         <button className="lbtn len" onClick={() => { setLang("en"); LS.set("lb_lang", "en"); setRoute(currentUser ? (industry ? "app" : "industry") : "register"); }}>🇺🇸 &nbsp;English</button>
         <button className="lbtn les" onClick={() => { setLang("es"); LS.set("lb_lang", "es"); setRoute(currentUser ? (industry ? "app" : "industry") : "register"); }}>🇲🇽 &nbsp;Español</button>
@@ -845,7 +1092,7 @@ export default function ListoBid() {
     <><style>{CSS}</style>
     <div className="auth">
       <div className="auth-box">
-        <div className="auth-logo"><div className="lm" style={{ width: 64, height: 64, fontSize: 26, borderRadius: 16 }}>LB</div></div>
+        <div className="auth-logo"><LogoImg width={160}/></div>
         <div className="auth-title">{t.register}</div>
         <div className="auth-sub">{t.welcomeSub}</div>
         <div className="fi"><label className="lb">{t.firstName}</label><input type="text" value={regForm.firstName} onChange={e => setRegForm(f => ({ ...f, firstName: e.target.value }))} placeholder="Carlos" autoFocus /></div>
@@ -863,7 +1110,7 @@ export default function ListoBid() {
     <><style>{CSS}</style>
     <div className="auth">
       <div className="auth-box">
-        <div className="auth-logo"><div className="lm" style={{ width: 64, height: 64, fontSize: 26, borderRadius: 16 }}>LB</div></div>
+        <div className="auth-logo"><LogoImg width={160}/></div>
         <div className="auth-title">{t.login}</div>
         <div className="auth-sub">{t.welcomeSub}</div>
         <div className="fi"><label className="lb">{t.email}</label><input type="email" value={loginForm.email} onChange={e => setLoginForm(f => ({ ...f, email: e.target.value }))} placeholder="you@email.com" autoFocus /></div>
@@ -885,7 +1132,7 @@ export default function ListoBid() {
     <><style>{CSS}</style>
     <div className="auth">
       <div className="auth-box">
-        <div className="auth-logo"><div className="lm" style={{ width: 64, height: 64, fontSize: 26, borderRadius: 16 }}>LB</div></div>
+        <div className="auth-logo"><LogoImg width={160}/></div>
         <div className="auth-title">{t.resetPass}</div>
         {resetSent
           ? <><div style={{ fontSize: 14, color: "var(--gdk)", textAlign: "center", padding: "16px 0", lineHeight: 1.6 }}>✅ {t.resetSent}</div><button className="btn bp" onClick={() => { setResetSent(false); setRoute("login"); }}>{t.signIn}</button></>
@@ -899,12 +1146,12 @@ export default function ListoBid() {
     </div></>
   );
 
-  if (!currentUser) return (<><style>{CSS}</style><div className="auth"><div className="auth-box"><div className="auth-logo"><div className="lm" style={{width:64,height:64,fontSize:26,borderRadius:16}}>LB</div></div><div className="auth-title">{t.login}</div><button className="btn bp mt8" onClick={()=>setRoute("login")}>{t.signIn}</button><button className="btn bg mt8" onClick={()=>setRoute("register")}>{t.signUp}</button></div></div></>);
+  if (!currentUser) return (<><style>{CSS}</style><div className="auth"><div className="auth-box"><div className="auth-logo"><LogoImg width={160}/></div><div className="auth-title">{t.login}</div><button className="btn bp mt8" onClick={()=>setRoute("login")}>{t.signIn}</button><button className="btn bg mt8" onClick={()=>setRoute("register")}>{t.signUp}</button></div></div></>);
 
   if (trial.hardLock) return (
     <><style>{CSS}</style>
     <div className="wlc">
-      <div className="wm">LB</div>
+      
       <p style={{ fontSize: 22, color: "#fff", fontWeight: 700, marginBottom: 10 }}>{t.trialExpiredTitle}</p>
       <p style={{ fontSize: 14, color: "rgba(255,255,255,.5)", marginBottom: 32, maxWidth: 280, lineHeight: 1.6 }}>{t.trialExpiredBody}</p>
       <div style={{ background: "rgba(255,255,255,.06)", border: "1px solid rgba(255,255,255,.1)", borderRadius: 14, padding: "18px 22px", marginBottom: 24, width: "100%", maxWidth: 300 }}>
@@ -919,7 +1166,7 @@ export default function ListoBid() {
   if (!industry || route === "industry") return (
     <><style>{CSS}</style>
     <div className="app">
-      <div className="hdr"><div className="hdr-logo"><div className="lm">LB</div><span className="lt">Listo<span>Bid</span></span></div></div>
+      <div className="hdr"><div className="hdr-logo"><LogoWordmark size={22}/></div></div>
       <div className="ct" style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: "70dvh", textAlign: "center" }}>
         <div style={{ fontSize: 28, marginBottom: 8 }}>👋</div>
         <div className="st" style={{ marginBottom: 4 }}>{lang === "es" ? `Hola, ${currentUser.firstName}!` : `Hi, ${currentUser.firstName}!`}</div>
@@ -933,7 +1180,16 @@ export default function ListoBid() {
                 const uk = `lb_user_${currentUser.email.replace(/[^a-z0-9]/gi, "_")}`;
                 const upd = { ...currentUser, industry: key };
                 LS.set("lb_industry", key); LS.set(uk, upd); LS.set("lb_current_user", upd);
-                setCurrentUser(upd); setIndustry(key); setStep(1); setRoute("setup");
+                setCurrentUser(upd); setIndustry(key);
+                // Initialize job library in correct language if not already set
+                const existing = LS.get("lb_all_jobs", null);
+                if (!existing || !existing[key] || existing[key].length === 0) {
+                  const newJobs = { ...(existing || {}), [key]: getJobs(INDUSTRY_TEMPLATES[key], lang || "en") };
+                  LS.set("lb_all_jobs", newJobs); setAllJobsRaw(newJobs);
+                }
+                // Save industry to Supabase
+                if (upd.id) sb.from("profiles").update({ industry: key }).eq("id", upd.id).then(() => {});
+                setStep(1); setRoute("setup");
               }}
               onMouseEnter={e => { e.currentTarget.style.borderColor = "var(--green)"; e.currentTarget.style.background = "var(--glt)"; }}
               onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--g200)"; e.currentTarget.style.background = "var(--w)"; }}>
@@ -973,11 +1229,16 @@ export default function ListoBid() {
         {profile.overheadMode==="pct" && <div className="fi"><label className="lb">Overhead %</label><div className="sx"><input type="number" min="0" max="100" value={profile.overheadPct} onChange={e=>ps("overheadPct",e.target.value)} placeholder="15"/><span className="sxs">%</span></div><div className="ht">{t.overheadHint}</div></div>}
         {profile.overheadMode==="flat" && <div className="fi"><label className="lb">Overhead per Job</label><div className="px"><span className="pxs">$</span><input type="number" min="0" value={profile.overheadFlat} onChange={e=>ps("overheadFlat",e.target.value)} placeholder="10"/></div></div>}
       </div>,
-      // Step 2: Location & Fuel
+      // Step 2: Fuel Cost
       <div key="s2">
-        <div className="st">{t.setup}</div><div className="ss">{t.step} 2 {t.of} {TOTAL_STEPS} — Location & Fuel</div>
-        <div className="fi"><label className="lb">{t.zipCode}</label><input type="text" value={profile.zipCode} onChange={e=>ps("zipCode",e.target.value)} placeholder="85001" maxLength={5}/><div className="ht">{t.zipHint}</div></div>
-        <div className="fi"><label className="lb">{t.fuelType}</label><div className="tg"><button className={`tb ${profile.fuelType==="gas"?"on":""}`} onClick={()=>ps("fuelType","gas")}>⛽ {t.gas}</button><button className={`tb ${profile.fuelType==="diesel"?"on":""}`} onClick={()=>ps("fuelType","diesel")}>🛢 {t.diesel}</button></div></div>
+        <div className="st">{t.setup}</div><div className="ss">{t.step} 2 {t.of} {TOTAL_STEPS} — Fuel Cost</div>
+        <div className="fi">
+          <label className="lb">{t.gasPriceLabel}</label>
+          <div className="px"><span className="pxs">$</span>
+            <input type="number" step="0.01" min="0" value={gasPrice} onChange={e=>setGasPrice(e.target.value)} placeholder="3.42"/>
+          </div>
+          <div className="ht">Enter your typical price per gallon at the pump. You can update this on each quote.</div>
+        </div>
       </div>,
       // Step 3: Vehicles
       <div key="s3">
@@ -1001,7 +1262,7 @@ export default function ListoBid() {
     return (
       <><style>{CSS}</style>
       <div className="app">
-        <div className="hdr"><div className="hdr-logo"><div className="lm">LB</div><span className="lt">Listo<span>Bid</span></span></div></div>
+        <div className="hdr"><div className="hdr-logo"><LogoWordmark size={22}/></div></div>
         <div className="ct">
           <div className="steps">{Array.from({length:TOTAL_STEPS},(_,i)=>i+1).map(i=><div key={i} className={`sd ${i<step?"done":i===step?"active":""}`}/>)}</div>
           {stepContent[step-1]}
@@ -1009,7 +1270,7 @@ export default function ListoBid() {
           <button className="btn bp" onClick={()=>{ if(step<TOTAL_STEPS){setStep(s=>s+1);}else{setStep(0);setRoute("app");} }}>
             {step===TOTAL_STEPS?t.saveProfile:t.continue}
           </button>
-          {step>1&&<button className="btn bg mt8" onClick={()=>setStep(s=>s-1)}>{t.back}</button>}
+          <button className="btn bg mt8" onClick={()=>{ if(step>1){setStep(s=>s-1);}else{setRoute("industry");setStep(0);} }}>{t.back}</button>
         </div>
       </div>
       {showDataWarn && (
@@ -1032,7 +1293,7 @@ export default function ListoBid() {
     <><style>{CSS}</style>
     <div className="app">
       <div className="hdr">
-        <div className="hdr-logo"><div className="lm">LB</div><span className="lt">Listo<span>Bid</span></span></div>
+        <div className="hdr-logo"><LogoWordmark size={22}/></div>
         <div className="hdr-user">👤 {currentUser?.firstName}</div>
       </div>
 
@@ -1138,14 +1399,18 @@ export default function ListoBid() {
                 <span className="pxs">$</span>
                 <input type="number" step="0.01" min="0" value={gasPrice} onChange={e=>{setGasPrice(e.target.value);setResult(null);}} placeholder={t.enterManual}/>
               </div>
-              <div className="ht" style={{marginTop:6}}>{profile.fuelType==="diesel"?"🛢 Diesel":"⛽ Gasoline"} · {t.gasPump}</div>
+              <div className="ht" style={{marginTop:6}}>⛽ {t.gasPump}</div>
             </div>
 
             {/* Calculate */}
-            <button className="btn bp" style={{opacity:canCalc?1:.45}} onClick={()=>doCalc()}>{t.calculate}</button>
+            <button className="btn bp" style={{opacity:canCalc?1:.45}} onClick={()=>{doCalc();setTimeout(()=>{document.getElementById("quote-result")?.scrollIntoView({behavior:"smooth",block:"start"})},100);}}>{t.calculate}</button>
 
             {result && <>
-              <div style={{height:16}}/>
+              <div id="quote-result" style={{height:4}}/>
+              <div style={{background:"var(--green)",borderRadius:10,padding:"12px 16px",marginBottom:12,display:"flex",alignItems:"center",gap:10}}>
+                <span style={{fontSize:20}}>✅</span>
+                <span style={{color:"#fff",fontWeight:700,fontSize:14}}>{lang==="es"?"Tu cotización está lista — mira abajo ↓":"Your quote is ready — see below ↓"}</span>
+              </div>
 
               {/* Price card */}
               <div className="rc">
@@ -1196,8 +1461,8 @@ export default function ListoBid() {
 
               {/* Post-result */}
               {!showAct
-                ? <button className="btn bg" onClick={()=>setShowAct(true)}>{t.donePrompt}</button>
-                : <div className="ac"><div className="ac-t">{t.whatsNext}</div>
+                ? <button className="btn bg" onClick={()=>{ setShowAct(true); setTimeout(()=>{ document.getElementById("quote-actions")?.scrollIntoView({behavior:"smooth",block:"start"}); },100); }}>{t.donePrompt}</button>
+                : <div className="ac" id="quote-actions"><div className="ac-t">{t.whatsNext}</div>
                     <div className="ac-s">
                       <button className="btn bp" onClick={()=>setShowSave(true)}>{t.saveToLog}</button>
                       <button className="btn bg" onClick={()=>setShowAct(false)}>{t.keepEditing}</button>
@@ -1294,6 +1559,7 @@ export default function ListoBid() {
                 </div>
               </div>
               <div className="sr" style={{cursor:"default"}}><span className="sr-l">{t.support}</span><span className="sr-v" style={{fontSize:12}}>{t.supportEmail}</span></div>
+              <div className="sr" style={{cursor:"pointer"}} onClick={()=>setShowLegal(true)}><span className="sr-l">Legal</span><span className="sr-v">›</span></div>
               <div className="sr" style={{cursor:"default"}}>
                 <span className="sr-l" style={{color:"var(--g400)",fontSize:13}}>⚠️ {t.dataWarningShort}</span>
                 <span style={{fontSize:12,color:"var(--green)",cursor:"pointer",fontWeight:600}} onClick={()=>setShowDataWarn(true)}>Info</span>
@@ -1327,8 +1593,8 @@ export default function ListoBid() {
               </div>
               {profile.overheadMode==="pct"&&<div className="fi"><div className="sx"><input type="number" min="0" max="100" value={profile.overheadPct} onChange={e=>ps("overheadPct",e.target.value)}/><span className="sxs">%</span></div><div className="ht">{t.overheadHint}</div></div>}
               {profile.overheadMode==="flat"&&<div className="fi"><div className="px"><span className="pxs">$</span><input type="number" min="0" value={profile.overheadFlat} onChange={e=>ps("overheadFlat",e.target.value)}/></div></div>}
-              <div className="fi"><label className="lb">{t.zipCode}</label><input type="text" value={profile.zipCode} onChange={e=>ps("zipCode",e.target.value)} maxLength={5}/></div>
-              <div className="fi"><label className="lb">{t.fuelType}</label><div className="tg"><button className={`tb ${profile.fuelType==="gas"?"on":""}`} onClick={()=>ps("fuelType","gas")}>⛽ {t.gas}</button><button className={`tb ${profile.fuelType==="diesel"?"on":""}`} onClick={()=>ps("fuelType","diesel")}>🛢 {t.diesel}</button></div></div>
+
+
               <div className="fi" style={{marginBottom:0}}><label className="lb">{t.vehicles}</label><div className="tg">{[1,2,3,4,5].map(x=><button key={x} className={`tb ${profile.vehicles===String(x)?"on":""}`} onClick={()=>ps("vehicles",String(x))}>{x}</button>)}</div></div>
             </div>
             <button className="btn bp" onClick={()=>setSettView("main")}>{t.saveProfile}</button>
@@ -1336,7 +1602,7 @@ export default function ListoBid() {
 
           {settView==="jobs" && <JobLibrary jobs={jobs} setJobs={setJobs} t={t} onBack={()=>setSettView("main")} backLabel={t.back}/>}
 
-          {settView==="industry" && <>
+                    {settView==="industry" && <>
             <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:17}}>
               <button className="btn bsm bg" onClick={()=>setSettView("main")}>← {t.back}</button>
               <div className="st" style={{margin:0}}>{t.industryLabel}</div>
@@ -1377,6 +1643,33 @@ export default function ListoBid() {
         </div>
       </div>
     )}
+
+    {/* Legal Modal */}
+    {showLegal&&(
+      <div className="ov" onClick={()=>setShowLegal(false)}>
+        <div className="mo" onClick={e=>e.stopPropagation()} style={{maxHeight:"85dvh",overflowY:"auto"}}>
+          <div className="mo-t">⚖️ {lang==="es"?"Aviso Legal":"Legal Disclaimer"}</div>
+          {lang==="es" ? (
+            <>
+              <p style={{fontSize:13,color:"var(--g600)",lineHeight:1.7,marginBottom:14}}>ListoBid es una herramienta de estimación de precios diseñada para ayudar a operadores de servicios independientes a calcular cotizaciones sugeridas. Los cálculos son únicamente estimaciones basadas en los datos ingresados y no constituyen asesoramiento financiero, legal ni comercial.</p>
+              <p style={{fontSize:13,color:"var(--g600)",lineHeight:1.7,marginBottom:14}}>ListoBid LLC no garantiza la exactitud ni idoneidad de ningún precio calculado. Los precios reales pueden variar según las condiciones del mercado, requisitos legales y otros factores fuera del control de esta aplicación.</p>
+              <p style={{fontSize:13,color:"var(--g600)",lineHeight:1.7,marginBottom:14}}>El usuario acepta toda la responsabilidad por los precios que establezca con sus clientes. ListoBid LLC no será responsable de ninguna pérdida, disputa o daño que surja del uso de esta aplicación.</p>
+              <p style={{fontSize:13,color:"var(--g600)",lineHeight:1.7,marginBottom:20}}>Al usar ListoBid, usted reconoce haber leído y aceptado estos términos. ListoBid LLC · {new Date().getFullYear()}</p>
+            </>
+          ) : (
+            <>
+              <p style={{fontSize:13,color:"var(--g600)",lineHeight:1.7,marginBottom:14}}>ListoBid is a pricing estimation tool designed to help independent field service operators calculate suggested job quotes. All calculations are estimates only, based on user-entered data, and do not constitute financial, legal, or professional advice.</p>
+              <p style={{fontSize:13,color:"var(--g600)",lineHeight:1.7,marginBottom:14}}>ListoBid LLC makes no warranty regarding the accuracy, completeness, or suitability of any calculated price for any specific job or market. Actual costs and profitability may vary based on local conditions, regulations, fuel prices, and other factors outside the control of this application.</p>
+              <p style={{fontSize:13,color:"var(--g600)",lineHeight:1.7,marginBottom:14}}>The user assumes full responsibility for all pricing decisions made with their clients. ListoBid LLC shall not be liable for any financial loss, dispute, or damages arising from use of this application.</p>
+              <p style={{fontSize:13,color:"var(--g600)",lineHeight:1.7,marginBottom:20}}>By using ListoBid, you acknowledge that you have read and agree to these terms. ListoBid LLC · {new Date().getFullYear()}</p>
+            </>
+          )}
+          <button className="btn bp" onClick={()=>setShowLegal(false)}>{lang==="es"?"Entendido":"Got it"}</button>
+        </div>
+      </div>
+    )}
+
+
 
     {/* Data Warning Modal */}
     {showDataWarn&&(
