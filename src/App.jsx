@@ -1,12 +1,12 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+import { createClient } from "@supabase/supabase-js";;
 
 // ─── CONFIG ───────────────────────────────────────────────────────────────────
 const STRIPE_LINK      = "https://buy.stripe.com/test_dRm8wRb6e4Hu4Rm3ib2VG00";
 const TRIAL_DAYS       = 14;
 const SOFT_LOCK_DAYS   = 5;
 const ADMIN_PASSWORD   = "listobid2026";
-const GOOGLE_API_KEY   = "AIzaSyD-biCG8bnGAyf0u9cgP0E1SXMRZ6yhYfg";
+const GOOGLE_API_KEY   = "AIzaSyBfC5MB_fkiL9c5XGORmZZDoPACfD9gzOk";
 const SUPABASE_URL     = "https://ljtvktacmabgixjbsdii.supabase.co";
 const SUPABASE_ANON    = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxqdHZrdGFjbWFiZ2l4amJzZGlpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3MDQwNDksImV4cCI6MjA5NDI4MDA0OX0.y7qIYZsAJGiPhIUGWvRj8_akHys71MPgScjpHZCEDvQ";
 
