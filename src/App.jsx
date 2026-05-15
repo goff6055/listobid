@@ -1498,13 +1498,13 @@ export default function ListoBid() {
               {/* Breakdown */}
               <div className="card">
                 <div className="ct2">{t.breakdown}</div>
-                <div className="bk"><span className="bk-l">⚒ {t.laborCost}</span><span className="bk-v">{$v(result.labor)}</span></div>
+                <div className="bk"><span className="bk-l">{t.laborCost}</span><span className="bk-v">{$v(result.labor)}</span></div>
                 <div className="bk">
-                  <span className="bk-l">⛽ {t.fuelCost} </span>
+                  <span className="bk-l">{t.fuelCost} </span>
                   <span className="bk-v">{$v(result.fuel)}</span>
                 </div>
-                <div className="bk"><span className="bk-l">🪴 {t.matsLabel}</span><span className="bk-v">{$v(result.mats)}</span></div>
-                {result.overhead > 0 && <div className="bk"><span className="bk-l">🏢 {t.overheadCost} {qOverheadMode==="pct"?`(${qOverheadPct}% of labor)`:"(flat)"}</span><span className="bk-v">{$v(result.overhead)}</span></div>}
+                <div className="bk"><span className="bk-l">{t.matsLabel}</span><span className="bk-v">{$v(result.mats)}</span></div>
+                {result.overhead > 0 && <div className="bk"><span className="bk-l">{t.overheadCost} {qOverheadMode==="pct"?`(${qOverheadPct}% of labor)`:"(flat)"}</span><span className="bk-v">{$v(result.overhead)}</span></div>}
                 <div className="bk bk-tot"><span className="bk-l">{t.totalCost}</span><span className="bk-v">{$v(result.cost)}</span></div>
               </div>
 
@@ -1589,7 +1589,7 @@ export default function ListoBid() {
 
             {currentUser.accountType==="paid"&&<div style={{background:"var(--glt)",border:"1px solid #A7F3D0",borderRadius:10,padding:"12px 16px",marginBottom:12,fontSize:13,color:"var(--gdk)",fontWeight:600}}>✅ Active Subscriber</div>}
             {currentUser.accountType !== "paid" && (
-              <div style={{background:"var(--glt)",border:"1px solid #A7F3D0",borderRadius:10,padding:"12px 16px",marginBottom:12,fontSize:13,color:"var(--gdk)",fontWeight:600}}>Free Access</div>
+              <div style={{background:"var(--glt)",border:"1px solid #A7F3D0",borderRadius:10,padding:"12px 16px",marginBottom:12,fontSize:13,color:"var(--gdk)",fontWeight:600}}>{lang==="es"?"Acceso Gratuito":"Free Access"}</div>
             )}
             <div className="card">
               <div className="sr" style={{cursor:"pointer"}} onClick={()=>setSettView("profile")}><span className="sr-l">{t.editProfile}</span><span className="sr-v">›</span></div>
@@ -1689,7 +1689,7 @@ export default function ListoBid() {
     {showLegal&&(
       <div className="ov" onClick={()=>setShowLegal(false)}>
         <div className="mo" onClick={e=>e.stopPropagation()} style={{maxHeight:"85dvh",overflowY:"auto"}}>
-          <div className="mo-t">⚖️ {lang==="es"?"Aviso Legal":"Legal Disclaimer"}</div>
+          <div className="mo-t">{lang==="es"?"Aviso Legal":"Legal Disclaimer"}</div>
           {lang==="es" ? (
             <>
               <p style={{fontSize:13,color:"var(--g600)",lineHeight:1.7,marginBottom:14}}>ListoBid es una herramienta de estimación de precios diseñada para ayudar a operadores de servicios independientes a calcular cotizaciones sugeridas. Los cálculos son únicamente estimaciones basadas en los datos ingresados y no constituyen asesoramiento financiero, legal ni comercial.</p>
