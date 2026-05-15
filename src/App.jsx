@@ -628,10 +628,7 @@ function AdminDashboard({ onClose }) {
   const getStatus = (u) => {
     if (u.accountType === "free") return "free";
     if (u.accountType === "paid") return "paid";
-    const d = Math.floor((Date.now() - new Date(u.signupDate)) / 86400000);
-    if (d <= TRIAL_DAYS) return "trial";
-    if (d <= TRIAL_DAYS + SOFT_LOCK_DAYS) return "expired";
-    return "locked";
+    return "free"; // treat all others as free during beta
   };
 
   const updateUser = async (email, updates) => {
@@ -736,9 +733,8 @@ function AdminDashboard({ onClose }) {
                         <span style={{ background: ss.bg, color: ss.color, padding: "3px 9px", borderRadius: 20, fontSize: 11, fontWeight: 700 }}>{s.toUpperCase()}</span>
                       </div>
                       <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-                        {u.accountType !== "free"  && <button className="btn bsm" style={{ background: "var(--glt)", color: "var(--gdk)", border: "none" }} onClick={() => updateUser(u.email, { accountType: "free" })}>Free</button>}
-                        {u.accountType !== "paid"  && <button className="btn bsm bp" onClick={() => updateUser(u.email, { accountType: "paid" })}>Paid</button>}
-                        {u.accountType !== "trial" && <button className="btn bsm bg" onClick={() => updateUser(u.email, { accountType: "trial" })}>Trial</button>}
+                        {u.accountType !== "free" && <button className="btn bsm" style={{ background: "var(--glt)", color: "var(--gdk)", border: "none" }} onClick={() => updateUser(u.email, { accountType: "free" })}>Mark Free</button>}
+                        {u.accountType !== "paid" && <button className="btn bsm bp" onClick={() => updateUser(u.email, { accountType: "paid" })}>Mark Paid</button>}
                         <button className="btn bsm bd" onClick={() => deleteUser(u.email)}>Delete</button>
                       </div>
                     </div>
@@ -1453,7 +1449,7 @@ export default function ListoBid() {
                 <input type="number" step="0.01" min="0" value={gasPrice} onChange={e=>{setGasPrice(e.target.value);setResult(null);setShowRequired(false);}} placeholder={t.enterManual}/>
               </div>
               {showRequired&&!pf(gasPrice)&&<div style={{fontSize:11,color:"var(--red)",marginTop:3}}>{lang==="es"?"Precio de combustible requerido":"Fuel price required"}</div>}
-              <div className="ht" style={{marginTop:3}}>{t.gasPump}</div>
+
             </div>
 
             {/* Calculate */}
@@ -1550,7 +1546,7 @@ export default function ListoBid() {
                           <div className="li-name">{q.name}</div>
                           <div className="li-meta">{q.jobType} · {q.date}</div>
                           {q.address&&<div style={{fontSize:11,color:"var(--g400)",marginTop:2}}>📍 {q.address}</div>}
-                          {q.industry&&q.industry!=="landscaping"&&<div style={{fontSize:11,color:"var(--g400)",marginTop:2}}>{INDUSTRY_TEMPLATES[q.industry]?.en.icon} {INDUSTRY_TEMPLATES[q.industry]?.en.name}</div>}
+                          {q.industry&&q.industry!=="landscaping"&&<div style={{fontSize:11,color:"var(--g400)",marginTop:2}}>{INDUSTRY_TEMPLATES[q.industry]?.en.name}</div>}
                         </div>
                         <div className="li-price">${q.price}</div>
                       </div>
@@ -1592,7 +1588,9 @@ export default function ListoBid() {
             <div className="ss">{t.version}</div>
 
             {currentUser.accountType==="paid"&&<div style={{background:"var(--glt)",border:"1px solid #A7F3D0",borderRadius:10,padding:"12px 16px",marginBottom:12,fontSize:13,color:"var(--gdk)",fontWeight:600}}>✅ Active Subscriber</div>}
-            {currentUser.accountType==="free"&&<div style={{background:"var(--glt)",border:"1px solid #A7F3D0",borderRadius:10,padding:"12px 16px",marginBottom:12,fontSize:13,color:"var(--gdk)",fontWeight:600}}>Free Access</div>}
+            {currentUser.accountType !== "paid" && (
+              <div style={{background:"var(--glt)",border:"1px solid #A7F3D0",borderRadius:10,padding:"12px 16px",marginBottom:12,fontSize:13,color:"var(--gdk)",fontWeight:600}}>Free Access</div>
+            )}
             <div className="card">
               <div className="sr" style={{cursor:"pointer"}} onClick={()=>setSettView("profile")}><span className="sr-l">{t.editProfile}</span><span className="sr-v">›</span></div>
               <div className="sr" style={{cursor:"pointer"}} onClick={()=>setSettView("jobs")}><span className="sr-l">{t.manageJobs}</span><span className="sr-v">{jobs.length} types ›</span></div>
@@ -1604,7 +1602,7 @@ export default function ListoBid() {
                   <button className={`tb ${lang==="es"?"on":""}`} style={{padding:"5px 10px",flex:"none"}} onClick={()=>{setLang("es");LS.set("lb_lang","es");}}>ES</button>
                 </div>
               </div>
-              <div className="sr" style={{cursor:"default"}}><span className="sr-l">{t.support}</span><span style={{fontSize:12,color:"var(--g400)",textDecoration:"none"}}>{t.supportEmail}</span></div>
+              <div className="sr" style={{cursor:"default"}}><span className="sr-l">{t.support}</span><span style={{fontSize:12,color:"var(--g400)",userSelect:"text"}}>{t.supportEmail}</span></div>
               <div className="sr" style={{cursor:"pointer"}} onClick={()=>setShowLegal(true)}><span className="sr-l">Legal</span><span className="sr-v">›</span></div>
 
             </div>
@@ -1707,7 +1705,7 @@ export default function ListoBid() {
               <p style={{fontSize:13,color:"var(--g600)",lineHeight:1.7,marginBottom:20}}>By using ListoBid, you acknowledge that you have read and agree to these terms. ListoBid · {new Date().getFullYear()}</p>
             </>
           )}
-          <button className="btn bp" onClick={()=>setShowLegal(false)}>{lang==="es"?"Entendido":"Got it"}</button>
+          <button className="btn bp" onClick={()=>setShowLegal(false)}>{lang==="es"?"Entendido":"I Agree"}</button>
         </div>
       </div>
     )}
