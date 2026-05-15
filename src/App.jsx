@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-import { createClient } from "@supabase/supabase-js";;
+import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 
 // ─── CONFIG ───────────────────────────────────────────────────────────────────
 const STRIPE_LINK      = "https://buy.stripe.com/test_dRm8wRb6e4Hu4Rm3ib2VG00";
@@ -217,7 +217,6 @@ const TX = {
     legal: "Legal",
     legalTitle: "Disclaimer",
     legalText: "ListoBid provides pricing estimates for informational purposes only. All calculations are based on user-provided inputs and general industry averages. ListoBid LLC makes no guarantee that suggested prices will result in profit, cover actual costs, or be appropriate for any specific job or market. Users are solely responsible for verifying costs, setting prices, and the outcomes of any bids or contracts. ListoBid LLC is not liable for any financial loss, missed revenue, disputes, or damages arising from use of this application. By using ListoBid, you agree that all pricing decisions are your own. This tool is not a substitute for professional business, financial, or legal advice.", legal: "Legal & Disclaimer",
-    dataWarningShort: "Data saved on this device only",
     nav_quote: "Quote", nav_log: "Log", nav_settings: "Settings",
   },
   es: {
@@ -310,7 +309,6 @@ const TX = {
     legal: "Legal",
     legalTitle: "Aviso Legal",
     legalText: "ListoBid proporciona estimaciones de precios solo con fines informativos. Todos los cálculos se basan en datos ingresados por el usuario y promedios generales de la industria. ListoBid LLC no garantiza que los precios sugeridos resulten en ganancias, cubran los costos reales, o sean apropiados para cualquier trabajo o mercado específico. Los usuarios son únicamente responsables de verificar costos, establecer precios y los resultados de cualquier oferta o contrato. ListoBid LLC no es responsable de pérdidas financieras, disputas o daños derivados del uso de esta aplicación. Al usar ListoBid, usted acepta que todas las decisiones de precios son de su exclusiva responsabilidad. Esta herramienta no reemplaza el asesoramiento profesional empresarial, financiero o legal.", legal: "Legal y Aviso Legal",
-    dataWarningShort: "Datos guardados solo en este dispositivo",
     nav_quote: "Cotizar", nav_log: "Historial", nav_settings: "Ajustes",
   }
 };
@@ -830,7 +828,6 @@ export default function ListoBid() {
   // ── Settings ──
   const [settView, setSettView] = useState("main");
   const [showLegal, setShowLegal] = useState(false);
-  const [showDataWarn, setShowDataWarn] = useState(false);
   const [showReminder, setShowReminder] = useState(false);
   const [reminderShown, setReminderShown] = useState(() => LS.get("lb_reminder_shown", { d10: false, d13: false }));
 
@@ -914,6 +911,8 @@ export default function ListoBid() {
   const handleRegister = async () => {
     setAuthErr("");
     if (!regForm.firstName.trim()) return setAuthErr("Please enter your first name");
+    // Clear any leftover data from previous user
+    ["lb_current_user","lb_profile","lb_all_jobs","lb_industry","lb_quote_log","lb_gas_price","lb_reminder_shown"].forEach(k => LS.del(k));
     if (!validateEmail(regForm.email)) return setAuthErr(t.emailInvalid);
     if (regForm.password.length < 8)  return setAuthErr(t.passMin);
     if (regForm.password !== regForm.confirm) return setAuthErr(t.passMismatch);
@@ -921,6 +920,10 @@ export default function ListoBid() {
       const { data, error } = await sb.auth.signUp({
         email: regForm.email.toLowerCase().trim(),
         password: regForm.password,
+        options: {
+          data: { first_name: regForm.firstName.trim() },
+          emailRedirectTo: null,
+        }
       });
       if (error) {
         if (error.message.includes("already registered")) return setAuthErr(t.emailTaken);
@@ -949,8 +952,7 @@ export default function ListoBid() {
       // Also cache locally for fast access
       LS.set("lb_current_user", user);
       setCurrentUser(user);
-      setShowDataWarn(true);
-      setRoute(!lang ? "welcome" : "industry");
+            setRoute(!lang ? "welcome" : "industry");
     } catch (e) {
       setAuthErr("Registration failed. Please try again.");
     }
@@ -965,6 +967,8 @@ export default function ListoBid() {
         password: loginForm.password,
       });
       if (error) return setAuthErr(t.invalidCreds);
+      // Clear old user data before loading new user
+      ["lb_current_user","lb_profile","lb_all_jobs","lb_industry","lb_quote_log","lb_gas_price","lb_reminder_shown"].forEach(k => LS.del(k));
       // Load profile from Supabase
       const { data: profile } = await sb.from("profiles").select("*").eq("id", data.user.id).single();
       const user = {
@@ -995,8 +999,16 @@ export default function ListoBid() {
 
   const handleLogout = async () => {
     await sb.auth.signOut();
-    LS.del("lb_current_user");
+    // Clear ALL local data so next user starts fresh
+    const keysToKeep = ["lb_lang"]; // keep language preference only
+    Object.keys(localStorage).forEach(k => {
+      if (!keysToKeep.includes(k)) localStorage.removeItem(k);
+    });
     setCurrentUser(null);
+    setIndustry(null);
+    setProfile({ laborRate: "", crewSize: "2", targetMargin: "40", targetDollar: "50", marginMode: "pct", zipCode: "", vehicles: "1", fuelType: "gas", overheadMode: "none", overheadPct: "15", overheadFlat: "10" });
+    setLog([]);
+    setStep(0);
     setRoute("login");
   };
 
@@ -1273,15 +1285,7 @@ export default function ListoBid() {
           <button className="btn bg mt8" onClick={()=>{ if(step>1){setStep(s=>s-1);}else{setRoute("industry");setStep(0);} }}>{t.back}</button>
         </div>
       </div>
-      {showDataWarn && (
-        <div className="ov" onClick={()=>setShowDataWarn(false)}>
-          <div className="mo" onClick={e=>e.stopPropagation()}>
-            <div className="mo-t">⚠️ {t.dataWarning}</div>
-            <p style={{fontSize:14,color:"var(--g600)",lineHeight:1.6,marginBottom:20}}>{t.dataWarningBody}</p>
-            <button className="btn bp" onClick={()=>setShowDataWarn(false)}>{t.understood}</button>
-          </div>
-        </div>
-      )}
+      
       </>
     );
   }
@@ -1560,10 +1564,7 @@ export default function ListoBid() {
               </div>
               <div className="sr" style={{cursor:"default"}}><span className="sr-l">{t.support}</span><span className="sr-v" style={{fontSize:12}}>{t.supportEmail}</span></div>
               <div className="sr" style={{cursor:"pointer"}} onClick={()=>setShowLegal(true)}><span className="sr-l">Legal</span><span className="sr-v">›</span></div>
-              <div className="sr" style={{cursor:"default"}}>
-                <span className="sr-l" style={{color:"var(--g400)",fontSize:13}}>⚠️ {t.dataWarningShort}</span>
-                <span style={{fontSize:12,color:"var(--green)",cursor:"pointer",fontWeight:600}} onClick={()=>setShowDataWarn(true)}>Info</span>
-              </div>
+
             </div>
             <button className="btn bg mt8" style={{fontSize:12,color:"var(--g400)"}} onClick={()=>setRoute("admin")}>Admin Portal</button>
             <button className="btn bg mt8" style={{color:"var(--red)",borderColor:"#FECACA"}} onClick={handleLogout}>{t.logout}</button>
@@ -1671,16 +1672,7 @@ export default function ListoBid() {
 
 
 
-    {/* Data Warning Modal */}
-    {showDataWarn&&(
-      <div className="ov" onClick={()=>setShowDataWarn(false)}>
-        <div className="mo" onClick={e=>e.stopPropagation()}>
-          <div className="mo-t">⚠️ {t.dataWarning}</div>
-          <p style={{fontSize:14,color:"var(--g600)",lineHeight:1.6,marginBottom:20}}>{t.dataWarningBody}</p>
-          <button className="btn bp" onClick={()=>setShowDataWarn(false)}>{t.understood}</button>
-        </div>
-      </div>
-    )}
+
     </>
   );
 }

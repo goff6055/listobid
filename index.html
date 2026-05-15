@@ -2,23 +2,37 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <head>
-      <meta charset="UTF-8" />
-      <link rel="icon" type="image/png" href="/logo.png" />
-      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      <title>ListoBid — Ready to Bid</title>
-      <meta name="description" content="Know your price. Know your profit. Price any job in 30 seconds." />
-      <meta property="og:title" content="ListoBid" />
-      <meta property="og:description" content="Know your price. Know your profit. Price any job in 30 seconds." />
-      <meta property="og:image" content="/logo.png" />
-      <meta property="og:url" content="https://listobid.com" />
-      <meta name="twitter:card" content="summary" />
-    </head>
+    <title>ListoBid — Ready to Bid</title>
+    <meta name="description" content="Know your price. Know your profit. Price any job in 30 seconds." />
+    <meta property="og:title" content="ListoBid" />
+    <meta property="og:description" content="Know your price. Know your profit." />
+    <meta property="og:url" content="https://listobid.com" />
+    <meta property="og:type" content="website" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="ListoBid" />
+    <meta name="theme-color" content="#1C2B3A" />
+
+    <!-- LB favicon — white L + green B on navy background -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,
+      <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'>
+        <rect width='32' height='32' rx='6' fill='%231C2B3A'/>
+        <text x='2' y='24' font-family='Arial Black,sans-serif' font-weight='900' font-size='18' fill='white'>L</text>
+        <text x='14' y='24' font-family='Arial Black,sans-serif' font-weight='900' font-size='18' fill='%233DC43C'>B</text>
+      </svg>" />
+
+    <!-- Apple touch icon for home screen -->
+    <link rel="apple-touch-icon" href="data:image/svg+xml,
+      <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'>
+        <rect width='180' height='180' rx='40' fill='%231C2B3A'/>
+        <text x='8' y='138' font-family='Arial Black,sans-serif' font-weight='900' font-size='110' fill='white'>L</text>
+        <text x='82' y='138' font-family='Arial Black,sans-serif' font-weight='900' font-size='110' fill='%233DC43C'>B</text>
+      </svg>" />
+
   </head>
   <body>
     <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
+    <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
