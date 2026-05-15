@@ -315,7 +315,7 @@ const TX = {
 
 // ─── CSS ──────────────────────────────────────────────────────────────────────
 const CSS = `
-@import url('https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700;800&family=Barlow+Condensed:wght@700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
   --navy:#1C2B3A;--green:#3DC43C;--gdk:#2aa62a;--glt:#f0fdf0;
@@ -323,27 +323,27 @@ const CSS = `
   --red:#DC2626;--rlt:#FEE2E2;--yellow:#CA8A04;--ylt:#FEF9C3;
   --rad:14px;--rsm:8px;--sh:0 2px 10px rgba(0,0,0,.07);
 }
-body{font-family:'Barlow',sans-serif;background:var(--g100);color:var(--g800);-webkit-font-smoothing:antialiased}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--g100);color:var(--g800);-webkit-font-smoothing:antialiased}
 .app{max-width:430px;margin:0 auto;min-height:100dvh;background:var(--w);display:flex;flex-direction:column}
 .hdr{background:var(--navy);padding:13px 17px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
 .hdr-logo{display:flex;align-items:center;gap:9px}
 .lm{display:flex;align-items:center;flex-shrink:0}
 .lm svg{height:28px;width:auto}
-.lt{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:20px;color:#fff;letter-spacing:.4px}
+.lt{font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;font-size:20px;color:#fff;letter-spacing:.4px}
 .lt span{color:var(--green)}
 .hdr-user{font-size:12px;color:rgba(255,255,255,.6);max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .nav{display:flex;background:var(--w);border-top:1px solid var(--g200);position:sticky;bottom:0;z-index:50}
-.nb{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:9px 0 11px;background:none;border:none;cursor:pointer;color:var(--g400);font-family:'Barlow',sans-serif;font-size:11px;font-weight:600;transition:color .15s}
+.nb{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:9px 0 11px;background:none;border:none;cursor:pointer;color:var(--g400);font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;font-weight:600;transition:color .15s}
 .nb.on{color:var(--green)}.nb svg{width:20px;height:20px}
 .ct{flex:1;overflow-y:auto;padding:18px 18px 28px;-webkit-overflow-scrolling:touch}
-.st{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:23px;color:var(--navy);margin-bottom:3px}
+.st{font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;font-size:23px;color:var(--navy);margin-bottom:3px}
 .ss{font-size:13px;color:var(--g400);margin-bottom:17px}
 .card{background:var(--w);border:1px solid var(--g200);border-radius:var(--rad);padding:15px;margin-bottom:11px;box-shadow:var(--sh)}
-.ct2{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:var(--g400);margin-bottom:12px}
+.ct2{font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:var(--g400);margin-bottom:12px}
 .fi{margin-bottom:13px}.fi:last-child{margin-bottom:0}
 .lb{display:block;font-size:13px;font-weight:600;color:var(--g600);margin-bottom:5px}
 .ht{font-size:11px;color:var(--g400);margin-top:3px}
-input[type=number],input[type=text],input[type=email],input[type=password],select,textarea{width:100%;padding:10px 12px;border:1.5px solid var(--g200);border-radius:var(--rsm);font-family:'Barlow',sans-serif;font-size:15px;color:var(--g800);background:var(--g50);outline:none;transition:border-color .15s;-webkit-appearance:none}
+input[type=number],input[type=text],input[type=email],input[type=password],select,textarea{width:100%;padding:10px 12px;border:1.5px solid var(--g200);border-radius:var(--rsm);font-family:'Plus Jakarta Sans',sans-serif;font-size:15px;color:var(--g800);background:var(--g50);outline:none;transition:border-color .15s;-webkit-appearance:none}
 input:focus,select:focus,textarea:focus{border-color:var(--green);background:#fff}
 textarea{resize:vertical;line-height:1.5}
 select{cursor:pointer}
@@ -357,7 +357,7 @@ select{cursor:pointer}
 .sxs{padding:10px 12px 10px 7px;color:var(--g400);font-size:15px;font-weight:600;flex-shrink:0}
 .sx input{border:none;background:transparent;padding:10px 3px 10px 12px;flex:1;min-width:0}
 .sx input:focus{background:transparent}
-.btn{width:100%;padding:13px;border-radius:var(--rad);font-family:'Barlow',sans-serif;font-size:15px;font-weight:700;border:none;cursor:pointer;transition:transform .1s;letter-spacing:.2px}
+.btn{width:100%;padding:13px;border-radius:var(--rad);font-family:'Plus Jakarta Sans',sans-serif;font-size:15px;font-weight:700;border:none;cursor:pointer;transition:transform .1s;letter-spacing:.2px}
 .btn:active{transform:scale(.98)}
 .bp{background:linear-gradient(135deg,var(--green),var(--gdk));color:#fff;box-shadow:0 4px 14px rgba(61,196,60,.3)}
 .bn{background:var(--navy);color:#fff}
@@ -367,7 +367,7 @@ select{cursor:pointer}
 .mt8{margin-top:8px}
 .r2{display:flex;gap:10px}.r2 .fi{flex:1;min-width:0}
 .tg{display:flex;gap:6px;flex-wrap:wrap}
-.tb{flex:1;padding:9px 5px;border-radius:var(--rsm);border:1.5px solid var(--g200);background:var(--g50);font-family:'Barlow',sans-serif;font-size:13px;font-weight:600;color:var(--g600);cursor:pointer;transition:all .15s;text-align:center;white-space:nowrap;min-width:0}
+.tb{flex:1;padding:9px 5px;border-radius:var(--rsm);border:1.5px solid var(--g200);background:var(--g50);font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:600;color:var(--g600);cursor:pointer;transition:all .15s;text-align:center;white-space:nowrap;min-width:0}
 .tb.on{border-color:var(--green);background:var(--glt);color:var(--gdk)}
 .steps{display:flex;gap:5px;margin-bottom:20px}
 .sd{flex:1;height:4px;border-radius:2px;background:var(--g200);transition:background .2s}
@@ -375,12 +375,12 @@ select{cursor:pointer}
 .rc{background:var(--navy);border-radius:var(--rad);padding:20px 17px 17px;margin-bottom:11px;position:relative;overflow:hidden}
 .rc::after{content:'';position:absolute;top:-20px;right:-20px;width:90px;height:90px;background:rgba(61,196,60,.1);border-radius:50%}
 .rl{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,.42);margin-bottom:5px}
-.rp{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:52px;color:#fff;line-height:1;letter-spacing:-1px;display:flex;align-items:flex-start;gap:3px}
+.rp{font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;font-size:52px;color:#fff;line-height:1;letter-spacing:-1px;display:flex;align-items:flex-start;gap:3px}
 .rp-dollar{font-size:26px;margin-top:6px;font-weight:800}
 .rrow{display:flex;gap:14px;margin-top:13px}
 .ri{flex:1}
 .ri-l{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,.38);margin-bottom:2px}
-.ri-v{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:19px;color:#fff}
+.ri-v{font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:19px;color:#fff}
 .mpill{display:inline-flex;align-items:center;gap:5px;padding:5px 10px;border-radius:20px;font-size:12px;font-weight:700;margin-top:11px}
 .mdot{width:7px;height:7px;border-radius:50%}
 .bk{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--g100);font-size:14px}
@@ -389,18 +389,18 @@ select{cursor:pointer}
 .bk-v{font-weight:700;color:var(--g800);flex-shrink:0}
 .bk-tot{border-top:2px solid var(--g200)!important;margin-top:3px;padding-top:11px!important}
 .bk-tot .bk-l{font-weight:700;color:var(--g800)}
-.sl-pct{text-align:center;font-family:'Barlow Condensed',sans-serif;font-size:30px;font-weight:800;color:var(--navy);margin-bottom:2px}
+.sl-pct{text-align:center;font-family:'Plus Jakarta Sans',sans-serif;font-size:30px;font-weight:800;color:var(--navy);margin-bottom:2px}
 input[type=range]{-webkit-appearance:none;width:100%;height:6px;border-radius:3px;background:var(--g200);outline:none;margin:10px 0}
 input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:var(--green);cursor:pointer;box-shadow:0 2px 8px rgba(61,196,60,.4);border:3px solid #fff}
 .sl-ends{display:flex;justify-content:space-between;font-size:11px;color:var(--g400);font-weight:600}
 .sl-hint{text-align:center;font-size:12px;color:var(--g400);margin-top:3px}
 .ac{background:var(--g50);border:1px solid var(--g200);border-radius:var(--rad);padding:15px;margin-bottom:11px}
-.ac-t{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--g400);margin-bottom:11px}
+.ac-t{font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--g400);margin-bottom:11px}
 .ac-s{display:flex;flex-direction:column;gap:8px}
 .li{border-radius:var(--rsm);padding:12px 14px;margin-bottom:8px}
 .li-hdr{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:5px}
 .li-name{font-size:15px;font-weight:700;color:var(--navy)}
-.li-price{font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:800;color:var(--gdk);flex-shrink:0;margin-left:8px}
+.li-price{font-family:'Plus Jakarta Sans',sans-serif;font-size:22px;font-weight:800;color:var(--gdk);flex-shrink:0;margin-left:8px}
 .li-meta{font-size:12px;color:var(--g400);margin-bottom:6px}
 .li-pills{display:flex;gap:7px;align-items:center;flex-wrap:wrap}
 .pill{font-size:12px;padding:3px 8px;border-radius:4px;font-weight:700}
@@ -412,7 +412,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
 .trial-bar{background:linear-gradient(135deg,var(--navy),#243a52);border-radius:var(--rad);padding:15px 17px;margin-bottom:11px;color:#fff}
 .trial-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:7px}
 .trial-l{font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,.42)}
-.trial-d{font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:800}
+.trial-d{font-family:'Plus Jakarta Sans',sans-serif;font-size:28px;font-weight:800}
 .trial-track{height:5px;background:rgba(255,255,255,.1);border-radius:3px;overflow:hidden}
 .trial-fill{height:100%;border-radius:3px}
 .ji{display:flex;align-items:center;justify-content:space-between;padding:11px 13px;background:var(--g50);border:1px solid var(--g200);border-radius:var(--rsm);margin-bottom:7px}
@@ -422,22 +422,22 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
 .ji-act{display:flex;gap:5px;flex-shrink:0}
 .ov{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;display:flex;align-items:flex-end;justify-content:center}
 .mo{background:#fff;border-radius:20px 20px 0 0;padding:24px 20px 40px;width:100%;max-width:430px;box-shadow:0 -8px 40px rgba(0,0,0,.15);max-height:90dvh;overflow-y:auto}
-.mo-t{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:21px;color:var(--navy);margin-bottom:17px}
+.mo-t{font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;font-size:21px;color:var(--navy);margin-bottom:17px}
 .mo-b{display:flex;gap:9px;margin-top:17px}
 .auth{min-height:100dvh;background:var(--navy);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px}
 .auth-box{background:#fff;border-radius:20px;padding:28px 24px;width:100%;max-width:380px;box-shadow:0 20px 60px rgba(0,0,0,.25);max-height:90dvh;overflow-y:auto}
 .auth-logo{display:flex;align-items:center;justify-content:center;margin-bottom:20px}
-.auth-title{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:26px;color:var(--navy);margin-bottom:4px;text-align:center}
+.auth-title{font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;font-size:26px;color:var(--navy);margin-bottom:4px;text-align:center}
 .auth-sub{font-size:13px;color:var(--g400);margin-bottom:20px;text-align:center}
 .auth-link{font-size:13px;color:var(--gdk);font-weight:600;cursor:pointer;text-align:center;margin-top:12px}
 .auth-err{font-size:13px;color:var(--red);text-align:center;margin-top:8px;padding:8px;background:var(--rlt);border-radius:6px}
 .wlc{min-height:100dvh;background:var(--navy);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 28px;text-align:center}
 .wm{display:flex;align-items:center;justify-content:center;margin-bottom:20px}
-.wt{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:38px;color:#fff;margin-bottom:6px}
+.wt{font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;font-size:38px;color:#fff;margin-bottom:6px}
 .wt span{color:var(--green)}
 .wsub{font-size:15px;color:rgba(255,255,255,.45);margin-bottom:42px}
 .ls{display:flex;flex-direction:column;gap:10px;width:100%;max-width:260px}
-.lbtn{padding:15px;border-radius:var(--rad);font-family:'Barlow',sans-serif;font-size:16px;font-weight:700;cursor:pointer;border:none;transition:transform .1s}
+.lbtn{padding:15px;border-radius:var(--rad);font-family:'Plus Jakarta Sans',sans-serif;font-size:16px;font-weight:700;cursor:pointer;border:none;transition:transform .1s}
 .lbtn:active{transform:scale(.97)}
 .len{background:var(--green);color:#fff}
 .les{background:rgba(255,255,255,.08);color:#fff;border:1.5px solid rgba(255,255,255,.15)}
@@ -445,7 +445,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
 .reminder-box{background:#fff;border-radius:18px;padding:28px 24px;width:100%;max-width:360px;text-align:center}
 .soft-banner{background:linear-gradient(135deg,#B45309,#92400E);padding:12px 17px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
 .soft-banner-text{font-size:12px;color:#FEF3C7;font-weight:600;flex:1;line-height:1.4}
-.soft-banner-btn{background:#FEF3C7;color:#92400E;border:none;border-radius:6px;padding:6px 10px;font-family:'Barlow',sans-serif;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap}
+.soft-banner-btn{background:#FEF3C7;color:#92400E;border:none;border-radius:6px;padding:6px 10px;font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap}
 .empty{text-align:center;padding:48px 20px;color:var(--g400)}
 .addr-wrap{position:relative}
 .addr-suggestions{position:absolute;top:100%;left:0;right:0;background:#fff;border:1px solid var(--g200);border-radius:var(--rsm);box-shadow:0 4px 20px rgba(0,0,0,.12);z-index:999;max-height:180px;overflow-y:auto}
@@ -466,8 +466,8 @@ const LogoImg = ({ width = 140 }) => (
 // LogoText: text wordmark — used on dark navy backgrounds (header, welcome)
 const LogoText = ({ size = 22 }) => (
   <div style={{display:"flex",alignItems:"baseline",gap:0,lineHeight:1}}>
-    <span style={{fontFamily:"'Barlow',sans-serif",fontWeight:800,fontSize:size,color:"#ffffff",letterSpacing:-0.3}}>Listo</span>
-    <span style={{fontFamily:"'Barlow',sans-serif",fontWeight:800,fontSize:size,color:"#3DC43C",letterSpacing:-0.3}}>Bid</span>
+    <span style={{fontFamily:"'Plus Jakarta Sans',sans-serif",fontWeight:800,fontSize:size,color:"#ffffff",letterSpacing:-0.3}}>Listo</span>
+    <span style={{fontFamily:"'Plus Jakarta Sans',sans-serif",fontWeight:800,fontSize:size,color:"#3DC43C",letterSpacing:-0.3}}>Bid</span>
   </div>
 );
 
@@ -526,7 +526,7 @@ function AddressInput({ value, onChange, placeholder = "123 Main St, Phoenix AZ"
         value={value}
         onChange={e => onChange(e.target.value)}
         placeholder={placeholder}
-        style={{width:"100%",padding:"10px 12px",border:"1.5px solid var(--g200)",borderRadius:"var(--rsm)",fontFamily:"'Barlow',sans-serif",fontSize:15,color:"var(--g800)",background:"var(--g50)",outline:"none"}}
+        style={{width:"100%",padding:"10px 12px",border:"1.5px solid var(--g200)",borderRadius:"var(--rsm)",fontFamily:"'Plus Jakarta Sans',sans-serif",fontSize:15,color:"var(--g800)",background:"var(--g50)",outline:"none"}}
         onFocus={e=>{e.target.style.borderColor="var(--green)";e.target.style.background="#fff";}}
         onBlur={e=>{e.target.style.borderColor="var(--g200)";e.target.style.background="var(--g50)";}}
       />
@@ -667,7 +667,7 @@ function AdminDashboard({ onClose }) {
   );
 
   return (
-    <div style={{ minHeight: "100dvh", background: "var(--g100)", fontFamily: "'Barlow',sans-serif" }}>
+    <div style={{ minHeight: "100dvh", background: "var(--g100)", fontFamily: "'Plus Jakarta Sans',sans-serif" }}>
       <div style={{ background: "var(--navy)", padding: "13px 20px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
           <LogoWordmark/>
@@ -681,7 +681,7 @@ function AdminDashboard({ onClose }) {
       <div style={{ background: "#fff", borderBottom: "1px solid var(--g200)", padding: "0 20px", display: "flex" }}>
         {["overview", "users"].map(tb => (
           <button key={tb} onClick={() => setTab(tb)}
-            style={{ padding: "12px 16px", fontSize: 14, fontWeight: 600, color: tab === tb ? "var(--navy)" : "var(--g400)", background: "none", border: "none", borderBottom: `2px solid ${tab === tb ? "var(--green)" : "transparent"}`, marginBottom: -1, cursor: "pointer", fontFamily: "'Barlow',sans-serif" }}>
+            style={{ padding: "12px 16px", fontSize: 14, fontWeight: 600, color: tab === tb ? "var(--navy)" : "var(--g400)", background: "none", border: "none", borderBottom: `2px solid ${tab === tb ? "var(--green)" : "transparent"}`, marginBottom: -1, cursor: "pointer", fontFamily: "'Plus Jakarta Sans',sans-serif" }}>
             {tb.charAt(0).toUpperCase() + tb.slice(1)}
           </button>
         ))}
@@ -698,7 +698,7 @@ function AdminDashboard({ onClose }) {
             ].map(s => (
               <div key={s.label} style={{ background: "#fff", border: "1px solid var(--g200)", borderRadius: 12, padding: "15px 16px", boxShadow: "var(--sh)" }}>
                 <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: ".8px", textTransform: "uppercase", color: "var(--g400)", marginBottom: 6 }}>{s.label}</div>
-                <div style={{ fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 800, fontSize: 30, color: s.green ? "var(--gdk)" : "var(--navy)", lineHeight: 1 }}>{s.val}</div>
+                <div style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontWeight: 800, fontSize: 30, color: s.green ? "var(--gdk)" : "var(--navy)", lineHeight: 1 }}>{s.val}</div>
                 <div style={{ fontSize: 12, color: "var(--g400)", marginTop: 3 }}>{s.sub}</div>
               </div>
             ))}
@@ -707,7 +707,7 @@ function AdminDashboard({ onClose }) {
         {tab === "users" && (
           <div>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
-              <span style={{ fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 800, fontSize: 18, color: "var(--navy)" }}>All Users</span>
+              <span style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontWeight: 800, fontSize: 18, color: "var(--navy)" }}>All Users</span>
               <span style={{ fontSize: 13, color: "var(--g400)" }}>{users.length} total</span>
             </div>
             {loadingUsers
@@ -1167,11 +1167,11 @@ export default function ListoBid() {
       <p style={{ fontSize: 22, color: "#fff", fontWeight: 700, marginBottom: 10 }}>{t.trialExpiredTitle}</p>
       <p style={{ fontSize: 14, color: "rgba(255,255,255,.5)", marginBottom: 32, maxWidth: 280, lineHeight: 1.6 }}>{t.trialExpiredBody}</p>
       <div style={{ background: "rgba(255,255,255,.06)", border: "1px solid rgba(255,255,255,.1)", borderRadius: 14, padding: "18px 22px", marginBottom: 24, width: "100%", maxWidth: 300 }}>
-        <div style={{ fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 800, fontSize: 40, color: "var(--green)" }}>$19.99<span style={{ fontSize: 18, color: "rgba(255,255,255,.4)" }}>/mo</span></div>
+        <div style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontWeight: 800, fontSize: 40, color: "var(--green)" }}>$19.99<span style={{ fontSize: 18, color: "rgba(255,255,255,.4)" }}>/mo</span></div>
         <div style={{ fontSize: 12, color: "rgba(255,255,255,.4)", marginTop: 5 }}>Cancel anytime · Autopay</div>
       </div>
-      <a href={STRIPE_LINK} target="_blank" rel="noopener noreferrer" style={{ width: "100%", maxWidth: 300, display: "block", padding: 14, background: "linear-gradient(135deg,var(--green),var(--gdk))", color: "#fff", borderRadius: 12, fontFamily: "'Barlow',sans-serif", fontSize: 15, fontWeight: 700, textDecoration: "none", textAlign: "center" }}>{t.subscribeNow}</a>
-      <button style={{ marginTop: 16, background: "none", border: "none", color: "rgba(255,255,255,.3)", fontSize: 12, cursor: "pointer", fontFamily: "'Barlow',sans-serif" }} onClick={handleLogout}>{t.logout}</button>
+      <a href={STRIPE_LINK} target="_blank" rel="noopener noreferrer" style={{ width: "100%", maxWidth: 300, display: "block", padding: 14, background: "linear-gradient(135deg,var(--green),var(--gdk))", color: "#fff", borderRadius: 12, fontFamily: "'Plus Jakarta Sans',sans-serif", fontSize: 15, fontWeight: 700, textDecoration: "none", textAlign: "center" }}>{t.subscribeNow}</a>
+      <button style={{ marginTop: 16, background: "none", border: "none", color: "rgba(255,255,255,.3)", fontSize: 12, cursor: "pointer", fontFamily: "'Plus Jakarta Sans',sans-serif" }} onClick={handleLogout}>{t.logout}</button>
     </div></>
   );
 
@@ -1187,7 +1187,7 @@ export default function ListoBid() {
         <div style={{ display: "flex", gap: 10, width: "100%" }}>
           {Object.entries(INDUSTRY_TEMPLATES).map(([key, tmpl]) => (
             <button key={key}
-              style={{ flex: 1, padding: "18px 6px", background: "var(--w)", border: "2px solid var(--g200)", borderRadius: "var(--rad)", cursor: "pointer", fontFamily: "'Barlow',sans-serif", boxShadow: "var(--sh)", transition: "all .15s" }}
+              style={{ flex: 1, padding: "18px 6px", background: "var(--w)", border: "2px solid var(--g200)", borderRadius: "var(--rad)", cursor: "pointer", fontFamily: "'Plus Jakarta Sans',sans-serif", boxShadow: "var(--sh)", transition: "all .15s" }}
               onClick={() => {
                 const uk = `lb_user_${currentUser.email.replace(/[^a-z0-9]/gi, "_")}`;
                 const upd = { ...currentUser, industry: key };
@@ -1312,10 +1312,10 @@ export default function ListoBid() {
         <div className="reminder-ov">
           <div className="reminder-box">
             <div style={{fontSize:36,marginBottom:12}}>⏰</div>
-            <div style={{fontFamily:"'Barlow Condensed',sans-serif",fontWeight:800,fontSize:22,color:"var(--navy)",marginBottom:8}}>{showReminder==="d13"?t.reminderDay13Title:t.reminderDay10Title}</div>
+            <div style={{fontFamily:"'Plus Jakarta Sans',sans-serif",fontWeight:800,fontSize:22,color:"var(--navy)",marginBottom:8}}>{showReminder==="d13"?t.reminderDay13Title:t.reminderDay10Title}</div>
             <div style={{fontSize:14,color:"var(--g600)",marginBottom:20,lineHeight:1.5}}>{showReminder==="d13"?t.reminderDay13Body:t.reminderDay10Body}</div>
             <div style={{display:"flex",flexDirection:"column",gap:8}}>
-              <a href={STRIPE_LINK} target="_blank" rel="noopener noreferrer" style={{display:"block",padding:13,background:"linear-gradient(135deg,var(--green),var(--gdk))",color:"#fff",borderRadius:12,fontFamily:"'Barlow',sans-serif",fontSize:15,fontWeight:700,textDecoration:"none",textAlign:"center"}} onClick={dismissReminder}>{t.subscribeBtn}</a>
+              <a href={STRIPE_LINK} target="_blank" rel="noopener noreferrer" style={{display:"block",padding:13,background:"linear-gradient(135deg,var(--green),var(--gdk))",color:"#fff",borderRadius:12,fontFamily:"'Plus Jakarta Sans',sans-serif",fontSize:15,fontWeight:700,textDecoration:"none",textAlign:"center"}} onClick={dismissReminder}>{t.subscribeBtn}</a>
               <button className="btn bg" onClick={dismissReminder}>{t.remindLater}</button>
             </div>
           </div>
@@ -1611,7 +1611,7 @@ export default function ListoBid() {
             <p style={{fontSize:13,color:"var(--g400)",marginBottom:20}}>{lang==="es"?"Tu biblioteca de cada industria se guarda por separado.":"Each industry's job library is saved separately."}</p>
             <div style={{display:"flex",gap:10}}>
               {Object.entries(INDUSTRY_TEMPLATES).map(([key,tmpl])=>(
-                <button key={key} style={{flex:1,padding:"18px 6px",background:industry===key?"var(--glt)":"var(--w)",border:`2px solid ${industry===key?"var(--green)":"var(--g200)"}`,borderRadius:"var(--rad)",cursor:"pointer",fontFamily:"'Barlow',sans-serif",boxShadow:"var(--sh)"}}
+                <button key={key} style={{flex:1,padding:"18px 6px",background:industry===key?"var(--glt)":"var(--w)",border:`2px solid ${industry===key?"var(--green)":"var(--g200)"}`,borderRadius:"var(--rad)",cursor:"pointer",fontFamily:"'Plus Jakarta Sans',sans-serif",boxShadow:"var(--sh)"}}
                   onClick={()=>{setIndustry(key);LS.set("lb_industry",key);setSelJob("");setResult(null);setSettView("main");}}>
                   <div style={{fontSize:26,marginBottom:6}}>{tmpl.en.icon}</div>
                   <div style={{fontSize:12,fontWeight:700,color:"var(--navy)"}}>{tmpl[lang]?.name||tmpl.en.name}</div>
