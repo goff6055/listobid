@@ -143,7 +143,7 @@ const TX = {
     invalidCreds: "Incorrect email or password",
     dataWarning: "Important: Your Data",
     dataWarningBody: "ListoBid saves your data on this device. Use the same browser each time and avoid clearing Safari data to keep your quotes and settings.",
-    understood: "Got it",
+    understood: "I Agree",
     rememberMe: "Remember me on this device",
     privateWarn: "Tip: Use regular (non-private) browser to stay logged in.",
     trialBanner: "Free trial ends in", trialDaysLeft: "days",
@@ -178,7 +178,7 @@ const TX = {
     jobName2: "Job Type Name", defHours: "Default Hours", defMats: "Default Materials ($)",
     saveJob: "Save", editJob: "Edit", deleteJob: "Delete",
     preloaded: "Preloaded defaults — edit or add your own",
-    priceJob: "Price a Job", fillDetails: "Fill in details — get your price.",
+    priceJob: "Price a Job", fillDetails: "Fill in details - get your price.",
     jobType: "Job Type", selectJob: "Select a job type...",
     crewWage: "Crew & Wage", perPerson: "per person / hr",
     jobDetails: "Job Details", hoursOnSite: "Hours on Site", materialsCost: "Materials Cost",
@@ -195,8 +195,8 @@ const TX = {
     laborCost: "Labor", fuelCost: "Fuel", matsLabel: "Materials", overheadCost: "Overhead",
     totalCost: "Total Cost", rtMiles: "round trip",
     adjustMargin: "Adjust Margin", slideHint: "Drag to update price instantly",
-    donePrompt: "Done with this quote?", whatsNext: "What's next?",
-    saveToLog: "💾 Save to Log", keepEditing: "✏️ Keep Editing", newQuote: "🔄 New Quote",
+    donePrompt: "Save or Continue", whatsNext: "What's next?",
+    saveToLog: "Save to Log", keepEditing: "Keep Editing", newQuote: "New Quote",
     saveQuote: "Save Quote", jobLabel: "Job Name / Customer",
     jobPlaceholder: "e.g. Smith Residence — Weekly",
     addressLabel: "Address", addressOpt: "(optional)",
@@ -205,8 +205,8 @@ const TX = {
     quoteLog: "Quote History", noQuotes: "No saved quotes yet.",
     filterAll: "All", filterConverted: "✅ Converted", filterPending: "⏳ Pending", filterDate: "📅 By Date",
     markConverted: "✅ Mark Converted", unmarkConverted: "↩ Unmark",
-    editQuote: "✏️ Edit", deleteQuote: "🗑 Delete",
-    settings: "Settings", version: "ListoBid LLC · v1.0",
+    editQuote: "Edit", deleteQuote: "Delete",
+    settings: "Settings", version: "ListoBid LLC",
     trialLabel: "Free Trial", trialDaysRemaining: "days remaining",
     language: "Language", editProfile: "Edit Profile", manageJobs: "Job Library",
     industryLabel: "Industry",
@@ -235,7 +235,7 @@ const TX = {
     invalidCreds: "Correo o contraseña incorrectos",
     dataWarning: "Importante: Tus Datos",
     dataWarningBody: "ListoBid guarda tus datos en este dispositivo. Usa siempre el mismo navegador y evita borrar los datos de Safari.",
-    understood: "Entendido",
+    understood: "De Acuerdo",
     rememberMe: "Recordarme en este dispositivo",
     privateWarn: "Consejo: Usa el navegador normal (no privado) para mantener la sesión.",
     trialBanner: "Prueba gratis termina en", trialDaysLeft: "días",
@@ -270,7 +270,7 @@ const TX = {
     jobName2: "Nombre del Tipo", defHours: "Horas por Defecto", defMats: "Materiales ($)",
     saveJob: "Guardar", editJob: "Editar", deleteJob: "Eliminar",
     preloaded: "Tipos precargados — edita o agrega los tuyos",
-    priceJob: "Cotizar Trabajo", fillDetails: "Llena los datos — obtén tu precio.",
+    priceJob: "Cotizar Trabajo", fillDetails: "Llena los datos - obtén tu precio.",
     jobType: "Tipo de Trabajo", selectJob: "Selecciona un tipo...",
     crewWage: "Equipo y Salario", perPerson: "por persona / hr",
     jobDetails: "Detalles del Trabajo", hoursOnSite: "Horas en Sitio", materialsCost: "Materiales",
@@ -287,8 +287,8 @@ const TX = {
     laborCost: "Mano de Obra", fuelCost: "Combustible", matsLabel: "Materiales", overheadCost: "Gastos Gen.",
     totalCost: "Costo Total", rtMiles: "ida y vuelta",
     adjustMargin: "Ajustar Margen", slideHint: "Desliza para actualizar el precio",
-    donePrompt: "¿Listo con esta cotización?", whatsNext: "¿Qué sigue?",
-    saveToLog: "💾 Guardar", keepEditing: "✏️ Seguir Editando", newQuote: "🔄 Nueva Cotización",
+    donePrompt: "Guardar o Continuar", whatsNext: "¿Qué sigue?",
+    saveToLog: "Guardar", keepEditing: "Seguir Editando", newQuote: "Nueva Cotización",
     saveQuote: "Guardar Cotización", jobLabel: "Trabajo / Cliente",
     jobPlaceholder: "ej. Casa García — Mantenimiento",
     addressLabel: "Dirección", addressOpt: "(opcional)",
@@ -297,8 +297,8 @@ const TX = {
     quoteLog: "Historial", noQuotes: "No hay cotizaciones guardadas.",
     filterAll: "Todo", filterConverted: "✅ Convertido", filterPending: "⏳ Pendiente", filterDate: "📅 Por Fecha",
     markConverted: "✅ Convertido", unmarkConverted: "↩ Desmarcar",
-    editQuote: "✏️ Editar", deleteQuote: "🗑 Eliminar",
-    settings: "Ajustes", version: "ListoBid LLC · v1.0",
+    editQuote: "Editar", deleteQuote: "Eliminar",
+    settings: "Ajustes", version: "ListoBid LLC",
     trialLabel: "Prueba Gratis", trialDaysRemaining: "días restantes",
     language: "Idioma", editProfile: "Editar Perfil", manageJobs: "Tipos de Trabajo",
     industryLabel: "Industria",
@@ -732,7 +732,7 @@ function AdminDashboard({ onClose }) {
                         {u.accountType !== "free"  && <button className="btn bsm" style={{ background: "var(--glt)", color: "var(--gdk)", border: "none" }} onClick={() => updateUser(u.email, { accountType: "free" })}>Free</button>}
                         {u.accountType !== "paid"  && <button className="btn bsm bp" onClick={() => updateUser(u.email, { accountType: "paid" })}>Paid</button>}
                         {u.accountType !== "trial" && <button className="btn bsm bg" onClick={() => updateUser(u.email, { accountType: "trial" })}>Trial</button>}
-                        <button className="btn bsm bd" onClick={() => deleteUser(u.email)}>🗑 Delete</button>
+                        <button className="btn bsm bd" onClick={() => deleteUser(u.email)}>Delete</button>
                       </div>
                     </div>
                   );
@@ -870,9 +870,14 @@ export default function ListoBid() {
           quotesGenerated: profile.quotes_generated || 0,
           lastActive: new Date().toISOString(),
         };
-        if (profile.profile_data) { const p = { ...LS.get("lb_profile", {}), ...profile.profile_data }; LS.set("lb_profile", p); setProfile(p); }
-        if (profile.jobs_data)    { LS.set("lb_all_jobs", profile.jobs_data); setAllJobsRaw(profile.jobs_data); }
-        if (user.industry)        { LS.set("lb_industry", user.industry); setIndustry(user.industry); }
+        if (profile.profile_data && Object.keys(profile.profile_data).length > 0) {
+            const merged = { laborRate: "", crewSize: "2", targetMargin: "40", targetDollar: "50", marginMode: "pct", zipCode: "", vehicles: "1", fuelType: "gas", overheadMode: "none", overheadPct: "15", overheadFlat: "10", ...profile.profile_data };
+            LS.set("lb_profile", merged); setProfile(merged);
+          }
+          if (profile.jobs_data && Object.keys(profile.jobs_data).length > 0) {
+            LS.set("lb_all_jobs", profile.jobs_data); setAllJobsRaw(profile.jobs_data);
+          }
+          if (user.industry) { LS.set("lb_industry", user.industry); setIndustry(user.industry); }
         LS.set("lb_current_user", user);
         setCurrentUser(user);
         const l = LS.get("lb_lang", null);
@@ -987,6 +992,18 @@ export default function ListoBid() {
       if (user.industry)         LS.set("lb_industry", user.industry);
       // Update last active in Supabase
       await sb.from("profiles").update({ last_active: new Date().toISOString() }).eq("id", data.user.id);
+      // Load quotes from Supabase
+      const { data: remoteQuotes } = await sb.from("quotes").select("*").eq("user_id", data.user.id).order("created_at", { ascending: false });
+      if (remoteQuotes && remoteQuotes.length > 0) {
+        const mapped = remoteQuotes.map(q => ({
+          id: q.id, name: q.name, address: q.address || "", notes: q.notes || "",
+          price: q.price, margin: q.margin, profit: q.profit,
+          date: new Date(q.created_at).toLocaleDateString(),
+          jobType: q.job_type, industry: q.industry, converted: q.converted || false,
+        }));
+        LS.set("lb_quote_log", mapped);
+        setLog(mapped);
+      }
       LS.set("lb_current_user", user);
       setCurrentUser(user);
       const savedInd = user.industry;
@@ -1067,15 +1084,27 @@ export default function ListoBid() {
     // Save to Supabase in background
     if (currentUser?.id) {
       try {
-        await sb.from("quotes").insert({
-          user_id: currentUser.id, name: entry.name, address: entry.address,
-          notes: entry.notes, price: entry.price, cost: result.cost,
-          profit: entry.profit, margin: entry.margin, job_type: entry.jobType,
-          industry: entry.industry, converted: false,
+        const { error: qErr } = await sb.from("quotes").insert({
+          user_id: currentUser.id,
+          name: entry.name,
+          address: entry.address || "",
+          notes: entry.notes || "",
+          price: entry.price,
+          cost: result.cost,
+          profit: entry.profit,
+          margin: entry.margin,
+          job_type: entry.jobType,
+          industry: entry.industry,
+          converted: false,
         });
-        // Update quote count
-        await sb.from("profiles").update({ quotes_generated: (currentUser.quotesGenerated || 0) + 1 }).eq("id", currentUser.id);
-      } catch (e) { /* silent fail — local copy saved */ }
+        if (qErr) console.error("Quote save error:", qErr);
+        await sb.from("profiles").update({
+          quotes_generated: (currentUser.quotesGenerated || 0) + 1
+        }).eq("id", currentUser.id);
+        const updatedUser = { ...currentUser, quotesGenerated: (currentUser.quotesGenerated || 0) + 1 };
+        LS.set("lb_current_user", updatedUser);
+        setCurrentUser(updatedUser);
+      } catch (e) { console.error("Quote save exception:", e); }
     }
     setShowSave(false); setSaveName(""); setSaveNotes(""); setSaveAddress(""); setShowAct(false); reset();
   };
@@ -1091,7 +1120,7 @@ export default function ListoBid() {
   if (!lang || route === "welcome") return (
     <><style>{CSS}</style>
     <div className="wlc">
-      <div style={{marginBottom:24,marginTop:8}}><LogoMark size={34}/></div>
+      <div style={{marginBottom:20,marginTop:8,background:"#fff",borderRadius:20,padding:"16px 24px",display:"inline-block"}}><LogoImg width={180}/></div>
       <p className="wsub" style={{marginBottom:42}}>Ready to Bid.</p>
       <div className="ls">
         <button className="lbtn len" onClick={() => { setLang("en"); LS.set("lb_lang", "en"); setRoute(currentUser ? (industry ? "app" : "industry") : "register"); }}>🇺🇸 &nbsp;English</button>
@@ -1180,7 +1209,7 @@ export default function ListoBid() {
     <div className="app">
       <div className="hdr"><div className="hdr-logo"><LogoWordmark size={22}/></div></div>
       <div className="ct" style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: "70dvh", textAlign: "center" }}>
-        <div style={{ fontSize: 28, marginBottom: 8 }}>👋</div>
+        
         <div className="st" style={{ marginBottom: 4 }}>{lang === "es" ? `Hola, ${currentUser.firstName}!` : `Hi, ${currentUser.firstName}!`}</div>
         <div className="st" style={{ marginBottom: 6 }}>{t.chooseIndustry}</div>
         <p style={{ fontSize: 13, color: "var(--g400)", marginBottom: 28 }}>{t.industrySubtitle}</p>
@@ -1279,7 +1308,21 @@ export default function ListoBid() {
           <div className="steps">{Array.from({length:TOTAL_STEPS},(_,i)=>i+1).map(i=><div key={i} className={`sd ${i<step?"done":i===step?"active":""}`}/>)}</div>
           {stepContent[step-1]}
           <div style={{height:20}}/>
-          <button className="btn bp" onClick={()=>{ if(step<TOTAL_STEPS){setStep(s=>s+1);}else{setStep(0);setRoute("app");} }}>
+          <button className="btn bp" onClick={async ()=>{
+              if(step<TOTAL_STEPS){
+                setStep(s=>s+1);
+              } else {
+                // Final sync of all profile data to Supabase on setup completion
+                if(currentUser?.id) {
+                  await sb.from("profiles").update({
+                    profile_data: profile,
+                    jobs_data: allJobs,
+                    industry: industry,
+                  }).eq("id", currentUser.id);
+                }
+                setStep(0); setRoute("app");
+              }
+            }}>
             {step===TOTAL_STEPS?t.saveProfile:t.continue}
           </button>
           <button className="btn bg mt8" onClick={()=>{ if(step>1){setStep(s=>s-1);}else{setRoute("industry");setStep(0);} }}>{t.back}</button>
@@ -1407,7 +1450,7 @@ export default function ListoBid() {
             </div>
 
             {/* Calculate */}
-            <button className="btn bp" style={{opacity:canCalc?1:.45}} onClick={()=>{doCalc();setTimeout(()=>{document.getElementById("quote-result")?.scrollIntoView({behavior:"smooth",block:"start"})},100);}}>{t.calculate}</button>
+            <button className="btn bn" style={{opacity:canCalc?1:.45}} onClick={()=>{doCalc();setTimeout(()=>{document.getElementById("quote-result")?.scrollIntoView({behavior:"smooth",block:"start"})},100);}}>{t.calculate}</button>
 
             {result && <>
               <div id="quote-result" style={{height:4}}/>
@@ -1524,7 +1567,7 @@ export default function ListoBid() {
           {editingQuote&&(
             <div className="ov" onClick={()=>setEditingQuote(null)}>
               <div className="mo" onClick={e=>e.stopPropagation()}>
-                <div className="mo-t">✏️ {t.editQuote.replace("✏️ ","")}</div>
+                <div className="mo-t">Edit Quote</div>
                 <div className="fi"><label className="lb">{t.jobLabel}</label><input type="text" value={editingQuote.name} onChange={e=>setEditingQuote(q=>({...q,name:e.target.value}))}/></div>
                 <div className="fi"><label className="lb">{t.addressLabel} <span style={{color:"var(--g400)",fontWeight:400}}>{t.addressOpt}</span></label><AddressInput value={editingQuote.address||""} onChange={v=>setEditingQuote(q=>({...q,address:v}))}/></div>
                 <div className="fi" style={{marginBottom:0}}><label className="lb">{t.notes} <span style={{color:"var(--g400)",fontWeight:400}}>{t.notesOpt}</span></label><textarea rows={3} value={editingQuote.notes||""} onChange={e=>setEditingQuote(q=>({...q,notes:e.target.value}))}/></div>
@@ -1550,7 +1593,7 @@ export default function ListoBid() {
               </div>
             )}
             {currentUser.accountType==="paid"&&<div style={{background:"var(--glt)",border:"1px solid #A7F3D0",borderRadius:10,padding:"12px 16px",marginBottom:12,fontSize:13,color:"var(--gdk)",fontWeight:600}}>✅ Active Subscriber</div>}
-            {currentUser.accountType==="free"&&<div style={{background:"var(--glt)",border:"1px solid #A7F3D0",borderRadius:10,padding:"12px 16px",marginBottom:12,fontSize:13,color:"var(--gdk)",fontWeight:600}}>🎁 Free Access — Beta Member</div>}
+            {currentUser.accountType==="free"&&<div style={{background:"var(--glt)",border:"1px solid #A7F3D0",borderRadius:10,padding:"12px 16px",marginBottom:12,fontSize:13,color:"var(--gdk)",fontWeight:600}}>Free Access</div>}
             <div className="card">
               <div className="sr" style={{cursor:"pointer"}} onClick={()=>setSettView("profile")}><span className="sr-l">{t.editProfile}</span><span className="sr-v">›</span></div>
               <div className="sr" style={{cursor:"pointer"}} onClick={()=>setSettView("jobs")}><span className="sr-l">{t.manageJobs}</span><span className="sr-v">{jobs.length} types ›</span></div>
@@ -1633,7 +1676,7 @@ export default function ListoBid() {
     {showSave&&(
       <div className="ov" onClick={()=>setShowSave(false)}>
         <div className="mo" onClick={e=>e.stopPropagation()}>
-          <div className="mo-t">💾 {t.saveQuote}</div>
+          <div className="mo-t">{t.saveQuote}</div>
           <div className="fi"><label className="lb">{t.jobLabel}</label><input type="text" value={saveName} onChange={e=>setSaveName(e.target.value)} placeholder={t.jobPlaceholder} autoFocus/></div>
           <div className="fi"><label className="lb">{t.addressLabel} <span style={{color:"var(--g400)",fontWeight:400}}>{t.addressOpt}</span></label><AddressInput value={saveAddress} onChange={setSaveAddress}/></div>
           <div className="fi" style={{marginBottom:0}}><label className="lb">{t.notes} <span style={{color:"var(--g400)",fontWeight:400}}>{t.notesOpt}</span></label><textarea rows={3} value={saveNotes} onChange={e=>setSaveNotes(e.target.value)} placeholder={t.notesPlaceholder}/></div>
