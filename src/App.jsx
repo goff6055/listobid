@@ -203,8 +203,8 @@ const TX = {
     notes: "Notes", notesOpt: "(optional)", notesPlaceholder: "e.g. Call before arrival.",
     cancel: "Cancel", save: "Save",
     quoteLog: "Quote History", noQuotes: "No saved quotes yet.",
-    filterAll: "All", filterConverted: "✅ Converted", filterPending: "⏳ Pending", filterDate: "📅 By Date",
-    markConverted: "✅ Mark Converted", unmarkConverted: "↩ Unmark",
+    filterAll: "All", filterConverted: "Converted", filterPending: "Pending", filterDate: "By Date",
+    markConverted: "Mark Converted", unmarkConverted: "Unmark",
     editQuote: "Edit", deleteQuote: "Delete",
     settings: "Settings", version: "ListoBid",
     trialLabel: "Free Trial", trialDaysRemaining: "days remaining",
@@ -295,8 +295,8 @@ const TX = {
     notes: "Notas", notesOpt: "(opcional)", notesPlaceholder: "ej. Llamar antes de llegar.",
     cancel: "Cancelar", save: "Guardar",
     quoteLog: "Historial", noQuotes: "No hay cotizaciones guardadas.",
-    filterAll: "Todo", filterConverted: "✅ Convertido", filterPending: "⏳ Pendiente", filterDate: "📅 Por Fecha",
-    markConverted: "✅ Convertido", unmarkConverted: "↩ Desmarcar",
+    filterAll: "Todo", filterConverted: "Convertido", filterPending: "Pendiente", filterDate: "Por Fecha",
+    markConverted: "Convertido", unmarkConverted: "Desmarcar",
     editQuote: "Editar", deleteQuote: "Eliminar",
     settings: "Ajustes", version: "ListoBid",
     trialLabel: "Prueba Gratis", trialDaysRemaining: "días restantes",
@@ -343,7 +343,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--g100);color:var
 .fi{margin-bottom:13px}.fi:last-child{margin-bottom:0}
 .lb{display:block;font-size:13px;font-weight:600;color:var(--g600);margin-bottom:5px}
 .ht{font-size:11px;color:var(--g400);margin-top:3px}
-input[type=number],input[type=text],input[type=email],input[type=password],select,textarea{width:100%;padding:10px 12px;border:1.5px solid var(--g200);border-radius:var(--rsm);font-family:'Plus Jakarta Sans',sans-serif;font-size:15px;color:var(--g800);background:var(--g50);outline:none;transition:border-color .15s;-webkit-appearance:none}
+input[type=number],input[type=text],input[type=email],input[type=password],select,textarea{width:100%;padding:10px 12px;border:1.5px solid var(--g200);border-radius:var(--rsm);font-family:'Plus Jakarta Sans',sans-serif;font-size:16px;color:var(--g800);background:var(--g50);outline:none;transition:border-color .15s;-webkit-appearance:none}
 input:focus,select:focus,textarea:focus{border-color:var(--green);background:#fff}
 textarea{resize:vertical;line-height:1.5}
 select{cursor:pointer}
@@ -758,12 +758,10 @@ export default function ListoBid() {
   const [route, setRoute] = useState(() => {
     if (typeof window !== "undefined" && window.location.pathname === "/admin") return "admin";
     const u = LS.get("lb_current_user", null);
-    const l = LS.get("lb_lang", null);
     const ind = LS.get("lb_industry", null);
-    if (u && l && ind) return "app";
-    if (u && l) return "industry";
+    if (u && ind) return "app";
     if (u) return "industry";
-    return "register"; // Start at register screen directly
+    return "register";
   });
   const [sbLoading, setSbLoading] = useState(false);
 
@@ -814,7 +812,7 @@ export default function ListoBid() {
   const [exactMi, setExactMi] = useState("");
   const [vehs,    setVehs]    = useState(() => LS.get("lb_profile", { vehicles: "1" }).vehicles || "1");
   const [margin,  setMargin]  = useState(() => pf(LS.get("lb_profile", { targetMargin: "40" }).targetMargin, 40));
-  const [gasPrice, setGasPrice] = useState(() => LS.get("lb_gas_price", "0.00"));
+  const [gasPrice, setGasPrice] = useState(() => LS.get("lb_gas_price", "5.00"));
   const [qMarginMode, setQMarginMode] = useState(() => LS.get("lb_profile", { marginMode: "pct" }).marginMode || "pct");
   const [qTargetDollar, setQTargetDollar] = useState(() => LS.get("lb_profile", { targetDollar: "50" }).targetDollar || "50");
   const [qOverheadMode, setQOverheadMode] = useState(() => LS.get("lb_profile", { overheadMode: "none" }).overheadMode || "none");
@@ -842,7 +840,7 @@ export default function ListoBid() {
   const [tab, setTab] = useState("quote");
 
   const t = TX[lang] || TX.en;
-  const TOTAL_STEPS = 5;
+  const TOTAL_STEPS = 4;
 
   // ── Persist gas price ──
   useEffect(() => { LS.set("lb_gas_price", gasPrice); }, [gasPrice]);
@@ -1126,7 +1124,7 @@ export default function ListoBid() {
 
   if (route === "admin") return (<><style>{CSS}</style><AdminDashboard onClose={() => setRoute(currentUser ? "app" : "welcome")} /></>);
 
-  if (!lang || route === "welcome") return (
+  if (route === "welcome") return (
     <><style>{CSS}</style>
     <div className="wlc">
       <div style={{marginBottom:20,marginTop:8,background:"#fff",borderRadius:20,padding:"16px 24px",display:"inline-block"}}><LogoImg width={180}/></div>
@@ -1291,7 +1289,6 @@ export default function ListoBid() {
           <div className="px"><span className="pxs">$</span>
             <input type="number" step="0.01" min="0" value={gasPrice} onChange={e=>setGasPrice(e.target.value)} placeholder="3.42"/>
           </div>
-          te.</div>
         </div>
       </div>,
       // Step 3: Vehicles
@@ -1305,12 +1302,7 @@ export default function ListoBid() {
         <p style={{fontSize:13,color:"var(--g400)",marginBottom:14}}>{t.preloaded}</p>
         <JobLibrary jobs={jobs} setJobs={setJobs} t={t} showHeading={false}/>
       </div>,
-      // Step 5: Language
-      <div key="s5">
-        <div className="st">{t.setup}</div><div className="ss">{t.step} 5 {t.of} {TOTAL_STEPS} — Language</div>
-        <div className="fi"><label className="lb">{t.language}</label><div className="tg"><button className={`tb ${lang==="en"?"on":""}`} onClick={()=>{setLang("en");LS.set("lb_lang","en");}}>🇺🇸 English</button><button className={`tb ${lang==="es"?"on":""}`} onClick={()=>{setLang("es");LS.set("lb_lang","es");}}>🇲🇽 Español</button></div></div>
-        <p style={{fontSize:13,color:"var(--g400)",marginTop:8}}>You can change this anytime in Settings.</p>
-      </div>,
+
     ];
 
     return (
@@ -1465,13 +1457,12 @@ export default function ListoBid() {
             </div>
 
             {/* Calculate */}
-            <button className="btn bn" onClick={()=>{ if(!canCalc){ setShowRequired(true); return; } setShowRequired(false); doCalc(); setTimeout(()=>{document.getElementById("quote-result")?.scrollIntoView({behavior:"smooth",block:"start"})},100); }}>{t.calculate}</button>
+            <button className="btn bn" onClick={()=>{ if(!canCalc){ setShowRequired(true); return; } setShowRequired(false); doCalc(); setTimeout(()=>{document.getElementById("quote-result")?.scrollIntoView({behavior:"smooth",block:"start"})},150); }}>{t.calculate}</button>
 
             {result && <>
-              <div id="quote-result" style={{height:4}}/>
+              <div id="quote-result" style={{height:6}}/>
               <div style={{background:"var(--green)",borderRadius:10,padding:"12px 16px",marginBottom:12,display:"flex",alignItems:"center",gap:10}}>
-                <span style={{fontSize:20}}>✅</span>
-                <span style={{color:"#fff",fontWeight:700,fontSize:14}}>{lang==="es"?"Tu cotización está lista — mira abajo ↓":"Your quote is ready — see below ↓"}</span>
+                <span style={{color:"#fff",fontWeight:700,fontSize:14}}>{lang==="es"?"Tu cotización lista. Ver abajo.":"Your quote is ready. See below."}</span>
               </div>
 
               {/* Price card */}
