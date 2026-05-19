@@ -776,7 +776,7 @@ export default function ListoBid() {
   const [step,     setStep]     = useState(0);
 
   // ── Profile ──
-  const defProfile = { laborRate: "", crewSize: "2", targetMargin: "40", targetDollar: "50", marginMode: "pct", zipCode: "", vehicles: "1", fuelType: "gas", overheadMode: "none", overheadPct: "15", overheadFlat: "10" };
+  const defProfile = { businessName: "", laborRate: "", crewSize: "2", targetMargin: "40", targetDollar: "50", marginMode: "pct", zipCode: "", vehicles: "1", fuelType: "gas", overheadMode: "none", overheadPct: "15", overheadFlat: "10" };
   const [profile, setProfile] = useState(() => ({ ...defProfile, ...LS.get("lb_profile", {}) }));
   const ps = (k, v) => {
     const p = { ...profile, [k]: v }; setProfile(p); LS.set("lb_profile", p);
@@ -821,10 +821,12 @@ export default function ListoBid() {
   const [log,          setLog]          = useState(() => LS.get("lb_quote_log", []));
   const [showSave,     setShowSave]     = useState(false);
   const [saveName,     setSaveName]     = useState("");
+  const [saveSuccess,  setSaveSuccess]  = useState(null); // {price, profit, margin}
   const [saveNotes,    setSaveNotes]    = useState("");
   const [saveAddress,  setSaveAddress]  = useState("");
   const [logFilter,    setLogFilter]    = useState("all");
-  const [editingQuote, setEditingQuote] = useState(null);
+  const [editingQuote,  setEditingQuote]  = useState(null);
+  const [sharingQuote,  setSharingQuote]  = useState(null);
 
   // ── Settings ──
   const [settView, setSettView] = useState("main");
@@ -1109,7 +1111,10 @@ export default function ListoBid() {
         setCurrentUser(updatedUser);
       } catch (e) { console.error("Quote save exception:", e); }
     }
-    setShowSave(false); setSaveName(""); setSaveNotes(""); setSaveAddress(""); setShowAct(false); reset();
+    setShowSave(false); setSaveName(""); setSaveNotes(""); setSaveAddress(""); setShowAct(false);
+    setSaveSuccess({ price: entry.price, profit: Math.round(entry.profit), margin: Math.round(entry.margin) });
+    reset();
+    setTimeout(() => setSaveSuccess(null), 4000);
   };
 
   const updateQuote = (id, updates) => { const nl = log.map(q => q.id === id ? { ...q, ...updates } : q); setLog(nl); LS.set("lb_quote_log", nl); };
@@ -1255,6 +1260,7 @@ export default function ListoBid() {
       // Step 1: Labor, Margin, Overhead
       <div key="s1">
         <div className="st">{t.setup}</div><div className="ss">{t.step} 1 {t.of} {TOTAL_STEPS} — Labor, Margin & Overhead</div>
+        <div className="fi"><label className="lb">Business Name <span style={{fontSize:11,color:"var(--g400)",fontWeight:400}}>(optional)</span></label><input type="text" value={profile.businessName||""} onChange={e=>ps("businessName",e.target.value)} placeholder="e.g. Garcia Landscaping"/></div>
         <div className="fi"><label className="lb">{t.laborRate}</label><div className="px"><span className="pxs">$</span><input type="number" min="0" value={profile.laborRate} onChange={e => ps("laborRate", e.target.value)} placeholder="18.00" /></div><div className="ht">{t.laborHint}</div></div>
         <div className="fi"><label className="lb">{t.crewSize}</label><div className="tg">{[1,2,3,4,5,6,7,8,9,10].map(x => <button key={x} className={`tb ${profile.crewSize===String(x)?"on":""}`} style={{flex:"0 0 calc(20% - 6px)",minWidth:36}} onClick={()=>ps("crewSize",String(x))}>{x}</button>)}</div></div>
         <div className="fi"><label className="lb">{t.marginMode}</label>
@@ -1521,22 +1527,61 @@ export default function ListoBid() {
             </>}
           </>}
           {trial.softLock && <button className="btn bn mt8" onClick={()=>setTab("log")}>{t.viewLog}</button>}
+
+          {/* Post-save success message */}
+          {saveSuccess && (
+            <div style={{position:"fixed",bottom:80,left:"50%",transform:"translateX(-50%)",background:"var(--navy)",borderRadius:14,padding:"14px 20px",boxShadow:"0 8px 32px rgba(0,0,0,.25)",zIndex:400,display:"flex",alignItems:"center",gap:12,minWidth:260,maxWidth:340}}>
+              <div style={{width:36,height:36,background:"var(--green)",borderRadius:10,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,fontSize:18}}>✓</div>
+              <div>
+                <div style={{color:"#fff",fontWeight:700,fontSize:14,marginBottom:2}}>Nice work — quote saved.</div>
+                <div style={{color:"rgba(255,255,255,.6)",fontSize:12}}>${saveSuccess.price} price · ${saveSuccess.profit} profit · {saveSuccess.margin}% margin</div>
+              </div>
+            </div>
+          )}
         </>}
 
         {/* ══ LOG ══ */}
         {tab==="log" && <>
           <div className="st">{t.quoteLog}</div>
-          <div className="ss">{log.length} saved</div>
+
+          {/* Summary stats */}
+          {log.length > 0 && (() => {
+            const totalProfit = log.reduce((s,q) => s + (q.profit||0), 0);
+            const avgMargin   = Math.round(log.reduce((s,q) => s + (q.margin||0), 0) / log.length);
+            return (
+              <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:8,marginBottom:16}}>
+                <div style={{background:"var(--navy)",borderRadius:10,padding:"12px 10px",textAlign:"center"}}>
+                  <div style={{fontFamily:"'Plus Jakarta Sans',sans-serif",fontWeight:800,fontSize:22,color:"#fff",lineHeight:1}}>{log.length}</div>
+                  <div style={{fontSize:10,fontWeight:700,letterSpacing:".8px",textTransform:"uppercase",color:"rgba(255,255,255,.4)",marginTop:3}}>Quotes</div>
+                </div>
+                <div style={{background:"var(--navy)",borderRadius:10,padding:"12px 10px",textAlign:"center"}}>
+                  <div style={{fontFamily:"'Plus Jakarta Sans',sans-serif",fontWeight:800,fontSize:22,color:"var(--green)",lineHeight:1}}>${Math.round(totalProfit).toLocaleString()}</div>
+                  <div style={{fontSize:10,fontWeight:700,letterSpacing:".8px",textTransform:"uppercase",color:"rgba(255,255,255,.4)",marginTop:3}}>Est. Profit</div>
+                </div>
+                <div style={{background:"var(--navy)",borderRadius:10,padding:"12px 10px",textAlign:"center"}}>
+                  <div style={{fontFamily:"'Plus Jakarta Sans',sans-serif",fontWeight:800,fontSize:22,color:"#fff",lineHeight:1}}>{avgMargin}%</div>
+                  <div style={{fontSize:10,fontWeight:700,letterSpacing:".8px",textTransform:"uppercase",color:"rgba(255,255,255,.4)",marginTop:3}}>Avg Margin</div>
+                </div>
+              </div>
+            );
+          })()}
+
+          <div className="ss" style={{marginBottom:10}}>{log.length} saved</div>
           <div style={{display:"flex",gap:6,flexWrap:"wrap",marginBottom:14}}>
-            {[{k:"all",l:t.filterAll},{k:"converted",l:t.filterConverted},{k:"notConverted",l:t.filterPending},{k:"byDate",l:t.filterDate}].map(f=>(
+            {[{k:"all",l:"All"},{k:"thisWeek",l:"This Week"},{k:"converted",l:"Converted"},{k:"notConverted",l:"Pending"}].map(f=>(
               <button key={f.k} className={`tb ${logFilter===f.k?"on":""}`} style={{flex:"none",padding:"6px 12px",fontSize:12}} onClick={()=>setLogFilter(f.k)}>{f.l}</button>
             ))}
           </div>
           {log.length===0
             ? <div className="empty"><div style={{fontSize:38,marginBottom:10}}>📋</div><div>{t.noQuotes}</div></div>
             : [...log]
-                .filter(q=>logFilter==="converted"?q.converted:logFilter==="notConverted"?!q.converted:true)
-                .sort((a,b)=>logFilter==="byDate"?new Date(b.date)-new Date(a.date):b.id-a.id)
+                .filter(q=>{
+                    if(logFilter==="converted") return q.converted;
+                    if(logFilter==="notConverted") return !q.converted;
+                    if(logFilter==="thisWeek"){const w=new Date(Date.now()-7*24*60*60*1000);return new Date(q.date)>=w;}
+                    return true;
+                  })
+                  .sort((a,b)=>b.id-a.id)
                 .map(q=>{
                   const qm=marginMeta(q.margin);
                   return (
@@ -1616,6 +1661,7 @@ export default function ListoBid() {
               <div className="st" style={{margin:0}}>{t.editProfile}</div>
             </div>
             <div className="card">
+              <div className="fi"><label className="lb">Business Name <span style={{fontSize:11,color:"var(--g400)",fontWeight:400}}>(optional)</span></label><input type="text" value={profile.businessName||""} onChange={e=>ps("businessName",e.target.value)} placeholder="e.g. Garcia Landscaping"/></div>
               <div className="fi"><label className="lb">{t.laborRate}</label><div className="px"><span className="pxs">$</span><input type="number" min="0" value={profile.laborRate} onChange={e=>ps("laborRate",e.target.value)}/></div></div>
               <div className="fi"><label className="lb">{t.crewSize}</label><div className="tg">{[1,2,3,4,5,6,7,8,9,10].map(x=><button key={x} className={`tb ${profile.crewSize===String(x)?"on":""}`} style={{flex:"0 0 calc(20% - 6px)",minWidth:36}} onClick={()=>ps("crewSize",String(x))}>{x}</button>)}</div></div>
               <div className="fi"><label className="lb">{t.marginMode}</label>
@@ -1681,6 +1727,41 @@ export default function ListoBid() {
             <button className="btn bg" onClick={()=>{setShowSave(false);setSaveNotes("");setSaveAddress("");}}>{t.cancel}</button>
             <button className="btn bp" style={{opacity:saveName.trim()?1:.45}} onClick={saveQuote}>{t.save}</button>
           </div>
+        </div>
+      </div>
+    )}
+
+    {/* Share Quote Modal */}
+    {sharingQuote && (
+      <div className="ov" onClick={()=>setSharingQuote(null)}>
+        <div className="mo" onClick={e=>e.stopPropagation()} style={{background:"var(--navy)",borderRadius:"20px 20px 0 0",padding:"28px 24px 40px"}}>
+          <div style={{textAlign:"center",marginBottom:20}}>
+            <div style={{fontSize:11,fontWeight:700,letterSpacing:"1.5px",textTransform:"uppercase",color:"rgba(255,255,255,.4)",marginBottom:12}}>Quote Summary</div>
+            {profile.businessName&&<div style={{fontWeight:800,fontSize:20,color:"#fff",marginBottom:4}}>{profile.businessName}</div>}
+            <div style={{fontSize:14,color:"rgba(255,255,255,.5)",marginBottom:20}}>{sharingQuote.name}</div>
+            <div style={{fontWeight:800,fontSize:60,color:"#fff",lineHeight:1,marginBottom:4}}>
+              <span style={{fontSize:26,verticalAlign:"top",marginTop:8,display:"inline-block"}}>$</span>{sharingQuote.price}
+            </div>
+            <div style={{fontSize:12,color:"rgba(255,255,255,.4)",marginBottom:20}}>Recommended Price</div>
+            <div style={{display:"flex",gap:16,justifyContent:"center",marginBottom:20}}>
+              <div style={{textAlign:"center"}}>
+                <div style={{fontWeight:800,fontSize:20,color:"var(--green)"}}>+${Math.round(sharingQuote.profit)}</div>
+                <div style={{fontSize:10,fontWeight:700,letterSpacing:".8px",textTransform:"uppercase",color:"rgba(255,255,255,.3)",marginTop:2}}>Profit</div>
+              </div>
+              <div style={{width:1,background:"rgba(255,255,255,.1)"}}/>
+              <div style={{textAlign:"center"}}>
+                <div style={{fontWeight:800,fontSize:20,color:"#fff"}}>{Math.round(sharingQuote.margin)}%</div>
+                <div style={{fontSize:10,fontWeight:700,letterSpacing:".8px",textTransform:"uppercase",color:"rgba(255,255,255,.3)",marginTop:2}}>Margin</div>
+              </div>
+            </div>
+            <div style={{fontSize:11,color:"rgba(255,255,255,.2)"}}>listobid.com</div>
+          </div>
+          <button className="btn bp" onClick={()=>{
+            const text = `${profile.businessName?profile.businessName+" — ":""}${sharingQuote.name}\nPrice: $${sharingQuote.price} · Profit: $${Math.round(sharingQuote.profit)} · Margin: ${Math.round(sharingQuote.margin)}%\nPriced with ListoBid — listobid.com`;
+            if(navigator.share){navigator.share({title:"ListoBid Quote",text}).catch(()=>{});}
+            else{navigator.clipboard.writeText(text).then(()=>{setSharingQuote(null);});}
+          }}>Share Quote</button>
+          <button className="btn bg mt8" style={{borderColor:"rgba(255,255,255,.2)",color:"rgba(255,255,255,.6)"}} onClick={()=>setSharingQuote(null)}>Close</button>
         </div>
       </div>
     )}
