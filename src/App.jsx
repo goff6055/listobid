@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 
 // ─── CONFIG ───────────────────────────────────────────────────────────────────
-const STRIPE_LINK      = "https://buy.stripe.com/test_dRm8wRb6e4Hu4Rm3ib2VG00";
+const STRIPE_LINK      = "https://buy.stripe.com/5kQ3cx5GAdQp9VH0wFgw000";
 const TRIAL_DAYS       = 14;
 const SOFT_LOCK_DAYS   = 5;
 const ADMIN_PASSWORD   = "listobid2026";
@@ -149,7 +149,7 @@ const TX = {
     trialBanner: "Free trial ends in", trialDaysLeft: "days",
     trialExpiredTitle: "Your free trial has ended",
     trialExpiredBody: "Subscribe to keep pricing jobs and tracking your profit.",
-    subscribeNow: "Subscribe Now — $19.99/mo",
+    subscribeNow: "Subscribe Now - $9.99/mo",
     softLockTitle: "Trial Ended",
     softLockBody: "You can view saved quotes but cannot create new ones.",
     softLockDays: "days until full lock",
@@ -158,7 +158,7 @@ const TX = {
     reminderDay10Body: "Your free trial ends in 4 days. Subscribe to keep full access.",
     reminderDay13Title: "Trial ending tomorrow",
     reminderDay13Body: "Your free trial ends tomorrow. Subscribe to avoid losing access.",
-    subscribeBtn: "Subscribe — $19.99/mo", remindLater: "Remind Me Later",
+    subscribeBtn: "Subscribe - $9.99/mo", remindLater: "Remind Me Later",
     chooseLanguage: "Choose your language",
     chooseIndustry: "What industry are you in?",
     industrySubtitle: "This sets up your job types",
@@ -177,7 +177,7 @@ const TX = {
     jobLibrary: "Job Library", addJob: "+ Add Job Type",
     jobName2: "Job Type Name", defHours: "Default Hours", defMats: "Default Materials ($)",
     saveJob: "Save", editJob: "Edit", deleteJob: "Delete",
-    preloaded: "Preloaded defaults — edit or add your own",
+    preloaded: "Preloaded defaults - edit or add your own",
     priceJob: "Price a Job", fillDetails: "Fill in details - get your price.",
     jobType: "Job Type", selectJob: "Select a job type...",
     crewWage: "Crew & Wage", perPerson: "per person / hr",
@@ -198,13 +198,13 @@ const TX = {
     donePrompt: "Save or Continue", whatsNext: "What's next?",
     saveToLog: "Save to Log", keepEditing: "Keep Editing", newQuote: "New Quote",
     saveQuote: "Save Quote", jobLabel: "Job Name / Customer",
-    jobPlaceholder: "e.g. Smith Residence — Weekly",
+    jobPlaceholder: "e.g. Smith Residence - Weekly",
     addressLabel: "Address", addressOpt: "(optional)",
     notes: "Notes", notesOpt: "(optional)", notesPlaceholder: "e.g. Call before arrival.",
     cancel: "Cancel", save: "Save",
     quoteLog: "Quote History", noQuotes: "No saved quotes yet.",
-    filterAll: "All", filterConverted: "Converted", filterPending: "Pending", filterDate: "By Date",
-    markConverted: "Mark Converted", unmarkConverted: "Unmark",
+    filterAll: "All", filterConverted: "Booked", filterPending: "Pending", filterDate: "By Date",
+    markConverted: "Mark Booked", unmarkConverted: "Unmark",
     editQuote: "Edit", deleteQuote: "Delete",
     settings: "Settings", version: "ListoBid",
     trialLabel: "Free Trial", trialDaysRemaining: "days remaining",
@@ -241,7 +241,7 @@ const TX = {
     trialBanner: "Prueba gratis termina en", trialDaysLeft: "días",
     trialExpiredTitle: "Tu prueba gratuita ha terminado",
     trialExpiredBody: "Suscríbete para seguir cotizando trabajos.",
-    subscribeNow: "Suscribirse — $19.99/mes",
+    subscribeNow: "Suscribirse - $9.99/mes",
     softLockTitle: "Prueba Terminada",
     softLockBody: "Puedes ver cotizaciones guardadas pero no crear nuevas.",
     softLockDays: "días hasta bloqueo total",
@@ -250,7 +250,7 @@ const TX = {
     reminderDay10Body: "Tu prueba gratuita termina en 4 días.",
     reminderDay13Title: "La prueba termina mañana",
     reminderDay13Body: "Tu prueba gratuita termina mañana.",
-    subscribeBtn: "Suscribirse — $19.99/mes", remindLater: "Recordarme Después",
+    subscribeBtn: "Suscribirse - $9.99/mes", remindLater: "Recordarme Después",
     chooseLanguage: "Elige tu idioma",
     chooseIndustry: "¿En qué industria trabajas?",
     industrySubtitle: "Esto configura tus tipos de trabajo",
@@ -269,7 +269,7 @@ const TX = {
     jobLibrary: "Tipos de Trabajo", addJob: "+ Agregar Tipo",
     jobName2: "Nombre del Tipo", defHours: "Horas por Defecto", defMats: "Materiales ($)",
     saveJob: "Guardar", editJob: "Editar", deleteJob: "Eliminar",
-    preloaded: "Tipos precargados — edita o agrega los tuyos",
+    preloaded: "Tipos precargados - edita o agrega los tuyos",
     priceJob: "Cotizar Trabajo", fillDetails: "Llena los datos - obtén tu precio.",
     jobType: "Tipo de Trabajo", selectJob: "Selecciona un tipo...",
     crewWage: "Equipo y Salario", perPerson: "por persona / hr",
@@ -290,13 +290,13 @@ const TX = {
     donePrompt: "Guardar o Continuar", whatsNext: "¿Qué sigue?",
     saveToLog: "Guardar", keepEditing: "Seguir Editando", newQuote: "Nueva Cotización",
     saveQuote: "Guardar Cotización", jobLabel: "Trabajo / Cliente",
-    jobPlaceholder: "ej. Casa García — Mantenimiento",
+    jobPlaceholder: "ej. Casa García - Mantenimiento",
     addressLabel: "Dirección", addressOpt: "(opcional)",
     notes: "Notas", notesOpt: "(opcional)", notesPlaceholder: "ej. Llamar antes de llegar.",
     cancel: "Cancelar", save: "Guardar",
     quoteLog: "Historial", noQuotes: "No hay cotizaciones guardadas.",
-    filterAll: "Todo", filterConverted: "Convertido", filterPending: "Pendiente", filterDate: "Por Fecha",
-    markConverted: "Convertido", unmarkConverted: "Desmarcar",
+    filterAll: "Todo", filterConverted: "Confirmado", filterPending: "Pendiente", filterDate: "Por Fecha",
+    markConverted: "Confirmado", unmarkConverted: "Desmarcar",
     editQuote: "Editar", deleteQuote: "Eliminar",
     settings: "Ajustes", version: "ListoBid",
     trialLabel: "Prueba Gratis", trialDaysRemaining: "días restantes",
@@ -457,13 +457,13 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
 // ─── ICONS ────────────────────────────────────────────────────────────────────
 // ListoBid logo SVG recreated from brand asset
 // ─── LOGO COMPONENTS ─────────────────────────────────────────────────────────
-// LogoImg: actual PNG — used on white backgrounds (auth screens)
+// LogoImg: actual PNG - used on white backgrounds (auth screens)
 const LogoImg = ({ width = 140 }) => (
   <img src="/logo.PNG" alt="ListoBid"
     style={{width, height:"auto", maxWidth:"100%", display:"block", objectFit:"contain"}} />
 );
 
-// LogoText: text wordmark — used on dark navy backgrounds (header, welcome)
+// LogoText: text wordmark - used on dark navy backgrounds (header, welcome)
 const LogoText = ({ size = 22 }) => (
   <div style={{display:"flex",alignItems:"baseline",gap:0,lineHeight:1}}>
     <span style={{fontFamily:"'Plus Jakarta Sans',sans-serif",fontWeight:800,fontSize:size,color:"#ffffff",letterSpacing:-0.3}}>Listo</span>
@@ -478,7 +478,7 @@ const LogoCompact  = ({ size = 64 }) => <LogoImg width={size}/>;
 
 // ─── ICONS ────────────────────────────────────────────────────────────────────
 // ListoBid logo SVG recreated from brand asset
-// Auth screens (white bg) — use actual PNG
+// Auth screens (white bg) - use actual PNG
 const IcoCalc = () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="10" x2="10" y2="10"/><line x1="14" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="10" y2="14"/><line x1="14" y1="14" x2="16" y2="14"/><line x1="8" y1="18" x2="10" y2="18"/><line x1="14" y1="18" x2="16" y2="18"/></svg>;
 const IcoList = () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>;
 const IcoGear = () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>;
@@ -597,7 +597,7 @@ function AdminDashboard({ onClose }) {
   const [users, setUsers] = useState([]);
   const [loadingUsers, setLoadingUsers] = useState(true);
 
-  // Load all users from Supabase (using anon key — only works because we query profiles which has open select for now)
+  // Load all users from Supabase (using anon key - only works because we query profiles which has open select for now)
   // In production this would use a service role key via edge function
   useEffect(() => {
     if (!authed) return;
@@ -726,7 +726,7 @@ function AdminDashboard({ onClose }) {
                         <div>
                           <div style={{ fontWeight: 700, fontSize: 15, color: "var(--navy)" }}>{u.firstName}</div>
                           <div style={{ fontSize: 12, color: "var(--g400)" }}>{u.email}</div>
-                          <div style={{ fontSize: 12, color: "var(--g600)", marginTop: 2, textTransform: "capitalize" }}>{u.industry || "—"}</div>
+                          <div style={{ fontSize: 12, color: "var(--g600)", marginTop: 2, textTransform: "capitalize" }}>{u.industry || "-"}</div>
                           <div style={{ fontSize: 12, color: "var(--g600)", marginTop: 1 }}>Calculated: {u.quotesGenerated || 0} &nbsp;·&nbsp; Saved: {u.savedQuotes || 0}</div>
                           <div style={{ fontSize: 11, color: "var(--g400)" }}>Joined {new Date(u.signupDate).toLocaleDateString()}</div>
                         </div>
@@ -776,7 +776,7 @@ export default function ListoBid() {
   const [step,     setStep]     = useState(0);
 
   // ── Profile ──
-  const defProfile = { businessName: "", laborRate: "", crewSize: "2", targetMargin: "40", targetDollar: "50", marginMode: "pct", zipCode: "", vehicles: "1", fuelType: "gas", overheadMode: "none", overheadPct: "15", overheadFlat: "10" };
+  const defProfile = { businessName: "", laborRate: "", crewSize: "2", targetMargin: "40", targetDollar: "50", marginMode: "pct", zipCode: "", vehicles: "1", fuelType: "gas", overheadMode: "none", overheadPct: "15", overheadFlat: "10", includeOneTime: true };
   const [profile, setProfile] = useState(() => ({ ...defProfile, ...LS.get("lb_profile", {}) }));
   const ps = (k, v) => {
     const p = { ...profile, [k]: v }; setProfile(p); LS.set("lb_profile", p);
@@ -802,8 +802,14 @@ export default function ListoBid() {
 
   // ── Quote form ──
   const [selJob,  setSelJob]  = useState("");
+  const [cadence, setCadence] = useState("once"); // once | weekly | biweekly | monthly | custom
+  const [customCadence, setCustomCadence] = useState(""); // e.g. "every 3 weeks"
+  const [resultView, setResultView] = useState("single"); // single | recurring
   const [hours,   setHours]   = useState("");
-  const [mats,    setMats]    = useState("");
+  const [mats,       setMats]       = useState("");
+  const [matsRaw,    setMatsRaw]    = useState("");
+  const [markupPct,  setMarkupPct]  = useState("20");
+  const [showMarkup, setShowMarkup] = useState(false);
   const [tier,    setTier]    = useState("short");
   const [exactMi, setExactMi] = useState("");
   const [vehs,    setVehs]    = useState(() => LS.get("lb_profile", { vehicles: "1" }).vehicles || "1");
@@ -824,7 +830,9 @@ export default function ListoBid() {
   const [saveSuccess,  setSaveSuccess]  = useState(null); // {price, profit, margin}
   const [saveNotes,    setSaveNotes]    = useState("");
   const [saveAddress,  setSaveAddress]  = useState("");
-  const [logFilter,    setLogFilter]    = useState("all");
+  const [logFilter,      setLogFilter]      = useState("all");
+  const [historyJobType, setHistoryJobType] = useState(null);
+  const [statPeriod,   setStatPeriod]   = useState("monthly");
   const [editingQuote,  setEditingQuote]  = useState(null);
   const [sharingQuote,  setSharingQuote]  = useState(null);
 
@@ -1073,7 +1081,7 @@ export default function ListoBid() {
     if (j) { setHours(String(j.hours)); setMats(String(j.materials)); }
   };
 
-  const reset = () => { setSelJob(""); setHours(""); setMats(""); setTier("short"); setExactMi(""); setVehs(profile.vehicles); setMargin(pf(profile.targetMargin, 40)); setResult(null); setShowAct(false); };
+  const reset = () => { setSelJob(""); setHours(""); setMats(""); setMatsRaw(""); setMarkupPct("20"); setShowMarkup(false); setTier("short"); setExactMi(""); setVehs(profile.vehicles); setMargin(pf(profile.targetMargin, 40)); setResult(null); setShowAct(false); setCadence("once"); setCustomCadence(""); setResultView("single"); };
 
   const saveQuote = async () => {
     if (!saveName.trim() || !result) return;
@@ -1081,8 +1089,9 @@ export default function ListoBid() {
       id: Date.now(), name: saveName.trim(), notes: saveNotes.trim(),
       address: saveAddress.trim(), price: result.price, margin: result.margin,
       profit: result.profit, date: new Date().toLocaleDateString(),
-      jobType: jobs.find(j => String(j.id) === String(selJob))?.name || "—",
+      jobType: jobs.find(j => String(j.id) === String(selJob))?.name || "-",
       industry: industry || "landscaping", converted: false,
+      cadence, customCadence,
     };
     // Save to local log immediately for fast UI
     const nl = [entry, ...log]; setLog(nl); LS.set("lb_quote_log", nl);
@@ -1208,7 +1217,7 @@ export default function ListoBid() {
       <p style={{ fontSize: 22, color: "#fff", fontWeight: 700, marginBottom: 10 }}>{t.trialExpiredTitle}</p>
       <p style={{ fontSize: 14, color: "rgba(255,255,255,.5)", marginBottom: 32, maxWidth: 280, lineHeight: 1.6 }}>{t.trialExpiredBody}</p>
       <div style={{ background: "rgba(255,255,255,.06)", border: "1px solid rgba(255,255,255,.1)", borderRadius: 14, padding: "18px 22px", marginBottom: 24, width: "100%", maxWidth: 300 }}>
-        <div style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontWeight: 800, fontSize: 40, color: "var(--green)" }}>$19.99<span style={{ fontSize: 18, color: "rgba(255,255,255,.4)" }}>/mo</span></div>
+        <div style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontWeight: 800, fontSize: 40, color: "var(--green)" }}>$9.99<span style={{ fontSize: 18, color: "rgba(255,255,255,.4)" }}>/mo</span></div>
         <div style={{ fontSize: 12, color: "rgba(255,255,255,.4)", marginTop: 5 }}>Cancel anytime · Autopay</div>
       </div>
       <a href={STRIPE_LINK} target="_blank" rel="noopener noreferrer" style={{ width: "100%", maxWidth: 300, display: "block", padding: 14, background: "linear-gradient(135deg,var(--green),var(--gdk))", color: "#fff", borderRadius: 12, fontFamily: "'Plus Jakarta Sans',sans-serif", fontSize: 15, fontWeight: 700, textDecoration: "none", textAlign: "center" }}>{t.subscribeNow}</a>
@@ -1259,7 +1268,7 @@ export default function ListoBid() {
     const stepContent = [
       // Step 1: Labor, Margin, Overhead
       <div key="s1">
-        <div className="st">{t.setup}</div><div className="ss">{t.step} 1 {t.of} {TOTAL_STEPS} — Labor, Margin & Overhead</div>
+        <div className="st">{t.setup}</div><div className="ss">{t.step} 1 {t.of} {TOTAL_STEPS} - Labor, Margin & Overhead</div>
         <div className="fi"><label className="lb">Business Name <span style={{fontSize:11,color:"var(--g400)",fontWeight:400}}>(optional)</span></label><input type="text" value={profile.businessName||""} onChange={e=>ps("businessName",e.target.value)} placeholder="e.g. Garcia Landscaping"/></div>
         <div className="fi"><label className="lb">{t.laborRate}</label><div className="px"><span className="pxs">$</span><input type="number" min="0" value={profile.laborRate} onChange={e => ps("laborRate", e.target.value)} placeholder="18.00" /></div><div className="ht">{t.laborHint}</div></div>
         <div className="fi"><label className="lb">{t.crewSize}</label><div className="tg">{[1,2,3,4,5,6,7,8,9,10].map(x => <button key={x} className={`tb ${profile.crewSize===String(x)?"on":""}`} style={{flex:"0 0 calc(20% - 6px)",minWidth:36}} onClick={()=>ps("crewSize",String(x))}>{x}</button>)}</div></div>
@@ -1285,7 +1294,7 @@ export default function ListoBid() {
       </div>,
       // Step 2: Fuel Cost
       <div key="s2">
-        <div className="st">{t.setup}</div><div className="ss">{t.step} 2 {t.of} {TOTAL_STEPS} — Fuel Cost</div>
+        <div className="st">{t.setup}</div><div className="ss">{t.step} 2 {t.of} {TOTAL_STEPS} - Fuel Cost</div>
         <div className="fi">
           <label className="lb">{t.gasPriceLabel}</label>
           <div className="px"><span className="pxs">$</span>
@@ -1295,12 +1304,12 @@ export default function ListoBid() {
       </div>,
       // Step 3: Vehicles
       <div key="s3">
-        <div className="st">{t.setup}</div><div className="ss">{t.step} 3 {t.of} {TOTAL_STEPS} — Vehicles</div>
+        <div className="st">{t.setup}</div><div className="ss">{t.step} 3 {t.of} {TOTAL_STEPS} - Vehicles</div>
         <div className="fi"><label className="lb">{t.vehicles}</label><div className="tg">{[1,2,3,4,5].map(x=><button key={x} className={`tb ${profile.vehicles===String(x)?"on":""}`} onClick={()=>ps("vehicles",String(x))}>{x}</button>)}</div></div>
       </div>,
       // Step 4: Job Library
       <div key="s4">
-        <div className="st">{t.setup}</div><div className="ss">{t.step} 4 {t.of} {TOTAL_STEPS} — {t.jobLibrary}</div>
+        <div className="st">{t.setup}</div><div className="ss">{t.step} 4 {t.of} {TOTAL_STEPS} - {t.jobLibrary}</div>
         <p style={{fontSize:13,color:"var(--g400)",marginBottom:14}}>{t.preloaded}</p>
         <JobLibrary jobs={jobs} setJobs={setJobs} t={t} showHeading={false}/>
       </div>,
@@ -1353,7 +1362,7 @@ export default function ListoBid() {
 
       {trial.softLock && (
         <div className="soft-banner">
-          <div className="soft-banner-text">{t.softLockTitle} — {SOFT_LOCK_DAYS - trial.daysAfter} {t.softLockDays}. {t.softLockBody}</div>
+          <div className="soft-banner-text">{t.softLockTitle} - {SOFT_LOCK_DAYS - trial.daysAfter} {t.softLockDays}. {t.softLockBody}</div>
           <a href={STRIPE_LINK} target="_blank" rel="noopener noreferrer" className="soft-banner-btn">{t.subscribeNow}</a>
         </div>
       )}
@@ -1408,7 +1417,23 @@ export default function ListoBid() {
               <div className="ct2">{t.jobDetails}</div>
               <div className="r2">
                 <div className="fi" style={{marginBottom:0}}><label className="lb">{t.hoursOnSite}</label><input type="number" min="0" step="0.5" value={hours} onChange={e=>{setHours(e.target.value);setResult(null);}} placeholder="2"/></div>
-                <div className="fi" style={{marginBottom:0}}><label className="lb">{t.materialsCost}</label><div className="px"><span className="pxs">$</span><input type="number" min="0" value={mats} onChange={e=>{setMats(e.target.value);setResult(null);}} placeholder="0"/></div></div>
+                <div className="fi" style={{marginBottom:0}}>
+                  <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:4}}>
+                    <label className="lb" style={{margin:0}}>{t.materialsCost}</label>
+                    <button onClick={()=>setShowMarkup(s=>!s)} style={{fontSize:10,fontWeight:700,color:"var(--green)",background:"none",border:"1px solid var(--green)",borderRadius:5,padding:"2px 6px",cursor:"pointer",fontFamily:"inherit"}}>{showMarkup?"- Markup":"+ Markup"}</button>
+                  </div>
+                  {showMarkup?(
+                    <div style={{display:"flex",flexDirection:"column",gap:6}}>
+                      <div className="r2" style={{gap:6}}>
+                        <div><div style={{fontSize:10,color:"var(--g400)",fontWeight:600,marginBottom:3}}>Cost Paid</div><div className="px"><span className="pxs">$</span><input type="number" min="0" value={matsRaw} onChange={e=>{setMatsRaw(e.target.value);const v=parseFloat(e.target.value)||0;const m=parseFloat(markupPct)||20;setMats(String(Math.round(v*(1+m/100))));setResult(null);}} placeholder="0"/></div></div>
+                        <div><div style={{fontSize:10,color:"var(--g400)",fontWeight:600,marginBottom:3}}>Markup</div><div className="px"><input type="number" min="0" max="200" value={markupPct} onChange={e=>{setMarkupPct(e.target.value);const v=parseFloat(matsRaw)||0;const m=parseFloat(e.target.value)||0;setMats(String(Math.round(v*(1+m/100))));setResult(null);}}/><span style={{padding:"0 8px",color:"var(--g400)",fontWeight:700,fontSize:13}}>%</span></div></div>
+                      </div>
+                      {parseFloat(matsRaw)>0&&<div style={{fontSize:11,color:"var(--green)",fontWeight:700,textAlign:"right"}}>Total: ${Math.round((parseFloat(matsRaw)||0)*(1+(parseFloat(markupPct)||0)/100))}</div>}
+                    </div>
+                  ):(
+                    <div className="px"><span className="pxs">$</span><input type="number" min="0" value={mats} onChange={e=>{setMats(e.target.value);setResult(null);}} placeholder="0"/></div>
+                  )}
+                </div>
               </div>
             </div>
 
@@ -1447,6 +1472,19 @@ export default function ListoBid() {
               {qOverheadMode==="flat" && <div className="fi" style={{marginBottom:0}}><div className="px"><span className="pxs">$</span><input type="number" min="0" value={qOverheadFlat} onChange={e=>{setQOverheadFlat(e.target.value);setResult(null);}}/></div><div className="ht">Flat overhead per job</div></div>}
             </div>
 
+              {/* 5c Job Cadence */}
+              <div className="card">
+                <div className="ct2">Job Frequency</div>
+                <div className="tg" style={{flexWrap:"wrap"}}>
+                  {[{k:"once",l:"One-Time"},{k:"weekly",l:"Weekly"},{k:"biweekly",l:"Bi-Weekly"},{k:"monthly",l:"Monthly"},{k:"custom",l:"Custom"}].map(c=>(
+                    <button key={c.k} className={`tb ${cadence===c.k?"on":""}`} style={{flex:"0 0 calc(33% - 4px)",fontSize:12,marginBottom:4}} onClick={()=>{setCadence(c.k);setResult(null);}}>
+                      {c.l}
+                    </button>
+                  ))}
+                </div>
+                {cadence==="custom"&&<div className="fi" style={{marginBottom:0,marginTop:10}}><input type="text" value={customCadence} onChange={e=>{setCustomCadence(e.target.value);setResult(null);}} placeholder="e.g. Every 3 weeks"/></div>}
+              </div>
+
             {/* 6 Gas */}
             <div className="card">
               <div className="ct2">{t.gasPriceLabel}</div>
@@ -1468,21 +1506,42 @@ export default function ListoBid() {
               </div>
 
               {/* Price card */}
+              {cadence !== "once" && (
+                <div className="tg" style={{marginBottom:8,gap:6}}>
+                  <button className={`tb ${resultView==="single"?"on":""}`} style={{fontSize:12}} onClick={()=>setResultView("single")}>Single Job</button>
+                  <button className={`tb ${resultView==="recurring"?"on":""}`} style={{fontSize:12}} onClick={()=>setResultView("recurring")}>
+                    {cadence==="weekly"?"Weekly":cadence==="biweekly"?"Bi-Weekly":cadence==="monthly"?"Monthly":customCadence||"Recurring"}
+                  </button>
+                </div>
+              )}
               <div className="rc">
-                <div className="rl">{t.yourPrice}</div>
-                <div className="rp"><span className="rp-dollar">$</span>{result.price}</div>
-                <div className="rrow">
-                  <div className="ri"><div className="ri-l">{t.yourCost}</div><div className="ri-v">${Math.round(result.cost)}</div></div>
-                  <div className="ri">
-                    <div className="ri-l">{t.yourProfit}</div>
-                    <div className="ri-v" style={{color:qMarginMode==="dollar"?"#3DC43C":"#fff"}}>
-                      {qMarginMode==="dollar"?`$${pf(qTargetDollar,50).toFixed(2)}`:`$${Math.round(result.profit)}`}
+                {resultView==="recurring"&&cadence!=="once"?(()=>{
+                  const mult=cadence==="weekly"?52:cadence==="biweekly"?26:cadence==="monthly"?12:1;
+                  const period=cadence==="weekly"?"Annual (Weekly)":cadence==="biweekly"?"Annual (Bi-Weekly)":cadence==="monthly"?"Annual (Monthly)":(customCadence||"Recurring").toUpperCase();
+                  return(<>
+                    <div className="rl">PROJECTED {period.toUpperCase()}</div>
+                    <div className="rp"><span className="rp-dollar">$</span>{Math.round(result.price*mult).toLocaleString()}</div>
+                    <div className="rrow">
+                      <div className="ri"><div className="ri-l">Per Job</div><div className="ri-v">${result.price}</div></div>
+                      <div className="ri"><div className="ri-l">Annual Profit</div><div className="ri-v" style={{color:"var(--green)"}}>${Math.round(result.profit*mult).toLocaleString()}</div></div>
+                    </div>
+                  </>);
+                })():(<>
+                  <div className="rl">{t.yourPrice}</div>
+                  <div className="rp"><span className="rp-dollar">$</span>{result.price}</div>
+                  <div className="rrow">
+                    <div className="ri"><div className="ri-l">{t.yourCost}</div><div className="ri-v">${Math.round(result.cost)}</div></div>
+                    <div className="ri">
+                      <div className="ri-l">{t.yourProfit}</div>
+                      <div className="ri-v" style={{color:qMarginMode==="dollar"?"#3DC43C":"#fff"}}>
+                        {qMarginMode==="dollar"?`$${pf(qTargetDollar,50).toFixed(2)}`:`$${Math.round(result.profit)}`}
+                      </div>
                     </div>
                   </div>
-                </div>
+                </>)}
                 <div className="mpill" style={{background:mc.bg}}>
                   <div className="mdot" style={{background:mc.fg}}/>
-                  <span style={{color:mc.fg}}>{roundPct(result.margin)}% {t.marginLabel} — {lang==="es"?mc.es:mc.en}</span>
+                  <span style={{color:mc.fg}}>{roundPct(result.margin)}% {t.marginLabel} - {lang==="es"?mc.es:mc.en}</span>
                 </div>
               </div>
 
@@ -1533,7 +1592,7 @@ export default function ListoBid() {
             <div style={{position:"fixed",bottom:80,left:"50%",transform:"translateX(-50%)",background:"var(--navy)",borderRadius:14,padding:"14px 20px",boxShadow:"0 8px 32px rgba(0,0,0,.25)",zIndex:400,display:"flex",alignItems:"center",gap:12,minWidth:260,maxWidth:340}}>
               <div style={{width:36,height:36,background:"var(--green)",borderRadius:10,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,fontSize:18}}>✓</div>
               <div>
-                <div style={{color:"#fff",fontWeight:700,fontSize:14,marginBottom:2}}>Nice work — quote saved.</div>
+                <div style={{color:"#fff",fontWeight:700,fontSize:14,marginBottom:2}}>Nice work. Quote saved.</div>
                 <div style={{color:"rgba(255,255,255,.6)",fontSize:12}}>${saveSuccess.price} price · ${saveSuccess.profit} profit · {saveSuccess.margin}% margin</div>
               </div>
             </div>
@@ -1544,31 +1603,94 @@ export default function ListoBid() {
         {tab==="log" && <>
           <div className="st">{t.quoteLog}</div>
 
-          {/* Summary stats */}
-          {log.length > 0 && (() => {
-            const totalProfit = log.reduce((s,q) => s + (q.profit||0), 0);
-            const avgMargin   = Math.round(log.reduce((s,q) => s + (q.margin||0), 0) / log.length);
+          {/* Booked jobs summary */}
+          {(() => {
+            const booked = log.filter(q => q.converted);
+            if (booked.length === 0) return null;
+            const now = new Date();
+            const weekStart  = new Date(now - 7*24*60*60*1000);
+            const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+            const inclOne    = profile.includeOneTime !== false;
+            const filterJobs = (arr) => inclOne ? arr : arr.filter(q => q.cadence && q.cadence !== "once");
+            const weekJobs   = filterJobs(booked.filter(q => new Date(q.date) >= weekStart));
+            const monthJobs  = filterJobs(booked.filter(q => new Date(q.date) >= monthStart));
+            const isWeek     = statPeriod === "weekly";
+            const jobs       = isWeek ? weekJobs : monthJobs;
+            const rev        = jobs.reduce((s,q) => s + (q.price||0), 0);
+            const profit     = jobs.reduce((s,q) => s + (q.profit||0), 0);
             return (
-              <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:8,marginBottom:16}}>
-                <div style={{background:"var(--navy)",borderRadius:10,padding:"12px 10px",textAlign:"center"}}>
-                  <div style={{fontFamily:"'Plus Jakarta Sans',sans-serif",fontWeight:800,fontSize:22,color:"#fff",lineHeight:1}}>{log.length}</div>
-                  <div style={{fontSize:10,fontWeight:700,letterSpacing:".8px",textTransform:"uppercase",color:"rgba(255,255,255,.4)",marginTop:3}}>Quotes</div>
+              <div style={{background:"var(--navy)",borderRadius:14,padding:"16px",marginBottom:16}}>
+                <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:12}}>
+                  <div style={{fontSize:11,fontWeight:700,letterSpacing:"1px",textTransform:"uppercase",color:"rgba(255,255,255,.45)"}}>Booked Jobs</div>
+                  <div style={{display:"flex",gap:4}}>
+                    <button onClick={()=>setStatPeriod("weekly")} style={{padding:"4px 10px",borderRadius:6,border:"none",background:isWeek?"var(--green)":"rgba(255,255,255,.1)",color:isWeek?"#fff":"rgba(255,255,255,.45)",fontFamily:"inherit",fontSize:11,fontWeight:700,cursor:"pointer"}}>Week</button>
+                    <button onClick={()=>setStatPeriod("monthly")} style={{padding:"4px 10px",borderRadius:6,border:"none",background:!isWeek?"var(--green)":"rgba(255,255,255,.1)",color:!isWeek?"#fff":"rgba(255,255,255,.45)",fontFamily:"inherit",fontSize:11,fontWeight:700,cursor:"pointer"}}>Month</button>
+                  </div>
                 </div>
-                <div style={{background:"var(--navy)",borderRadius:10,padding:"12px 10px",textAlign:"center"}}>
-                  <div style={{fontFamily:"'Plus Jakarta Sans',sans-serif",fontWeight:800,fontSize:22,color:"var(--green)",lineHeight:1}}>${Math.round(totalProfit).toLocaleString()}</div>
-                  <div style={{fontSize:10,fontWeight:700,letterSpacing:".8px",textTransform:"uppercase",color:"rgba(255,255,255,.4)",marginTop:3}}>Est. Profit</div>
+                <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginBottom:8}}>
+                  <div style={{background:"rgba(255,255,255,.07)",borderRadius:10,padding:"12px"}}>
+                    <div style={{fontWeight:800,fontSize:22,color:"#fff",lineHeight:1}}>${Math.round(rev).toLocaleString()}</div>
+                    <div style={{fontSize:9,fontWeight:700,letterSpacing:".8px",textTransform:"uppercase",color:"rgba(255,255,255,.35)",marginTop:3}}>Revenue</div>
+                  </div>
+                  <div style={{background:"rgba(255,255,255,.07)",borderRadius:10,padding:"12px"}}>
+                    <div style={{fontWeight:800,fontSize:22,color:"var(--green)",lineHeight:1}}>${Math.round(profit).toLocaleString()}</div>
+                    <div style={{fontSize:9,fontWeight:700,letterSpacing:".8px",textTransform:"uppercase",color:"rgba(255,255,255,.35)",marginTop:3}}>Profit</div>
+                  </div>
                 </div>
-                <div style={{background:"var(--navy)",borderRadius:10,padding:"12px 10px",textAlign:"center"}}>
-                  <div style={{fontFamily:"'Plus Jakarta Sans',sans-serif",fontWeight:800,fontSize:22,color:"#fff",lineHeight:1}}>{avgMargin}%</div>
-                  <div style={{fontSize:10,fontWeight:700,letterSpacing:".8px",textTransform:"uppercase",color:"rgba(255,255,255,.4)",marginTop:3}}>Avg Margin</div>
+                <div style={{fontSize:11,color:"rgba(255,255,255,.3)",textAlign:"right"}}>
+                  {jobs.length} booked job{jobs.length!==1?"s":""}
+                  {!inclOne&&" (recurring only)"}
                 </div>
               </div>
             );
           })()}
 
           <div className="ss" style={{marginBottom:10}}>{log.length} saved</div>
+          {/* Job cost history chips */}
+          {(() => {
+            const jobTypes = [...new Set(log.map(q => q.jobType).filter(Boolean))];
+            if (jobTypes.length === 0) return null;
+            return (
+              <div style={{marginBottom:14}}>
+                <div style={{fontSize:11,fontWeight:700,letterSpacing:".8px",textTransform:"uppercase",color:"var(--g400)",marginBottom:8}}>Job History</div>
+                <div style={{display:"flex",gap:6,flexWrap:"wrap",marginBottom:historyJobType?10:0}}>
+                  {jobTypes.map(jt=>(
+                    <button key={jt} onClick={()=>setHistoryJobType(historyJobType===jt?null:jt)}
+                      className="tb" style={{flex:"none",fontSize:11,padding:"5px 10px",background:historyJobType===jt?"var(--navy)":"var(--g50)",color:historyJobType===jt?"#fff":"var(--g600)",borderColor:historyJobType===jt?"var(--navy)":"var(--g200)"}}>
+                      {jt}
+                    </button>
+                  ))}
+                </div>
+                {historyJobType&&(()=>{
+                  const jobQ   = log.filter(q=>q.jobType===historyJobType);
+                  const bookQ  = jobQ.filter(q=>q.converted);
+                  const avg    = (arr,k) => arr.length ? Math.round(arr.reduce((s,q)=>s+(q[k]||0),0)/arr.length) : 0;
+                  return (
+                    <div style={{background:"var(--navy)",borderRadius:12,padding:"14px",marginBottom:4}}>
+                      <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:10}}>
+                        <div style={{fontWeight:700,fontSize:13,color:"#fff"}}>{historyJobType}</div>
+                        <div style={{fontSize:10,color:"rgba(255,255,255,.35)"}}>avg of {jobQ.length} quote{jobQ.length!==1?"s":""} · <span style={{color:"var(--green)"}}>{bookQ.length} booked</span></div>
+                      </div>
+                      <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:8}}>
+                        {[
+                          {val:`$${avg(jobQ,"price")}`,label:"Avg Price"},
+                          {val:`$${avg(jobQ,"profit")}`,label:"Avg Profit",green:true},
+                          {val:`${avg(jobQ,"margin")}%`,label:"Avg Margin"},
+                        ].map((s,i)=>(
+                          <div key={i} style={{background:"rgba(255,255,255,.07)",borderRadius:8,padding:"10px 8px",textAlign:"center"}}>
+                            <div style={{fontWeight:800,fontSize:18,color:s.green?"var(--green)":"#fff",lineHeight:1}}>{s.val}</div>
+                            <div style={{fontSize:9,fontWeight:700,letterSpacing:".6px",textTransform:"uppercase",color:"rgba(255,255,255,.35)",marginTop:3}}>{s.label}</div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })()}
+              </div>
+            );
+          })()}
           <div style={{display:"flex",gap:6,flexWrap:"wrap",marginBottom:14}}>
-            {[{k:"all",l:"All"},{k:"thisWeek",l:"This Week"},{k:"converted",l:"Converted"},{k:"notConverted",l:"Pending"}].map(f=>(
+            {[{k:"all",l:"All"},{k:"converted",l:"Booked"},{k:"notConverted",l:"Pending"},{k:"byDate",l:"By Date"}].map(f=>(
               <button key={f.k} className={`tb ${logFilter===f.k?"on":""}`} style={{flex:"none",padding:"6px 12px",fontSize:12}} onClick={()=>setLogFilter(f.k)}>{f.l}</button>
             ))}
           </div>
@@ -1578,10 +1700,9 @@ export default function ListoBid() {
                 .filter(q=>{
                     if(logFilter==="converted") return q.converted;
                     if(logFilter==="notConverted") return !q.converted;
-                    if(logFilter==="thisWeek"){const w=new Date(Date.now()-7*24*60*60*1000);return new Date(q.date)>=w;}
                     return true;
                   })
-                  .sort((a,b)=>b.id-a.id)
+                  .sort((a,b)=>logFilter==="byDate"?new Date(b.date)-new Date(a.date):b.id-a.id)
                 .map(q=>{
                   const qm=marginMeta(q.margin);
                   return (
@@ -1612,7 +1733,7 @@ export default function ListoBid() {
           }
           {editingQuote&&(
             <div className="ov" onClick={()=>setEditingQuote(null)}>
-              <div className="mo" onClick={e=>e.stopPropagation()}>
+              <div className="mo" onClick={e=>e.stopPropagation()} style={{maxHeight:"85dvh",overflowY:"auto"}}>
                 <div className="mo-t">Edit Quote</div>
                 <div className="fi"><label className="lb">{t.jobLabel}</label><input type="text" value={editingQuote.name} onChange={e=>setEditingQuote(q=>({...q,name:e.target.value}))}/></div>
                 <div className="fi"><label className="lb">{t.addressLabel} <span style={{color:"var(--g400)",fontWeight:400}}>{t.addressOpt}</span></label><AddressInput value={editingQuote.address||""} onChange={v=>setEditingQuote(q=>({...q,address:v}))}/></div>
@@ -1663,6 +1784,15 @@ export default function ListoBid() {
             <div className="card">
               <div className="fi"><label className="lb">Business Name <span style={{fontSize:11,color:"var(--g400)",fontWeight:400}}>(optional)</span></label><input type="text" value={profile.businessName||""} onChange={e=>ps("businessName",e.target.value)} placeholder="e.g. Garcia Landscaping"/></div>
               <div className="fi"><label className="lb">{t.laborRate}</label><div className="px"><span className="pxs">$</span><input type="number" min="0" value={profile.laborRate} onChange={e=>ps("laborRate",e.target.value)}/></div></div>
+              <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"12px 0",borderTop:"1px solid var(--g100)",marginTop:4}}>
+                <div>
+                  <div style={{fontSize:14,fontWeight:600,color:"var(--g800)"}}>Include one-time jobs in summary</div>
+                  <div style={{fontSize:12,color:"var(--g400)",marginTop:2}}>Adds one-time booked jobs to your revenue and profit totals</div>
+                </div>
+                <div onClick={()=>ps("includeOneTime",!profile.includeOneTime)} style={{width:44,height:26,borderRadius:13,background:profile.includeOneTime?"var(--green)":"var(--g200)",cursor:"pointer",position:"relative",transition:"background .2s",flexShrink:0}}>
+                  <div style={{position:"absolute",top:3,left:profile.includeOneTime?21:3,width:20,height:20,borderRadius:"50%",background:"#fff",transition:"left .2s",boxShadow:"0 1px 4px rgba(0,0,0,.2)"}}/>
+                </div>
+              </div>
               <div className="fi"><label className="lb">{t.crewSize}</label><div className="tg">{[1,2,3,4,5,6,7,8,9,10].map(x=><button key={x} className={`tb ${profile.crewSize===String(x)?"on":""}`} style={{flex:"0 0 calc(20% - 6px)",minWidth:36}} onClick={()=>ps("crewSize",String(x))}>{x}</button>)}</div></div>
               <div className="fi"><label className="lb">{t.marginMode}</label>
                 <div className="tg">
@@ -1757,7 +1887,7 @@ export default function ListoBid() {
             <div style={{fontSize:11,color:"rgba(255,255,255,.2)"}}>listobid.com</div>
           </div>
           <button className="btn bp" onClick={()=>{
-            const text = `${profile.businessName?profile.businessName+" — ":""}${sharingQuote.name}\nPrice: $${sharingQuote.price} · Profit: $${Math.round(sharingQuote.profit)} · Margin: ${Math.round(sharingQuote.margin)}%\nPriced with ListoBid — listobid.com`;
+            const text = `${profile.businessName?profile.businessName+" - ":""}${sharingQuote.name}\nPrice: $${sharingQuote.price} · Profit: $${Math.round(sharingQuote.profit)} · Margin: ${Math.round(sharingQuote.margin)}%\nPriced with ListoBid - listobid.com`;
             if(navigator.share){navigator.share({title:"ListoBid Quote",text}).catch(()=>{});}
             else{navigator.clipboard.writeText(text).then(()=>{setSharingQuote(null);});}
           }}>Share Quote</button>
