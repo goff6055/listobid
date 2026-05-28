@@ -689,7 +689,7 @@ function AdminDashboard({ onClose }) {
         {tab === "overview" && (
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(140px,1fr))", gap: 12 }}>
             {[
-              { label: "Monthly Revenue", val: `$${totalMRR.toFixed(2)}`, sub: `${users.filter(u=>u.accountType==="paid").length} paid`, green: true },
+              { label: "Net Revenue / Mo", val: `$${Math.max(0, totalMRR * 0.971 - users.filter(u=>u.accountType==="paid").length * 0.30).toFixed(2)}`, sub: "after Stripe fees", green: true },
               { label: "Active Trials",   val: users.filter(u=>getStatus(u)==="trial").length, sub: "Converting soon" },
               { label: "Free Accounts",   val: users.filter(u=>u.accountType==="free").length, sub: "Beta / Legacy" },
               { label: "Total Users",     val: users.length, sub: "All time" },
@@ -729,8 +729,8 @@ function AdminDashboard({ onClose }) {
                         <span style={{ background: ss.bg, color: ss.color, padding: "3px 9px", borderRadius: 20, fontSize: 11, fontWeight: 700 }}>{s.toUpperCase()}</span>
                       </div>
                       <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-                        {u.accountType !== "free" && <button className="btn bsm" style={{ background: "var(--glt)", color: "var(--gdk)", border: "none" }} onClick={() => updateUser(u.email, { accountType: "free" })}>Mark Free</button>}
-                        {u.accountType !== "paid" && <button className="btn bsm bp" onClick={() => updateUser(u.email, { accountType: "paid" })}>Mark Paid</button>}
+                        <button className="btn bsm" style={{ background: u.accountType==="free"?"var(--g200)":"var(--glt)", color:"var(--gdk)", border:"1.5px solid var(--g200)", opacity: u.accountType==="free"?.5:1 }} onClick={() => updateUser(u.email, { accountType: "free" })}>Mark Free</button>
+                        <button className="btn bsm bp" style={{ opacity: u.accountType==="paid"?.5:1 }} onClick={() => updateUser(u.email, { accountType: "paid" })}>Mark Paid</button>
                         <button className="btn bsm bd" onClick={() => deleteUser(u.email)}>Delete</button>
                       </div>
                     </div>
@@ -761,8 +761,11 @@ export default function ListoBid() {
   const [currentUser, setCurrentUser] = useState(() => LS.get("lb_current_user", null));
   const [regForm, setRegForm]   = useState({ firstName: "", email: "", password: "", confirm: "" });
   const [loginForm, setLoginForm] = useState({ email: "", password: "" });
-  const [resetEmail, setResetEmail] = useState("");
-  const [resetSent, setResetSent]   = useState(false);
+  const [resetEmail,   setResetEmail]  = useState("");
+  const [resetSent,    setResetSent]   = useState(false);
+  const [newPass,      setNewPass]     = useState("");
+  const [newPassConf,  setNewPassConf] = useState("");
+  const [resetSuccess, setResetSuccess]= useState(false);
   const [authErr, setAuthErr] = useState("");
   const [rememberMe, setRememberMe] = useState(true);
 
@@ -818,6 +821,7 @@ export default function ListoBid() {
   const [qOverheadFlat, setQOverheadFlat] = useState(() => LS.get("lb_profile", { overheadFlat: "10" }).overheadFlat || "10");
   const [result,  setResult]  = useState(null);
   const [showAct, setShowAct] = useState(false);
+  const [welcomeDismissed, setWelcomeDismissed] = useState(() => LS.get("lb_welcome_seen", false));
 
   // ── Log ──
   const [log,          setLog]          = useState(() => LS.get("lb_quote_log", []));
@@ -859,6 +863,14 @@ export default function ListoBid() {
   // ── Persist log ──
   useEffect(() => { LS.set("lb_quote_log", log); }, [log]);
 
+  // ── Detect password reset token in URL ──
+  useEffect(() => {
+    const hash = window.location.hash;
+    if (hash && hash.includes("type=recovery")) {
+      setRoute("resetNewPass");
+    }
+  }, []);
+
   // ── Restore Supabase session on mount ──
   useEffect(() => {
     sb.auth.getSession().then(({ data: { session } }) => {
@@ -898,6 +910,17 @@ export default function ListoBid() {
     });
   }, []);
 
+  // ── Send day-11 trial reminder email ──
+  useEffect(() => {
+    if (!currentUser || currentUser.accountType !== "trial") return;
+    const days = Math.floor((Date.now() - new Date(currentUser.signupDate)) / 86400000);
+    if (days >= 11 && !LS.get("lb_trial_reminder_sent", false)) {
+      sb.functions.invoke("send-trial-reminder", {
+        body: { email: currentUser.email, daysLeft: TRIAL_DAYS - days, lang }
+      }).then(() => { LS.set("lb_trial_reminder_sent", true); }).catch(() => {});
+    }
+  }, [currentUser]);
+
   // ── Trial reminders ──
   useEffect(() => {
     if (!currentUser || currentUser.accountType !== "trial") return;
@@ -908,7 +931,7 @@ export default function ListoBid() {
 
   // ── Trial ──
   const trialInfo = useCallback(() => {
-    if (!currentUser || currentUser.accountType === "free" || currentUser.accountType === "paid" || currentUser.accountType === "trial")
+    if (!currentUser || currentUser.accountType === "free" || currentUser.accountType === "paid")
       return { daysLeft: TRIAL_DAYS, expired: false, softLock: false, hardLock: false, pct: 100, daysAfter: 0 };
     const d = Math.floor((Date.now() - new Date(currentUser.signupDate)) / 86400000);
     const daysLeft = Math.max(0, TRIAL_DAYS - d);
@@ -966,7 +989,7 @@ export default function ListoBid() {
       setCurrentUser(user);
             setRoute(!lang ? "welcome" : "industry");
     } catch (e) {
-      setAuthErr("Registration failed. Please try again.");
+      setAuthErr(e.message || "Registration failed. Please check your connection and try again.");
     }
   };
 
@@ -1018,7 +1041,7 @@ export default function ListoBid() {
       setTab("quote");
       setRoute(!lang ? "welcome" : !savedInd ? "industry" : "app");
     } catch (e) {
-      setAuthErr("Login failed. Please try again.");
+      setAuthErr(e.message || "Login failed. Please check your connection and try again.");
     }
   };
 
@@ -1136,10 +1159,55 @@ export default function ListoBid() {
       <div style={{marginBottom:20,marginTop:8,background:"#fff",borderRadius:20,padding:"16px 24px",display:"inline-block"}}><LogoImg width={180}/></div>
       <p className="wsub" style={{marginBottom:42}}>Ready to Bid.</p>
       <div className="ls">
-        <button className="lbtn len" onClick={() => { setLang("en"); LS.set("lb_lang", "en"); setRoute("register"); }}>🇺🇸 &nbsp;English</button>
-        <button className="lbtn les" onClick={() => { setLang("es"); LS.set("lb_lang", "es"); setRoute("register"); }}>🇲🇽 &nbsp;Español</button>
+        <button className="lbtn len" onClick={() => { setLang("en"); LS.set("lb_lang", "en"); setRoute("register"); }}>English</button>
+        <button className="lbtn les" onClick={() => { setLang("es"); LS.set("lb_lang", "es"); setRoute("register"); }}>Español</button>
       </div>
     </div></>
+  );
+
+  // ── Set New Password screen (from email reset link) ──
+  if (route === "resetNewPass") return (
+    <div style={{minHeight:"100dvh",background:"#fff",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:"32px 24px"}}>
+      <div style={{width:"100%",maxWidth:400}}>
+        <div style={{textAlign:"center",marginBottom:28}}>
+          <LogoImg width={140}/>
+        </div>
+        <div style={{fontWeight:800,fontSize:22,color:"var(--navy)",marginBottom:6,textAlign:"center"}}>
+          {lang==="es"?"Nueva Contrasena":"Set New Password"}
+        </div>
+        <div style={{fontSize:14,color:"var(--g400)",marginBottom:24,textAlign:"center"}}>
+          {lang==="es"?"Ingresa tu nueva contrasena.":"Enter your new password below."}
+        </div>
+        {authErr&&<div className="err">{authErr}</div>}
+        {resetSuccess?(
+          <div style={{textAlign:"center"}}>
+            <div style={{fontSize:15,color:"var(--gdk)",fontWeight:600,marginBottom:20}}>
+              {lang==="es"?"Contrasena actualizada. Inicia sesion.":"Password updated. Please sign in."}
+            </div>
+            <button className="btn bp" onClick={()=>{setRoute("login");window.history.replaceState(null,"","/");}}>
+              {lang==="es"?"Iniciar Sesion":"Sign In"}
+            </button>
+          </div>
+        ):(
+          <>
+            <div className="fi"><label className="lb">{lang==="es"?"Nueva Contrasena":"New Password"}</label>
+              <input type="password" value={newPass} onChange={e=>setNewPass(e.target.value)} placeholder="Min 8 characters"/>
+            </div>
+            <div className="fi"><label className="lb">{lang==="es"?"Confirmar Contrasena":"Confirm Password"}</label>
+              <input type="password" value={newPassConf} onChange={e=>setNewPassConf(e.target.value)} placeholder="Repeat password"/>
+            </div>
+            <button className="btn bp" onClick={async()=>{
+              setAuthErr("");
+              if(newPass.length<8) return setAuthErr(t.passMin);
+              if(newPass!==newPassConf) return setAuthErr(t.passMismatch);
+              const {error}=await sb.auth.updateUser({password:newPass});
+              if(error) return setAuthErr(error.message);
+              setResetSuccess(true);
+            }}>{lang==="es"?"Guardar Contrasena":"Save Password"}</button>
+          </>
+        )}
+      </div>
+    </div>
   );
 
   if (route === "register") return (
@@ -1157,8 +1225,8 @@ export default function ListoBid() {
         <button className="btn bp mt8" onClick={handleRegister}>{t.signUp}</button>
         <div className="auth-link" onClick={() => { setAuthErr(""); setRoute("login"); }}>{t.hasAccount} {t.signIn}</div>
         <div style={{display:"flex",justifyContent:"center",gap:10,marginTop:16,paddingTop:14,borderTop:"1px solid var(--g200)"}}>
-          <button className={`tb ${lang==="en"?"on":""}`} style={{flex:"none",padding:"5px 14px",fontSize:13}} onClick={()=>{setLang("en");LS.set("lb_lang","en");}}>🇺🇸 EN</button>
-          <button className={`tb ${lang==="es"?"on":""}`} style={{flex:"none",padding:"5px 14px",fontSize:13}} onClick={()=>{setLang("es");LS.set("lb_lang","es");}}>🇲🇽 ES</button>
+          <button className={`tb ${lang==="en"?"on":""}`} style={{flex:"none",padding:"5px 14px",fontSize:13}} onClick={()=>{setLang("en");LS.set("lb_lang","en");}}>English</button>
+          <button className={`tb ${lang==="es"?"on":""}`} style={{flex:"none",padding:"5px 14px",fontSize:13}} onClick={()=>{setLang("es");LS.set("lb_lang","es");}}>Español</button>
         </div>
       </div>
     </div></>
@@ -1424,7 +1492,7 @@ export default function ListoBid() {
                   {showMarkup?(
                     <div style={{display:"flex",flexDirection:"column",gap:6}}>
                       <div className="r2" style={{gap:6}}>
-                        <div><div style={{fontSize:10,color:"var(--g400)",fontWeight:600,marginBottom:3}}>Cost Paid</div><div className="px"><span className="pxs">$</span><input type="number" min="0" value={matsRaw} onChange={e=>{setMatsRaw(e.target.value);const v=parseFloat(e.target.value)||0;const m=parseFloat(markupPct)||20;setMats(String(Math.round(v*(1+m/100))));setResult(null);}} placeholder="0"/></div></div>
+                        <div><div style={{fontSize:10,color:"var(--g400)",fontWeight:600,marginBottom:3}}>{lang==="es"?"Costo Pagado":"Cost Paid"}</div><div className="px"><span className="pxs">$</span><input type="number" min="0" value={matsRaw} onChange={e=>{setMatsRaw(e.target.value);const v=parseFloat(e.target.value)||0;const m=parseFloat(markupPct)||20;setMats(String(Math.round(v*(1+m/100))));setResult(null);}} placeholder="0"/></div></div>
                         <div><div style={{fontSize:10,color:"var(--g400)",fontWeight:600,marginBottom:3}}>Markup</div><div className="px"><input type="number" min="0" max="200" value={markupPct} onChange={e=>{setMarkupPct(e.target.value);const v=parseFloat(matsRaw)||0;const m=parseFloat(e.target.value)||0;setMats(String(Math.round(v*(1+m/100))));setResult(null);}}/><span style={{padding:"0 8px",color:"var(--g400)",fontWeight:700,fontSize:13}}>%</span></div></div>
                       </div>
                       {parseFloat(matsRaw)>0&&<div style={{fontSize:11,color:"var(--green)",fontWeight:700,textAlign:"right"}}>Total: ${Math.round((parseFloat(matsRaw)||0)*(1+(parseFloat(markupPct)||0)/100))}</div>}
@@ -1473,9 +1541,9 @@ export default function ListoBid() {
 
               {/* 5c Job Cadence */}
               <div className="card">
-                <div className="ct2">Job Frequency</div>
+                <div className="ct2">{lang==="es"?"Frecuencia del Trabajo":"Job Frequency"}</div>
                 <div className="tg" style={{flexWrap:"wrap"}}>
-                  {[{k:"once",l:"One-Time"},{k:"weekly",l:"Weekly"},{k:"biweekly",l:"Bi-Weekly"},{k:"monthly",l:"Monthly"},{k:"custom",l:"Custom"}].map(c=>(
+                  {[{k:"once",l:lang==="es"?"Una Vez":"One-Time"},{k:"weekly",l:lang==="es"?"Semanal":"Weekly"},{k:"biweekly",l:lang==="es"?"Quincenal":"Bi-Weekly"},{k:"monthly",l:lang==="es"?"Mensual":"Monthly"},{k:"custom",l:lang==="es"?"Personalizado":"Custom"}].map(c=>(
                     <button key={c.k} className={`tb ${cadence===c.k?"on":""}`} style={{flex:"0 0 calc(33% - 4px)",fontSize:12,marginBottom:4}} onClick={()=>{setCadence(c.k);setResult(null);}}>
                       {c.l}
                     </button>
@@ -1507,16 +1575,16 @@ export default function ListoBid() {
               {/* Price card */}
               {cadence !== "once" && (
                 <div className="tg" style={{marginBottom:8,gap:6}}>
-                  <button className={`tb ${resultView==="single"?"on":""}`} style={{fontSize:12}} onClick={()=>setResultView("single")}>Single Job</button>
+                  <button className={`tb ${resultView==="single"?"on":""}`} style={{fontSize:12}} onClick={()=>setResultView("single")}>{lang==="es"?"Trabajo Unico":"Single Job"}</button>
                   <button className={`tb ${resultView==="recurring"?"on":""}`} style={{fontSize:12}} onClick={()=>setResultView("recurring")}>
-                    {cadence==="weekly"?"Weekly":cadence==="biweekly"?"Bi-Weekly":cadence==="monthly"?"Monthly":customCadence||"Recurring"}
+                    {cadence==="weekly"?(lang==="es"?"Semanal":"Weekly"):cadence==="biweekly"?(lang==="es"?"Quincenal":"Bi-Weekly"):cadence==="monthly"?(lang==="es"?"Mensual":"Monthly"):customCadence||(lang==="es"?"Recurrente":"Recurring")}
                   </button>
                 </div>
               )}
               <div className="rc">
                 {resultView==="recurring"&&cadence!=="once"?(()=>{
                   const mult=cadence==="weekly"?52:cadence==="biweekly"?26:cadence==="monthly"?12:1;
-                  const period=cadence==="weekly"?"Annual (Weekly)":cadence==="biweekly"?"Annual (Bi-Weekly)":cadence==="monthly"?"Annual (Monthly)":(customCadence||"Recurring").toUpperCase();
+                  const period=cadence==="weekly"?lang==="es"?"Anual (Semanal)":"Annual (Weekly)":cadence==="biweekly"?lang==="es"?"Anual (Quincenal)":"Annual (Bi-Weekly)":cadence==="monthly"?lang==="es"?"Anual (Mensual)":"Annual (Monthly)":(customCadence||"Recurring").toUpperCase();
                   return(<>
                     <div className="rl">PROJECTED {period.toUpperCase()}</div>
                     <div className="rp"><span className="rp-dollar">$</span>{Math.round(result.price*mult).toLocaleString()}</div>
@@ -1620,20 +1688,20 @@ export default function ListoBid() {
             return (
               <div style={{background:"var(--navy)",borderRadius:14,padding:"16px",marginBottom:16}}>
                 <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:12}}>
-                  <div style={{fontSize:11,fontWeight:700,letterSpacing:"1px",textTransform:"uppercase",color:"rgba(255,255,255,.45)"}}>Booked Jobs</div>
+                  <div style={{fontSize:11,fontWeight:700,letterSpacing:"1px",textTransform:"uppercase",color:"rgba(255,255,255,.45)"}}>{lang==="es"?"Trabajos Confirmados":"Booked Jobs"}</div>
                   <div style={{display:"flex",gap:4}}>
-                    <button onClick={()=>setStatPeriod("weekly")} style={{padding:"4px 10px",borderRadius:6,border:"none",background:isWeek?"var(--green)":"rgba(255,255,255,.1)",color:isWeek?"#fff":"rgba(255,255,255,.45)",fontFamily:"inherit",fontSize:11,fontWeight:700,cursor:"pointer"}}>Week</button>
-                    <button onClick={()=>setStatPeriod("monthly")} style={{padding:"4px 10px",borderRadius:6,border:"none",background:!isWeek?"var(--green)":"rgba(255,255,255,.1)",color:!isWeek?"#fff":"rgba(255,255,255,.45)",fontFamily:"inherit",fontSize:11,fontWeight:700,cursor:"pointer"}}>Month</button>
+                    <button onClick={()=>setStatPeriod("weekly")} style={{padding:"4px 10px",borderRadius:6,border:"none",background:isWeek?"var(--green)":"rgba(255,255,255,.1)",color:isWeek?"#fff":"rgba(255,255,255,.45)",fontFamily:"inherit",fontSize:11,fontWeight:700,cursor:"pointer"}}>{lang==="es"?"Semana":"Week"}</button>
+                    <button onClick={()=>setStatPeriod("monthly")} style={{padding:"4px 10px",borderRadius:6,border:"none",background:!isWeek?"var(--green)":"rgba(255,255,255,.1)",color:!isWeek?"#fff":"rgba(255,255,255,.45)",fontFamily:"inherit",fontSize:11,fontWeight:700,cursor:"pointer"}}>{lang==="es"?"Mes":"Month"}</button>
                   </div>
                 </div>
                 <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginBottom:8}}>
                   <div style={{background:"rgba(255,255,255,.07)",borderRadius:10,padding:"12px"}}>
                     <div style={{fontWeight:800,fontSize:22,color:"#fff",lineHeight:1}}>${Math.round(rev).toLocaleString()}</div>
-                    <div style={{fontSize:9,fontWeight:700,letterSpacing:".8px",textTransform:"uppercase",color:"rgba(255,255,255,.35)",marginTop:3}}>Revenue</div>
+                    <div style={{fontSize:9,fontWeight:700,letterSpacing:".8px",textTransform:"uppercase",color:"rgba(255,255,255,.35)",marginTop:3}}>{lang==="es"?"Ingresos":"Revenue"}</div>
                   </div>
                   <div style={{background:"rgba(255,255,255,.07)",borderRadius:10,padding:"12px"}}>
                     <div style={{fontWeight:800,fontSize:22,color:"var(--green)",lineHeight:1}}>${Math.round(profit).toLocaleString()}</div>
-                    <div style={{fontSize:9,fontWeight:700,letterSpacing:".8px",textTransform:"uppercase",color:"rgba(255,255,255,.35)",marginTop:3}}>Profit</div>
+                    <div style={{fontSize:9,fontWeight:700,letterSpacing:".8px",textTransform:"uppercase",color:"rgba(255,255,255,.35)",marginTop:3}}>{lang==="es"?"Ganancia":"Profit"}</div>
                   </div>
                 </div>
                 <div style={{fontSize:11,color:"rgba(255,255,255,.3)",textAlign:"right"}}>
@@ -1672,9 +1740,9 @@ export default function ListoBid() {
                       </div>
                       <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:8}}>
                         {[
-                          {val:`$${avg(jobQ,"price")}`,label:"Avg Price"},
-                          {val:`$${avg(jobQ,"profit")}`,label:"Avg Profit",green:true},
-                          {val:`${avg(jobQ,"margin")}%`,label:"Avg Margin"},
+                          {val:`$${avg(jobQ,"price")}`,label:lang==="es"?"Precio Prom.":"Avg Price"},
+                          {val:`$${avg(jobQ,"profit")}`,label:lang==="es"?"Ganancia Prom.":"Avg Profit",green:true},
+                          {val:`${avg(jobQ,"margin")}%`,label:lang==="es"?"Margen Prom.":"Avg Margin"},
                         ].map((s,i)=>(
                           <div key={i} style={{background:"rgba(255,255,255,.07)",borderRadius:8,padding:"10px 8px",textAlign:"center"}}>
                             <div style={{fontWeight:800,fontSize:18,color:s.green?"var(--green)":"#fff",lineHeight:1}}>{s.val}</div>
@@ -1758,14 +1826,15 @@ export default function ListoBid() {
               <div style={{background:"var(--glt)",border:"1px solid #A7F3D0",borderRadius:10,padding:"12px 16px",marginBottom:12,fontSize:13,color:"var(--gdk)",fontWeight:600}}>{lang==="es"?"Acceso Gratuito":"Free Access"}</div>
             )}
             <div className="card">
+              <div className="sr" style={{cursor:"pointer"}} onClick={()=>setSettView("account")}><span className="sr-l">{lang==="es"?"Cuenta":"Account"}</span><span className="sr-v">›</span></div>
               <div className="sr" style={{cursor:"pointer"}} onClick={()=>setSettView("profile")}><span className="sr-l">{t.editProfile}</span><span className="sr-v">›</span></div>
               <div className="sr" style={{cursor:"pointer"}} onClick={()=>setSettView("jobs")}><span className="sr-l">{t.manageJobs}</span><span className="sr-v">{jobs.length} types ›</span></div>
               <div className="sr" style={{cursor:"pointer"}} onClick={()=>setSettView("industry")}><span className="sr-l">{t.industryLabel}</span><span className="sr-v">{INDUSTRY_TEMPLATES[industry]?.[lang]?.name||INDUSTRY_TEMPLATES[industry]?.en.name} ›</span></div>
               <div className="sr" style={{cursor:"default"}}>
                 <span className="sr-l">{t.language}</span>
                 <div className="tg" style={{width:"auto",gap:5}}>
-                  <button className={`tb ${lang==="en"?"on":""}`} style={{padding:"5px 10px",flex:"none"}} onClick={()=>{setLang("en");LS.set("lb_lang","en");}}>EN</button>
-                  <button className={`tb ${lang==="es"?"on":""}`} style={{padding:"5px 10px",flex:"none"}} onClick={()=>{setLang("es");LS.set("lb_lang","es");}}>ES</button>
+                  <button className={`tb ${lang==="en"?"on":""}`} style={{padding:"5px 10px",flex:"none",fontSize:12}} onClick={()=>{setLang("en");LS.set("lb_lang","en");}}>English</button>
+                  <button className={`tb ${lang==="es"?"on":""}`} style={{padding:"5px 10px",flex:"none",fontSize:12}} onClick={()=>{setLang("es");LS.set("lb_lang","es");}}>Español</button>
                 </div>
               </div>
               <div className="sr" style={{cursor:"default"}}><span className="sr-l">{t.support}</span><span style={{fontSize:12,color:"var(--g400)",userSelect:"text"}}>{t.supportEmail}</span></div>
@@ -1818,6 +1887,70 @@ export default function ListoBid() {
           </>}
 
           {settView==="jobs" && <JobLibrary jobs={jobs} setJobs={setJobs} t={t} onBack={()=>setSettView("main")} backLabel={t.back}/>}
+
+          {settView==="account"&&(
+            <div>
+              <button className="btn bsm bg" style={{marginBottom:16}} onClick={()=>setSettView("main")}>← {t.back}</button>
+              <div className="st">{lang==="es"?"Cuenta":"Account"}</div>
+              <div style={{background:"var(--navy)",borderRadius:14,padding:"18px",marginBottom:16}}>
+                <div style={{fontSize:11,fontWeight:700,letterSpacing:"1px",textTransform:"uppercase",color:"rgba(255,255,255,.4)",marginBottom:12}}>{lang==="es"?"Estado de Cuenta":"Account Status"}</div>
+                {currentUser.accountType==="paid"?(
+                  <div>
+                    <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:8}}>
+                      <div style={{width:8,height:8,borderRadius:"50%",background:"var(--green)",flexShrink:0}}/>
+                      <div style={{fontWeight:700,fontSize:15,color:"#fff"}}>{lang==="es"?"Suscriptor Activo":"Active Subscriber"}</div>
+                    </div>
+                    <div style={{fontSize:12,color:"rgba(255,255,255,.4)",marginBottom:16}}>{lang==="es"?"Suscripcion activa a $9.99/mes.":"Active subscription at $9.99/month."}</div>
+                    <a href="https://billing.stripe.com/p/login/5kQ3cx5GAdQp9VH0wFgw000" target="_blank" rel="noopener noreferrer"
+                      style={{display:"block",padding:"11px",background:"rgba(255,255,255,.1)",border:"1.5px solid rgba(255,255,255,.15)",borderRadius:10,color:"#fff",textAlign:"center",fontWeight:700,fontSize:13,textDecoration:"none"}}>
+                      {lang==="es"?"Administrar Suscripcion":"Manage Subscription"}
+                    </a>
+                    <div style={{fontSize:11,color:"rgba(255,255,255,.2)",textAlign:"center",marginTop:6}}>{lang==="es"?"Actualiza tarjeta o cancela aqui.":"Update card or cancel here."}</div>
+                  </div>
+                ):(
+                  <div>
+                    <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:8}}>
+                      <div style={{width:8,height:8,borderRadius:"50%",background:"var(--g400)",flexShrink:0}}/>
+                      <div style={{fontWeight:700,fontSize:15,color:"#fff"}}>
+                        {currentUser.accountType==="trial"
+                          ?`${lang==="es"?"Prueba Gratis":"Free Trial"} - ${Math.max(0,TRIAL_DAYS-Math.floor((Date.now()-new Date(currentUser.signupDate))/86400000))} ${lang==="es"?"dias restantes":"days remaining"}`
+                          :lang==="es"?"Acceso Gratuito":"Free Access"}
+                      </div>
+                    </div>
+                    <div style={{fontSize:12,color:"rgba(255,255,255,.4)",marginBottom:16}}>{lang==="es"?"Suscribete por $9.99/mes.":"Subscribe for $9.99/month."}</div>
+                    <a href={STRIPE_LINK} target="_blank" rel="noopener noreferrer"
+                      style={{display:"block",padding:"13px",background:"var(--green)",borderRadius:10,color:"#fff",textAlign:"center",fontWeight:800,fontSize:14,textDecoration:"none"}}>
+                      {lang==="es"?"Suscribirse - $9.99/mes":"Subscribe - $9.99/mo"}
+                    </a>
+                  </div>
+                )}
+              </div>
+              <div className="card" style={{marginBottom:12}}>
+                <div className="ct2">{lang==="es"?"Correo":"Email"}</div>
+                <div style={{fontSize:14,color:"var(--g600)",padding:"2px 0"}}>{currentUser.email}</div>
+              </div>
+              <button className="btn bg" style={{marginBottom:24}} onClick={async()=>{
+                const {error}=await sb.auth.resetPasswordForEmail(currentUser.email,{redirectTo:"https://listobid.com/reset"});
+                if(!error) alert(lang==="es"?"Revisa tu correo.":"Check your email for a reset link.");
+                else alert("Error. Please try again.");
+              }}>{lang==="es"?"Cambiar Contrasena":"Change Password"}</button>
+              <div style={{paddingTop:16,borderTop:"1px solid var(--g200)"}}>
+                <div style={{fontSize:11,fontWeight:700,letterSpacing:".8px",textTransform:"uppercase",color:"var(--g400)",marginBottom:10,textAlign:"center"}}>{lang==="es"?"Zona de Peligro":"Danger Zone"}</div>
+                <button className="btn bd" onClick={()=>{
+                  const c=window.prompt(lang==="es"?"Escribe ELIMINAR para confirmar:":"Type DELETE to confirm:");
+                  if(c==="DELETE"||c==="ELIMINAR"){
+                    sb.auth.signOut().then(()=>{
+                      sb.from("quotes").delete().eq("user_id",currentUser.id);
+                      sb.from("profiles").delete().eq("id",currentUser.id);
+                      Object.keys(localStorage).forEach(k=>localStorage.removeItem(k));
+                      setCurrentUser(null);setRoute("register");
+                    });
+                  }
+                }}>{lang==="es"?"Eliminar Cuenta":"Delete Account"}</button>
+                <div style={{fontSize:11,color:"var(--g400)",textAlign:"center",marginTop:6}}>{lang==="es"?"Esta accion no se puede deshacer.":"This action cannot be undone."}</div>
+              </div>
+            </div>
+          )}
 
                     {settView==="industry" && <>
             <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:17}}>
@@ -1876,7 +2009,7 @@ export default function ListoBid() {
             <div style={{display:"flex",gap:16,justifyContent:"center",marginBottom:20}}>
               <div style={{textAlign:"center"}}>
                 <div style={{fontWeight:800,fontSize:20,color:"var(--green)"}}>+${Math.round(sharingQuote.profit)}</div>
-                <div style={{fontSize:10,fontWeight:700,letterSpacing:".8px",textTransform:"uppercase",color:"rgba(255,255,255,.3)",marginTop:2}}>Profit</div>
+                <div style={{fontSize:10,fontWeight:700,letterSpacing:".8px",textTransform:"uppercase",color:"rgba(255,255,255,.3)",marginTop:2}}>{lang==="es"?"Ganancia":"Profit"}</div>
               </div>
               <div style={{width:1,background:"rgba(255,255,255,.1)"}}/>
               <div style={{textAlign:"center"}}>
