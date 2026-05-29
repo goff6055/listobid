@@ -205,7 +205,7 @@ const TX = {
     cancel: "Cancel", save: "Save",
     quoteLog: "Quote History", noQuotes: "No saved quotes yet.",
     filterAll: "All", filterConverted: "Booked", filterPending: "Pending", filterDate: "By Date",
-    markConverted: "Mark Booked", unmarkConverted: "Unmark",
+    markConverted: "Mark Booked", unmarkConverted: "Unmark Booked",
     editQuote: "Edit", deleteQuote: "Delete",
     settings: "Settings", version: "ListoBid",
     trialLabel: "Free Trial", trialDaysRemaining: "days remaining",
@@ -295,7 +295,7 @@ const TX = {
     cancel: "Cancelar", save: "Guardar",
     quoteLog: "Historial", noQuotes: "No hay cotizaciones guardadas.",
     filterAll: "Todo", filterConverted: "Confirmado", filterPending: "Pendiente", filterDate: "Por Fecha",
-    markConverted: "Confirmado", unmarkConverted: "Desmarcar",
+    markConverted: "Confirmado", unmarkConverted: "Desmarcar Confirmado",
     editQuote: "Editar", deleteQuote: "Eliminar",
     settings: "Ajustes", version: "ListoBid",
     trialLabel: "Prueba Gratis", trialDaysRemaining: "días restantes",
@@ -632,9 +632,9 @@ function AdminDashboard({ onClose }) {
   const totalQ   = users.reduce((s, u) => s + (u.quotesGenerated || 0), 0);
 
   const getStatus = (u) => {
-    if (u.accountType === "free") return "free";
-    if (u.accountType === "paid") return "paid";
-    return "free"; // treat all others as free during beta
+    if (u.accountType === "paid")  return "paid";
+    if (u.accountType === "trial") return "trial";
+    return "free";
   };
 
   const updateUser = async (email, updates) => {
@@ -1418,7 +1418,7 @@ export default function ListoBid() {
                     industry: industry,
                   }).eq("id", currentUser.id);
                 }
-                setStep(0); setRoute("app");
+                setStep(0); setTab("quote"); setRoute("app");
               }
             }}>
             {step===TOTAL_STEPS?t.saveProfile:t.continue}
@@ -1675,7 +1675,9 @@ export default function ListoBid() {
           {/* Post-save success message */}
           {saveSuccess && (
             <div style={{position:"fixed",bottom:80,left:"50%",transform:"translateX(-50%)",background:"var(--navy)",borderRadius:14,padding:"14px 20px",boxShadow:"0 8px 32px rgba(0,0,0,.25)",zIndex:400,display:"flex",alignItems:"center",gap:12,minWidth:260,maxWidth:340}}>
-              <div style={{width:36,height:36,background:"var(--green)",borderRadius:10,flexShrink:0}}/>
+              <div style={{width:36,height:36,background:"var(--green)",borderRadius:10,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center"}}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              </div>
               <div>
                 <div style={{color:"#fff",fontWeight:700,fontSize:14,marginBottom:2}}>Nice work. Quote saved.</div>
                 <div style={{color:"rgba(255,255,255,.6)",fontSize:12}}>${saveSuccess.price} price · ${saveSuccess.profit} profit · {saveSuccess.margin}% margin</div>
@@ -1731,53 +1733,45 @@ export default function ListoBid() {
           })()}
 
           <div className="ss" style={{marginBottom:10}}>{log.length} saved</div>
-          {/* Job cost history chips */}
-          {(() => {
-            const jobTypes = [...new Set(log.map(q => q.jobType).filter(Boolean))];
-            if (jobTypes.length === 0) return null;
+          {/* Job history insight card */}
+          {historyJobType&&(()=>{
+            const jobQ  = log.filter(q=>q.jobType===historyJobType);
+            const bookQ = jobQ.filter(q=>q.converted);
+            const avg   = (arr,k) => arr.length ? Math.round(arr.reduce((s,q)=>s+(q[k]||0),0)/arr.length) : 0;
             return (
-              <div style={{marginBottom:14}}>
-                <div style={{fontSize:11,fontWeight:700,letterSpacing:".8px",textTransform:"uppercase",color:"var(--g400)",marginBottom:8}}>Job History</div>
-                <div style={{display:"flex",gap:6,flexWrap:"wrap",marginBottom:historyJobType?10:0}}>
-                  {jobTypes.map(jt=>(
-                    <button key={jt} onClick={()=>setHistoryJobType(historyJobType===jt?null:jt)}
-                      className="tb" style={{flex:"none",fontSize:11,padding:"5px 10px",background:historyJobType===jt?"var(--navy)":"var(--g50)",color:historyJobType===jt?"#fff":"var(--g600)",borderColor:historyJobType===jt?"var(--navy)":"var(--g200)"}}>
-                      {jt}
-                    </button>
+              <div style={{background:"var(--navy)",borderRadius:12,padding:"14px",marginBottom:12}}>
+                <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:10}}>
+                  <div style={{fontWeight:700,fontSize:13,color:"#fff"}}>{historyJobType}</div>
+                  <div style={{fontSize:10,color:"rgba(255,255,255,.35)"}}>avg of {jobQ.length} quote{jobQ.length!==1?"s":""} · <span style={{color:"var(--green)"}}>{bookQ.length} booked</span></div>
+                </div>
+                <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:8}}>
+                  {[
+                    {val:`$${avg(jobQ,"price")}`,label:lang==="es"?"Precio Prom.":"Avg Price"},
+                    {val:`$${avg(jobQ,"profit")}`,label:lang==="es"?"Ganancia Prom.":"Avg Profit",green:true},
+                    {val:`${avg(jobQ,"margin")}%`,label:lang==="es"?"Margen Prom.":"Avg Margin"},
+                  ].map((s,i)=>(
+                    <div key={i} style={{background:"rgba(255,255,255,.07)",borderRadius:8,padding:"10px 8px",textAlign:"center"}}>
+                      <div style={{fontWeight:800,fontSize:18,color:s.green?"var(--green)":"#fff",lineHeight:1}}>{s.val}</div>
+                      <div style={{fontSize:9,fontWeight:700,letterSpacing:".6px",textTransform:"uppercase",color:"rgba(255,255,255,.35)",marginTop:3}}>{s.label}</div>
+                    </div>
                   ))}
                 </div>
-                {historyJobType&&(()=>{
-                  const jobQ   = log.filter(q=>q.jobType===historyJobType);
-                  const bookQ  = jobQ.filter(q=>q.converted);
-                  const avg    = (arr,k) => arr.length ? Math.round(arr.reduce((s,q)=>s+(q[k]||0),0)/arr.length) : 0;
-                  return (
-                    <div style={{background:"var(--navy)",borderRadius:12,padding:"14px",marginBottom:4}}>
-                      <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:10}}>
-                        <div style={{fontWeight:700,fontSize:13,color:"#fff"}}>{historyJobType}</div>
-                        <div style={{fontSize:10,color:"rgba(255,255,255,.35)"}}>avg of {jobQ.length} quote{jobQ.length!==1?"s":""} · <span style={{color:"var(--green)"}}>{bookQ.length} booked</span></div>
-                      </div>
-                      <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:8}}>
-                        {[
-                          {val:`$${avg(jobQ,"price")}`,label:lang==="es"?"Precio Prom.":"Avg Price"},
-                          {val:`$${avg(jobQ,"profit")}`,label:lang==="es"?"Ganancia Prom.":"Avg Profit",green:true},
-                          {val:`${avg(jobQ,"margin")}%`,label:lang==="es"?"Margen Prom.":"Avg Margin"},
-                        ].map((s,i)=>(
-                          <div key={i} style={{background:"rgba(255,255,255,.07)",borderRadius:8,padding:"10px 8px",textAlign:"center"}}>
-                            <div style={{fontWeight:800,fontSize:18,color:s.green?"var(--green)":"#fff",lineHeight:1}}>{s.val}</div>
-                            <div style={{fontSize:9,fontWeight:700,letterSpacing:".6px",textTransform:"uppercase",color:"rgba(255,255,255,.35)",marginTop:3}}>{s.label}</div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  );
-                })()}
               </div>
             );
           })()}
-          <div style={{display:"flex",gap:6,flexWrap:"wrap",marginBottom:14}}>
             {[{k:"all",l:"All"},{k:"converted",l:"Booked"},{k:"notConverted",l:"Pending"},{k:"byDate",l:"By Date"}].map(f=>(
               <button key={f.k} className={`tb ${logFilter===f.k?"on":""}`} style={{flex:"none",padding:"6px 12px",fontSize:12}} onClick={()=>setLogFilter(f.k)}>{f.l}</button>
             ))}
+            {/* Job Type dropdown */}
+            {[...new Set(log.map(q=>q.jobType).filter(Boolean))].length>0&&(
+              <select value={historyJobType||""} onChange={e=>setHistoryJobType(e.target.value||null)}
+                style={{flex:"none",padding:"6px 10px",fontSize:12,border:"1.5px solid var(--g200)",borderRadius:8,background:historyJobType?"var(--navy)":"var(--g50)",color:historyJobType?"#fff":"var(--g600)",fontFamily:"inherit",fontWeight:600,cursor:"pointer"}}>
+                <option value="">{lang==="es"?"Tipo de Trabajo":"Job Type"}</option>
+                {[...new Set(log.map(q=>q.jobType).filter(Boolean))].map(jt=>(
+                  <option key={jt} value={jt}>{jt}</option>
+                ))}
+              </select>
+            )}
           </div>
           {log.length===0
             ? <div className="empty"><div style={{fontSize:38,marginBottom:10}}></div><div>{t.noQuotes}</div></div>
@@ -1956,20 +1950,36 @@ export default function ListoBid() {
                 if(!error) alert(lang==="es"?"Revisa tu correo.":"Check your email for a reset link.");
                 else alert("Error. Please try again.");
               }}>{lang==="es"?"Cambiar Contrasena":"Change Password"}</button>
-              <div style={{paddingTop:16,borderTop:"1px solid var(--g200)"}}>
-                <div style={{fontSize:11,fontWeight:700,letterSpacing:".8px",textTransform:"uppercase",color:"var(--g400)",marginBottom:10,textAlign:"center"}}>{lang==="es"?"Zona de Peligro":"Danger Zone"}</div>
-                <button className="btn bd" onClick={()=>{
-                  const c=window.prompt(lang==="es"?"Escribe ELIMINAR para confirmar:":"Type DELETE to confirm:");
-                  if(c==="DELETE"||c==="ELIMINAR"){
-                    sb.auth.signOut().then(()=>{
-                      sb.from("quotes").delete().eq("user_id",currentUser.id);
-                      sb.from("profiles").delete().eq("id",currentUser.id);
-                      Object.keys(localStorage).forEach(k=>localStorage.removeItem(k));
-                      setCurrentUser(null);setRoute("register");
-                    });
-                  }
-                }}>{lang==="es"?"Eliminar Cuenta":"Delete Account"}</button>
-                <div style={{fontSize:11,color:"var(--g400)",textAlign:"center",marginTop:6}}>{lang==="es"?"Esta accion no se puede deshacer.":"This action cannot be undone."}</div>
+              <div style={{marginTop:8,paddingTop:16,borderTop:"1px solid var(--g200)"}}>
+                <div style={{fontSize:12,fontWeight:700,color:"var(--g800)",marginBottom:10}}>{lang==="es"?"Administrar Cuenta":"Manage Account"}</div>
+                <div style={{display:"flex",flexDirection:"column",gap:8}}>
+                  <a href={STRIPE_PORTAL_LINK} target="_blank" rel="noopener noreferrer"
+                    style={{display:"block",padding:"11px 14px",background:"var(--g50)",border:"1.5px solid var(--g200)",borderRadius:10,color:"var(--g800)",textDecoration:"none",fontSize:13,fontWeight:600}}>
+                    {lang==="es"?"Actualizar Metodo de Pago":"Update Payment Method"} ›
+                  </a>
+                  <a href={STRIPE_PORTAL_LINK} target="_blank" rel="noopener noreferrer"
+                    style={{display:"block",padding:"11px 14px",background:"var(--g50)",border:"1.5px solid var(--g200)",borderRadius:10,color:"var(--g800)",textDecoration:"none",fontSize:13,fontWeight:600}}>
+                    {lang==="es"?"Cancelar Suscripcion":"Cancel Subscription"} ›
+                  </a>
+                  <a href={`mailto:support@listobid.com?subject=${encodeURIComponent("Feedback - ListoBid")}&body=${encodeURIComponent("Hi ListoBid,
+
+")}`}
+                    style={{display:"block",padding:"11px 14px",background:"var(--g50)",border:"1.5px solid var(--g200)",borderRadius:10,color:"var(--g800)",textDecoration:"none",fontSize:13,fontWeight:600}}>
+                    {lang==="es"?"Enviar Comentarios":"Send Feedback"} ›
+                  </a>
+                  <button className="btn bd" style={{marginTop:4}} onClick={()=>{
+                    const c=window.prompt(lang==="es"?"Escribe ELIMINAR para confirmar:":"Type DELETE to confirm:");
+                    if(c==="DELETE"||c==="ELIMINAR"){
+                      sb.auth.signOut().then(()=>{
+                        sb.from("quotes").delete().eq("user_id",currentUser.id);
+                        sb.from("profiles").delete().eq("id",currentUser.id);
+                        Object.keys(localStorage).forEach(k=>localStorage.removeItem(k));
+                        setCurrentUser(null);setRoute("register");
+                      });
+                    }
+                  }}>{lang==="es"?"Eliminar Cuenta":"Delete Account"}</button>
+                  <div style={{fontSize:11,color:"var(--g400)",textAlign:"center"}}>{lang==="es"?"Esta accion no se puede deshacer.":"This action cannot be undone."}</div>
+                </div>
               </div>
             </div>
           )}
@@ -2019,34 +2029,43 @@ export default function ListoBid() {
     {/* Share Quote Modal */}
     {sharingQuote && (
       <div className="ov" onClick={()=>setSharingQuote(null)}>
-        <div className="mo" onClick={e=>e.stopPropagation()} style={{background:"var(--navy)",borderRadius:"20px 20px 0 0",padding:"28px 24px 40px"}}>
-          <div style={{textAlign:"center",marginBottom:20}}>
-            <div style={{fontSize:11,fontWeight:700,letterSpacing:"1.5px",textTransform:"uppercase",color:"rgba(255,255,255,.4)",marginBottom:12}}>Quote Summary</div>
-            {profile.businessName&&<div style={{fontWeight:800,fontSize:20,color:"#fff",marginBottom:4}}>{profile.businessName}</div>}
-            <div style={{fontSize:14,color:"rgba(255,255,255,.5)",marginBottom:20}}>{sharingQuote.name}</div>
-            <div style={{fontWeight:800,fontSize:60,color:"#fff",lineHeight:1,marginBottom:4}}>
-              <span style={{fontSize:26,verticalAlign:"top",marginTop:8,display:"inline-block"}}>$</span>{sharingQuote.price}
-            </div>
-            <div style={{fontSize:12,color:"rgba(255,255,255,.4)",marginBottom:20}}>Recommended Price</div>
-            <div style={{display:"flex",gap:16,justifyContent:"center",marginBottom:20}}>
-              <div style={{textAlign:"center"}}>
-                <div style={{fontWeight:800,fontSize:20,color:"var(--green)"}}>+${Math.round(sharingQuote.profit)}</div>
-                <div style={{fontSize:10,fontWeight:700,letterSpacing:".8px",textTransform:"uppercase",color:"rgba(255,255,255,.3)",marginTop:2}}>{lang==="es"?"Ganancia":"Profit"}</div>
-              </div>
-              <div style={{width:1,background:"rgba(255,255,255,.1)"}}/>
-              <div style={{textAlign:"center"}}>
-                <div style={{fontWeight:800,fontSize:20,color:"#fff"}}>{Math.round(sharingQuote.margin)}%</div>
-                <div style={{fontSize:10,fontWeight:700,letterSpacing:".8px",textTransform:"uppercase",color:"rgba(255,255,255,.3)",marginTop:2}}>Margin</div>
+        <div className="mo" onClick={e=>e.stopPropagation()} style={{background:"#f0f4f8",borderRadius:"20px 20px 0 0",padding:"20px 20px 36px"}}>
+          <div style={{background:"var(--navy)",borderRadius:16,padding:"24px 20px",marginBottom:16,position:"relative",overflow:"hidden"}}>
+            <div style={{position:"absolute",top:-30,right:-30,width:120,height:120,borderRadius:"50%",background:"rgba(61,196,60,.08)"}}/>
+            {profile.businessName&&<div style={{fontSize:12,fontWeight:700,color:"rgba(255,255,255,.45)",marginBottom:4}}>{profile.businessName}</div>}
+            <div style={{fontSize:16,fontWeight:800,color:"#fff",marginBottom:14,lineHeight:1.3}}>{sharingQuote.name}</div>
+            <div style={{marginBottom:14}}>
+              <div style={{fontSize:10,fontWeight:700,letterSpacing:"1px",textTransform:"uppercase",color:"rgba(255,255,255,.35)",marginBottom:3}}>{lang==="es"?"Precio Recomendado":"Recommended Price"}</div>
+              <div style={{fontWeight:800,fontSize:48,color:"#fff",lineHeight:1}}>
+                <span style={{fontSize:22,verticalAlign:"top",marginTop:7,display:"inline-block"}}>$</span>{sharingQuote.price}
               </div>
             </div>
-            <div style={{fontSize:11,color:"rgba(255,255,255,.2)"}}>listobid.com</div>
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:8,marginBottom:14}}>
+              {[
+                {label:lang==="es"?"Ganancia":"Profit",val:`+$${Math.round(sharingQuote.profit)}`,green:true},
+                {label:lang==="es"?"Margen":"Margin",val:`${Math.round(sharingQuote.margin)}%`,green:false},
+                {label:lang==="es"?"Fecha":"Date",val:sharingQuote.date,green:false},
+              ].map((s,i)=>(
+                <div key={i} style={{background:"rgba(255,255,255,.07)",borderRadius:10,padding:"9px 7px",textAlign:"center"}}>
+                  <div style={{fontWeight:800,fontSize:14,color:s.green?"var(--green)":"#fff",lineHeight:1}}>{s.val}</div>
+                  <div style={{fontSize:9,fontWeight:700,letterSpacing:".5px",textTransform:"uppercase",color:"rgba(255,255,255,.3)",marginTop:3}}>{s.label}</div>
+                </div>
+              ))}
+            </div>
+            <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",paddingTop:10,borderTop:"1px solid rgba(255,255,255,.1)"}}>
+              <div style={{display:"flex",alignItems:"baseline"}}>
+                <span style={{fontWeight:800,fontSize:12,color:"#fff"}}>Listo</span>
+                <span style={{fontWeight:800,fontSize:12,color:"var(--green)"}}>Bid</span>
+              </div>
+              <div style={{fontSize:10,color:"rgba(255,255,255,.3)"}}>listobid.com</div>
+            </div>
           </div>
           <button className="btn bp" onClick={()=>{
-            const text = `${profile.businessName?profile.businessName+" - ":""}${sharingQuote.name}\nPrice: $${sharingQuote.price} · Profit: $${Math.round(sharingQuote.profit)} · Margin: ${Math.round(sharingQuote.margin)}%\nPriced with ListoBid - listobid.com`;
+            const text = `${profile.businessName?profile.businessName+" - ":""}${sharingQuote.name}\nPrice: $${sharingQuote.price} | Profit: +$${Math.round(sharingQuote.profit)} | Margin: ${Math.round(sharingQuote.margin)}%\nDate: ${sharingQuote.date}\nPriced with ListoBid - listobid.com`;
             if(navigator.share){navigator.share({title:"ListoBid Quote",text}).catch(()=>{});}
             else{navigator.clipboard.writeText(text).then(()=>{setSharingQuote(null);});}
-          }}>Share Quote</button>
-          <button className="btn bg mt8" style={{borderColor:"rgba(255,255,255,.2)",color:"rgba(255,255,255,.6)"}} onClick={()=>setSharingQuote(null)}>Close</button>
+          }}>{lang==="es"?"Compartir Cotización":"Share Quote"}</button>
+          <button className="btn bg mt8" style={{color:"var(--g600)"}} onClick={()=>setSharingQuote(null)}>{lang==="es"?"Cerrar":"Close"}</button>
         </div>
       </div>
     )}
