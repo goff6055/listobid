@@ -2,7 +2,8 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 
 // ─── CONFIG ───────────────────────────────────────────────────────────────────
-const STRIPE_LINK      = "https://buy.stripe.com/5kQ3cx5GAdQp9VH0wFgw000";
+const STRIPE_LINK        = "https://buy.stripe.com/5kQ3cx5GAdQp9VH0wFgw000";
+const STRIPE_PORTAL_LINK = {STRIPE_PORTAL_LINK};
 const TRIAL_DAYS       = 14;
 const SOFT_LOCK_DAYS   = 5;
 const ADMIN_PASSWORD   = "listobid2026";
@@ -452,6 +453,15 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
 
 // ─── ICONS ────────────────────────────────────────────────────────────────────
 // ListoBid logo SVG recreated from brand asset
+// ─── INSTAGRAM ICON ──────────────────────────────────────────────────────────
+const IcoInstagram = ({ size = 20, color = "#fff" }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+    <circle cx="12" cy="12" r="4"/>
+    <circle cx="17.5" cy="6.5" r="1" fill={color} stroke="none"/>
+  </svg>
+);
+
 // ─── LOGO COMPONENTS ─────────────────────────────────────────────────────────
 // LogoImg: actual PNG - used on white backgrounds (auth screens)
 const LogoImg = ({ width = 140 }) => (
@@ -1167,6 +1177,7 @@ export default function ListoBid() {
 
   // ── Set New Password screen (from email reset link) ──
   if (route === "resetNewPass") return (
+    <><style>{CSS}</style>
     <div style={{minHeight:"100dvh",background:"#fff",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:"32px 24px"}}>
       <div style={{width:"100%",maxWidth:400}}>
         <div style={{textAlign:"center",marginBottom:28}}>
@@ -1178,7 +1189,7 @@ export default function ListoBid() {
         <div style={{fontSize:14,color:"var(--g400)",marginBottom:24,textAlign:"center"}}>
           {lang==="es"?"Ingresa tu nueva contrasena.":"Enter your new password below."}
         </div>
-        {authErr&&<div className="err">{authErr}</div>}
+        {authErr&&<div className="auth-err">{authErr}</div>}
         {resetSuccess?(
           <div style={{textAlign:"center"}}>
             <div style={{fontSize:15,color:"var(--gdk)",fontWeight:600,marginBottom:20}}>
@@ -1207,7 +1218,7 @@ export default function ListoBid() {
           </>
         )}
       </div>
-    </div>
+    </div></> 
   );
 
   if (route === "register") return (
@@ -1227,6 +1238,13 @@ export default function ListoBid() {
         <div style={{display:"flex",justifyContent:"center",gap:10,marginTop:16,paddingTop:14,borderTop:"1px solid var(--g200)"}}>
           <button className={`tb ${lang==="en"?"on":""}`} style={{flex:"none",padding:"5px 14px",fontSize:13}} onClick={()=>{setLang("en");LS.set("lb_lang","en");}}>English</button>
           <button className={`tb ${lang==="es"?"on":""}`} style={{flex:"none",padding:"5px 14px",fontSize:13}} onClick={()=>{setLang("es");LS.set("lb_lang","es");}}>Español</button>
+        </div>
+        <div style={{display:"flex",justifyContent:"center",marginTop:14}}>
+          <a href="https://instagram.com/listobid" target="_blank" rel="noopener noreferrer"
+            style={{display:"flex",alignItems:"center",gap:6,color:"var(--g400)",textDecoration:"none",fontSize:12,fontWeight:600}}>
+            <IcoInstagram size={16} color="var(--g400)"/>
+            @listobid
+          </a>
         </div>
       </div>
     </div></>
@@ -1657,7 +1675,7 @@ export default function ListoBid() {
           {/* Post-save success message */}
           {saveSuccess && (
             <div style={{position:"fixed",bottom:80,left:"50%",transform:"translateX(-50%)",background:"var(--navy)",borderRadius:14,padding:"14px 20px",boxShadow:"0 8px 32px rgba(0,0,0,.25)",zIndex:400,display:"flex",alignItems:"center",gap:12,minWidth:260,maxWidth:340}}>
-              <div style={{width:36,height:36,background:"var(--green)",borderRadius:10,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,fontSize:18}}>✓</div>
+              <div style={{width:36,height:36,background:"var(--green)",borderRadius:10,flexShrink:0}}/>
               <div>
                 <div style={{color:"#fff",fontWeight:700,fontSize:14,marginBottom:2}}>Nice work. Quote saved.</div>
                 <div style={{color:"rgba(255,255,255,.6)",fontSize:12}}>${saveSuccess.price} price · ${saveSuccess.profit} profit · {saveSuccess.margin}% margin</div>
@@ -1838,6 +1856,10 @@ export default function ListoBid() {
                 </div>
               </div>
               <div className="sr" style={{cursor:"default"}}><span className="sr-l">{t.support}</span><span style={{fontSize:12,color:"var(--g400)",userSelect:"text"}}>{t.supportEmail}</span></div>
+              <div className="sr" style={{cursor:"pointer"}} onClick={()=>window.open("https://instagram.com/listobid","_blank")}>
+                <span className="sr-l" style={{display:"flex",alignItems:"center",gap:6}}><IcoInstagram size={15} color="var(--g600)"/>Instagram</span>
+                <span className="sr-v" style={{fontSize:12,color:"var(--g400)"}}>@listobid ›</span>
+              </div>
               <div className="sr" style={{cursor:"pointer"}} onClick={()=>setShowLegal(true)}><span className="sr-l">Legal</span><span className="sr-v">›</span></div>
 
             </div>
@@ -1901,7 +1923,7 @@ export default function ListoBid() {
                       <div style={{fontWeight:700,fontSize:15,color:"#fff"}}>{lang==="es"?"Suscriptor Activo":"Active Subscriber"}</div>
                     </div>
                     <div style={{fontSize:12,color:"rgba(255,255,255,.4)",marginBottom:16}}>{lang==="es"?"Suscripcion activa a $9.99/mes.":"Active subscription at $9.99/month."}</div>
-                    <a href="https://billing.stripe.com/p/login/5kQ3cx5GAdQp9VH0wFgw000" target="_blank" rel="noopener noreferrer"
+                    <a href={STRIPE_PORTAL_LINK} target="_blank" rel="noopener noreferrer"
                       style={{display:"block",padding:"11px",background:"rgba(255,255,255,.1)",border:"1.5px solid rgba(255,255,255,.15)",borderRadius:10,color:"#fff",textAlign:"center",fontWeight:700,fontSize:13,textDecoration:"none"}}>
                       {lang==="es"?"Administrar Suscripcion":"Manage Subscription"}
                     </a>
