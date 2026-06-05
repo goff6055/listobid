@@ -1510,10 +1510,16 @@ export default function ListoBid() {
                   {showMarkup?(
                     <div style={{display:"flex",flexDirection:"column",gap:6}}>
                       <div className="r2" style={{gap:6}}>
-                        <div><div style={{fontSize:10,color:"var(--g400)",fontWeight:600,marginBottom:3}}>{lang==="es"?"Costo Pagado":"Cost Paid"}</div><div className="px"><span className="pxs">$</span><input type="number" min="0" value={matsRaw} onChange={e=>{setMatsRaw(e.target.value);const v=parseFloat(e.target.value)||0;const m=parseFloat(markupPct)||20;setMats(String(Math.round(v*(1+m/100))));setResult(null);}} placeholder="0"/></div></div>
-                        <div><div style={{fontSize:10,color:"var(--g400)",fontWeight:600,marginBottom:3}}>Markup</div><div className="px"><input type="number" min="0" max="200" value={markupPct} onChange={e=>{setMarkupPct(e.target.value);const v=parseFloat(matsRaw)||0;const m=parseFloat(e.target.value)||0;setMats(String(Math.round(v*(1+m/100))));setResult(null);}}/><span style={{padding:"0 8px",color:"var(--g400)",fontWeight:700,fontSize:13}}>%</span></div></div>
+                        <div>
+                          <div style={{fontSize:10,color:"var(--g400)",fontWeight:600,marginBottom:3}}>{lang==="es"?"Costo Pagado":"Cost Paid"}</div>
+                          <div className="px"><span className="pxs">$</span><input type="number" min="0" value={matsRaw} onChange={e=>{setMatsRaw(e.target.value);const v=parseFloat(e.target.value)||0;const m=parseFloat(markupPct)||20;setMats(String(Math.round(v*(1+m/100))));setResult(null);}} placeholder="0"/></div>
+                        </div>
+                        <div>
+                          <div style={{fontSize:10,color:"var(--g400)",fontWeight:600,marginBottom:3}}>{lang==="es"?"Margen":"Markup"}</div>
+                          <div className="px"><input type="number" min="0" max="200" value={markupPct} onChange={e=>{setMarkupPct(e.target.value);const v=parseFloat(matsRaw)||0;const m=parseFloat(e.target.value)||0;setMats(String(Math.round(v*(1+m/100))));setResult(null);}}/><span style={{padding:"0 8px",color:"var(--g400)",fontWeight:700,fontSize:13}}>%</span></div>
+                        </div>
                       </div>
-                      {parseFloat(matsRaw)>0&&<div style={{fontSize:11,color:"var(--green)",fontWeight:700,textAlign:"right"}}>Total: ${Math.round((parseFloat(matsRaw)||0)*(1+(parseFloat(markupPct)||0)/100))}</div>}
+                      {parseFloat(matsRaw)>0&&<div style={{fontSize:11,color:"var(--green)",fontWeight:700,textAlign:"right"}}>{lang==="es"?"Total":"Total"}: ${Math.round((parseFloat(matsRaw)||0)*(1+(parseFloat(markupPct)||0)/100))}</div>}
                     </div>
                   ):(
                     <div className="px"><span className="pxs">$</span><input type="number" min="0" value={mats} onChange={e=>{setMats(e.target.value);setResult(null);}} placeholder="0"/></div>
@@ -1759,6 +1765,7 @@ export default function ListoBid() {
               </div>
             );
           })()}
+          <div style={{display:"flex",gap:6,flexWrap:"wrap",marginBottom:14}}>
             {[{k:"all",l:"All"},{k:"converted",l:"Booked"},{k:"notConverted",l:"Pending"},{k:"byDate",l:"By Date"}].map(f=>(
               <button key={f.k} className={`tb ${logFilter===f.k?"on":""}`} style={{flex:"none",padding:"6px 12px",fontSize:12}} onClick={()=>setLogFilter(f.k)}>{f.l}</button>
             ))}
@@ -1961,9 +1968,7 @@ export default function ListoBid() {
                     style={{display:"block",padding:"11px 14px",background:"var(--g50)",border:"1.5px solid var(--g200)",borderRadius:10,color:"var(--g800)",textDecoration:"none",fontSize:13,fontWeight:600}}>
                     {lang==="es"?"Cancelar Suscripcion":"Cancel Subscription"} ›
                   </a>
-                  <a href={`mailto:support@listobid.com?subject=${encodeURIComponent("Feedback - ListoBid")}&body=${encodeURIComponent("Hi ListoBid,
-
-")}`}
+                  <a href={`mailto:support@listobid.com?subject=${encodeURIComponent("Feedback - ListoBid")}&body=${encodeURIComponent("Hi ListoBid,\n\n")}`}
                     style={{display:"block",padding:"11px 14px",background:"var(--g50)",border:"1.5px solid var(--g200)",borderRadius:10,color:"var(--g800)",textDecoration:"none",fontSize:13,fontWeight:600}}>
                     {lang==="es"?"Enviar Comentarios":"Send Feedback"} ›
                   </a>
