@@ -6,7 +6,8 @@ const STRIPE_LINK        = "https://buy.stripe.com/5kQ3cx5GAdQp9VH0wFgw000";
 const STRIPE_PORTAL_LINK = {STRIPE_PORTAL_LINK};
 const TRIAL_DAYS       = 14;
 const SOFT_LOCK_DAYS   = 5;
-const ADMIN_PASSWORD   = "listobid2026";
+const ADMIN_PASSWORD   = "Ready2bid$";
+const ADMIN_EMAIL      = "support@listobid.com";
 const GOOGLE_API_KEY   = "AIzaSyBfC5MB_fkiL9c5XGORmZZDoPACfD9gzOk";
 const SUPABASE_URL     = "https://ljtvktacmabgixjbsdii.supabase.co";
 const SUPABASE_ANON    = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxqdHZrdGFjbWFiZ2l4amJzZGlpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3MDQwNDksImV4cCI6MjA5NDI4MDA0OX0.y7qIYZsAJGiPhIUGWvRj8_akHys71MPgScjpHZCEDvQ";
@@ -1864,7 +1865,9 @@ export default function ListoBid() {
               <div className="sr" style={{cursor:"pointer"}} onClick={()=>setShowLegal(true)}><span className="sr-l">Legal</span><span className="sr-v">›</span></div>
 
             </div>
-            <button className="btn bg mt8" style={{fontSize:12,color:"var(--g400)"}} onClick={()=>setRoute("admin")}>Admin Portal</button>
+            {currentUser.email === ADMIN_EMAIL && (
+              <button className="btn bg mt8" style={{fontSize:12,color:"var(--g400)"}} onClick={()=>setRoute("admin")}>Admin Portal</button>
+            )}
             <button className="btn bg mt8" style={{color:"var(--red)",borderColor:"#FECACA"}} onClick={handleLogout}>{t.logout}</button>
           </>}
 
@@ -1960,15 +1963,24 @@ export default function ListoBid() {
               <div style={{marginTop:8,paddingTop:16,borderTop:"1px solid var(--g200)"}}>
                 <div style={{fontSize:12,fontWeight:700,color:"var(--g800)",marginBottom:10}}>{lang==="es"?"Administrar Cuenta":"Manage Account"}</div>
                 <div style={{display:"flex",flexDirection:"column",gap:8}}>
-                  <a href={STRIPE_PORTAL_LINK} target="_blank" rel="noopener noreferrer"
-                    style={{display:"block",padding:"11px 14px",background:"var(--g50)",border:"1.5px solid var(--g200)",borderRadius:10,color:"var(--g800)",textDecoration:"none",fontSize:13,fontWeight:600}}>
-                    {lang==="es"?"Actualizar Metodo de Pago":"Update Payment Method"} ›
-                  </a>
-                  <a href={STRIPE_PORTAL_LINK} target="_blank" rel="noopener noreferrer"
-                    style={{display:"block",padding:"11px 14px",background:"var(--g50)",border:"1.5px solid var(--g200)",borderRadius:10,color:"var(--g800)",textDecoration:"none",fontSize:13,fontWeight:600}}>
-                    {lang==="es"?"Cancelar Suscripcion":"Cancel Subscription"} ›
-                  </a>
-                  <a href={`mailto:support@listobid.com?subject=${encodeURIComponent("Feedback - ListoBid")}&body=${encodeURIComponent("Hi ListoBid,\n\n")}`}
+                  {currentUser.accountType==="paid"?(
+                    <>
+                      <a href={STRIPE_PORTAL_LINK} target="_blank" rel="noopener noreferrer"
+                        style={{display:"block",padding:"11px 14px",background:"var(--g50)",border:"1.5px solid var(--g200)",borderRadius:10,color:"var(--g800)",textDecoration:"none",fontSize:13,fontWeight:600}}>
+                        {lang==="es"?"Actualizar Metodo de Pago":"Update Payment Method"} ›
+                      </a>
+                      <a href={STRIPE_PORTAL_LINK} target="_blank" rel="noopener noreferrer"
+                        style={{display:"block",padding:"11px 14px",background:"var(--g50)",border:"1.5px solid var(--g200)",borderRadius:10,color:"var(--g800)",textDecoration:"none",fontSize:13,fontWeight:600}}>
+                        {lang==="es"?"Cancelar Suscripcion":"Cancel Subscription"} ›
+                      </a>
+                    </>
+                  ):(
+                    <a href={STRIPE_LINK} target="_blank" rel="noopener noreferrer"
+                      style={{display:"block",padding:"13px 14px",background:"var(--green)",borderRadius:10,color:"#fff",textDecoration:"none",fontSize:13,fontWeight:800,textAlign:"center"}}>
+                      {lang==="es"?"Suscribirse - $9.99/mes":"Subscribe - $9.99/mo"}
+                    </a>
+                  )}
+                  <a href="mailto:support@listobid.com?subject=Feedback%20-%20ListoBid"
                     style={{display:"block",padding:"11px 14px",background:"var(--g50)",border:"1.5px solid var(--g200)",borderRadius:10,color:"var(--g800)",textDecoration:"none",fontSize:13,fontWeight:600}}>
                     {lang==="es"?"Enviar Comentarios":"Send Feedback"} ›
                   </a>
