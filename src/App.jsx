@@ -459,7 +459,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
 .tab-fade{animation:tabFade .18s ease-out both}
 .pulse-btn{animation:pulse 2s ease-in-out infinite}
 .shiny-text{background:linear-gradient(90deg,rgba(255,255,255,.5) 0%,#fff 40%,rgba(61,196,60,1) 50%,#fff 60%,rgba(255,255,255,.5) 100%);background-size:200% auto;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:shine 3s linear infinite}
-\`;
+`;
 
 // ─── ICONS ────────────────────────────────────────────────────────────────────
 // ListoBid logo SVG recreated from brand asset
@@ -1736,7 +1736,6 @@ export default function ListoBid() {
                   </div>
               }
             </>}
-          </>}
           {trial.softLock && <button className="btn bn mt8" onClick={()=>setTab("log")}>{t.viewLog}</button>}
 
           {/* Post-save success message */}
@@ -1751,7 +1750,8 @@ export default function ListoBid() {
               </div>
             </div>
           )}
-        </>}
+          </>}
+        </div>}
 
         {/* ══ LOG ══ */}
         {tab==="log" && <div className="tab-fade" key="log">
@@ -1893,7 +1893,7 @@ export default function ListoBid() {
               </div>
             </div>
           )}
-        </>}
+        </div>}
 
         {/* ══ SETTINGS ══ */}
         {tab==="settings" && <div className="tab-fade" key="settings">
@@ -2080,7 +2080,7 @@ export default function ListoBid() {
                 </button>
               ))}
             </div>
-          </div>}
+          </>}
         </div>}
       </div>
 
