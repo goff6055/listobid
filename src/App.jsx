@@ -450,10 +450,65 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
 .addr-item{padding:10px 14px;font-size:13px;color:var(--g800);cursor:pointer;border-bottom:1px solid var(--g100)}
 .addr-item:last-child{border-bottom:none}
 .addr-item:hover{background:var(--g50)}
-`;
+@keyframes countUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes tabFade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+@keyframes beamMove{0%{transform:translateX(-200%) rotate(25deg)}100%{transform:translateX(400%) rotate(25deg)}}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(61,196,60,.35)}60%{box-shadow:0 0 0 10px rgba(61,196,60,0)}}
+@keyframes shine{0%{background-position:-200% center}100%{background-position:200% center}}
+@keyframes ripple{0%{transform:scale(0);opacity:.5}100%{transform:scale(4);opacity:0}}
+.tab-fade{animation:tabFade .18s ease-out both}
+.pulse-btn{animation:pulse 2s ease-in-out infinite}
+.shiny-text{background:linear-gradient(90deg,rgba(255,255,255,.5) 0%,#fff 40%,rgba(61,196,60,1) 50%,#fff 60%,rgba(255,255,255,.5) 100%);background-size:200% auto;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:shine 3s linear infinite}
+\`;
 
 // ─── ICONS ────────────────────────────────────────────────────────────────────
 // ListoBid logo SVG recreated from brand asset
+// ─── COUNT UP HOOK ───────────────────────────────────────────────────────────
+function useCountUp(target, duration=900, active=true) {
+  const [val, setVal] = React.useState(0);
+  React.useEffect(() => {
+    if (!active || !target) return;
+    let start = 0;
+    const step = target / (duration / 16);
+    const timer = setInterval(() => {
+      start += step;
+      if (start >= target) { setVal(target); clearInterval(timer); }
+      else setVal(Math.round(start));
+    }, 16);
+    return () => clearInterval(timer);
+  }, [target, active]);
+  return active ? val : target;
+}
+
+// ─── ANIMATED NUMBER ─────────────────────────────────────────────────────────
+function AnimatedNumber({ value, duration=900, decimals=0 }) {
+  const [display, setDisplay] = React.useState(0);
+  const prev = React.useRef(0);
+  React.useEffect(() => {
+    const start = prev.current;
+    const diff = value - start;
+    if (diff === 0) return;
+    const startTime = performance.now();
+    const tick = (now) => {
+      const p = Math.min((now - startTime) / duration, 1);
+      const ease = p < 0.5 ? 2*p*p : -1+(4-2*p)*p;
+      const cur = start + diff * ease;
+      setDisplay(decimals ? cur.toFixed(decimals) : Math.round(cur));
+      if (p < 1) requestAnimationFrame(tick);
+      else { prev.current = value; setDisplay(value); }
+    };
+    requestAnimationFrame(tick);
+  }, [value, duration, decimals]);
+  return <>{display.toLocaleString()}</>;
+}
+
+// ─── FACEBOOK ICON ───────────────────────────────────────────────────────────
+const IcoFacebook = ({ size = 20, color = "#fff" }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill={color}>
+    <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>
+  </svg>
+);
+
 // ─── INSTAGRAM ICON ──────────────────────────────────────────────────────────
 const IcoInstagram = ({ size = 20, color = "#fff" }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -1240,11 +1295,16 @@ export default function ListoBid() {
           <button className={`tb ${lang==="en"?"on":""}`} style={{flex:"none",padding:"5px 14px",fontSize:13}} onClick={()=>{setLang("en");LS.set("lb_lang","en");}}>English</button>
           <button className={`tb ${lang==="es"?"on":""}`} style={{flex:"none",padding:"5px 14px",fontSize:13}} onClick={()=>{setLang("es");LS.set("lb_lang","es");}}>Español</button>
         </div>
-        <div style={{display:"flex",justifyContent:"center",marginTop:14}}>
+        <div style={{display:"flex",justifyContent:"center",gap:20,marginTop:14}}>
           <a href="https://instagram.com/listobid" target="_blank" rel="noopener noreferrer"
             style={{display:"flex",alignItems:"center",gap:6,color:"var(--g400)",textDecoration:"none",fontSize:12,fontWeight:600}}>
             <IcoInstagram size={16} color="var(--g400)"/>
             @listobid
+          </a>
+          <a href="https://www.facebook.com/profile.php?id=61590502810704" target="_blank" rel="noopener noreferrer"
+            style={{display:"flex",alignItems:"center",gap:6,color:"var(--g400)",textDecoration:"none",fontSize:12,fontWeight:600}}>
+            <IcoFacebook size={16} color="var(--g400)"/>
+            ListoBid
           </a>
         </div>
       </div>
@@ -1470,7 +1530,7 @@ export default function ListoBid() {
       <div className="ct">
 
         {/* ══ QUOTE ══ */}
-        {tab==="quote" && <>
+        {tab==="quote" && <div className="tab-fade" key="quote">
           <div className="st">{t.priceJob}</div>
           <div className="ss">{t.fillDetails}</div>
 
@@ -1620,13 +1680,13 @@ export default function ListoBid() {
                   </>);
                 })():(<>
                   <div className="rl">{t.yourPrice}</div>
-                  <div className="rp"><span className="rp-dollar">$</span>{result.price}</div>
+                  <div className="rp"><span className="rp-dollar">$</span><AnimatedNumber value={parseFloat(result.price)||0} duration={900}/></div>
                   <div className="rrow">
                     <div className="ri"><div className="ri-l">{t.yourCost}</div><div className="ri-v">${Math.round(result.cost)}</div></div>
                     <div className="ri">
                       <div className="ri-l">{t.yourProfit}</div>
                       <div className="ri-v" style={{color:qMarginMode==="dollar"?"#3DC43C":"#fff"}}>
-                        {`$${Math.round(result.profit)}`}
+                        $<AnimatedNumber value={Math.round(result.profit)||0} duration={900}/>
                       </div>
                     </div>
                   </div>
@@ -1667,11 +1727,11 @@ export default function ListoBid() {
 
               {/* Post-result */}
               {!showAct
-                ? <button className="btn bg" onClick={()=>{ setShowAct(true); setTimeout(()=>{ document.getElementById("quote-actions")?.scrollIntoView({behavior:"smooth",block:"start"}); },100); }}>{t.donePrompt}</button>
-                : <div className="ac" id="quote-actions"><div className="ac-t">{t.whatsNext}</div>
+                ? <button className="btn bp" onClick={()=>{ setShowAct(true); setTimeout(()=>{ document.getElementById("quote-actions")?.scrollIntoView({behavior:"smooth",block:"start"}); },100); }}>{lang==="es"?"Guardar en Registro":"Save to Log"}</button>
+                : <div className="ac" id="quote-actions">
                     <div className="ac-s">
-                      <button className="btn bp" onClick={()=>setShowSave(true)}>{t.saveToLog}</button>
-                      <button className="btn bg" onClick={()=>{ if(window.confirm(lang==="es"?"¿Empezar nueva cotización sin guardar?":"Start new quote without saving?")) reset(); }}>{t.newQuote}</button>
+                      <button className="btn bp" onClick={()=>setShowSave(true)}>{lang==="es"?"Guardar en Registro":"Save to Log"}</button>
+                      <button className="btn bg" style={{marginTop:8,fontSize:13,color:"var(--g400)",background:"none",border:"1.5px solid var(--g200)"}} onClick={()=>setShowAct(false)}>{lang==="es"?"Seguir Editando":"Keep Editing"}</button>
                     </div>
                   </div>
               }
@@ -1694,7 +1754,7 @@ export default function ListoBid() {
         </>}
 
         {/* ══ LOG ══ */}
-        {tab==="log" && <>
+        {tab==="log" && <div className="tab-fade" key="log">
           <div className="st">{t.quoteLog}</div>
 
           {/* Booked jobs summary */}
@@ -1836,7 +1896,7 @@ export default function ListoBid() {
         </>}
 
         {/* ══ SETTINGS ══ */}
-        {tab==="settings" && <>
+        {tab==="settings" && <div className="tab-fade" key="settings">
           {settView==="main" && <>
             <div className="st">{t.settings}</div>
             <div className="ss">{t.version}</div>
@@ -1858,6 +1918,10 @@ export default function ListoBid() {
                 </div>
               </div>
               <div className="sr" style={{cursor:"default"}}><span className="sr-l">{t.support}</span><span style={{fontSize:12,color:"var(--g400)",userSelect:"text"}}>{t.supportEmail}</span></div>
+              <div className="sr" style={{cursor:"pointer"}} onClick={()=>window.open("https://www.facebook.com/profile.php?id=61590502810704","_blank")}>
+                <span className="sr-l" style={{display:"flex",alignItems:"center",gap:6}}><IcoFacebook size={15} color="var(--g600)"/>Facebook</span>
+                <span className="sr-v" style={{fontSize:12,color:"var(--g400)"}}>ListoBid ›</span>
+              </div>
               <div className="sr" style={{cursor:"pointer"}} onClick={()=>window.open("https://instagram.com/listobid","_blank")}>
                 <span className="sr-l" style={{display:"flex",alignItems:"center",gap:6}}><IcoInstagram size={15} color="var(--g600)"/>Instagram</span>
                 <span className="sr-v" style={{fontSize:12,color:"var(--g400)"}}>@listobid ›</span>
@@ -2016,8 +2080,8 @@ export default function ListoBid() {
                 </button>
               ))}
             </div>
-          </>}
-        </>}
+          </div>}
+        </div>}
       </div>
 
       <div className="nav">
