@@ -465,8 +465,8 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
 // ListoBid logo SVG recreated from brand asset
 // ─── COUNT UP HOOK ───────────────────────────────────────────────────────────
 function useCountUp(target, duration=900, active=true) {
-  const [val, setVal] = React.useState(0);
-  React.useEffect(() => {
+  const [val, setVal] = useState(0);
+  useEffect(() => {
     if (!active || !target) return;
     let start = 0;
     const step = target / (duration / 16);
@@ -483,7 +483,7 @@ function useCountUp(target, duration=900, active=true) {
 // ─── ANIMATED NUMBER ─────────────────────────────────────────────────────────
 function AnimatedNumber({ value, duration=900 }) {
   const [display, setDisplay] = React.useState(0);
-  const raf = React.useRef(null);
+  const raf = useRef(null);
   React.useEffect(() => {
     const target = Math.round(Number(value) || 0);
     const startVal = display;
