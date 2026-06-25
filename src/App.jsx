@@ -482,9 +482,9 @@ function useCountUp(target, duration=900, active=true) {
 
 // ─── ANIMATED NUMBER ─────────────────────────────────────────────────────────
 function AnimatedNumber({ value, duration=900 }) {
-  const [display, setDisplay] = React.useState(0);
+  const [display, setDisplay] = useState(0);
   const raf = useRef(null);
-  React.useEffect(() => {
+  useEffect(() => {
     const target = Math.round(Number(value) || 0);
     const startVal = display;
     if (startVal === target) return;
