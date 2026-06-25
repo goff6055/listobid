@@ -481,25 +481,25 @@ function useCountUp(target, duration=900, active=true) {
 }
 
 // ─── ANIMATED NUMBER ─────────────────────────────────────────────────────────
-function AnimatedNumber({ value, duration=900, decimals=0 }) {
+function AnimatedNumber({ value, duration=900 }) {
   const [display, setDisplay] = React.useState(0);
-  const prev = React.useRef(0);
+  const raf = React.useRef(null);
   React.useEffect(() => {
-    const start = prev.current;
-    const diff = value - start;
-    if (diff === 0) return;
+    const target = Math.round(Number(value) || 0);
+    const startVal = display;
+    if (startVal === target) return;
     const startTime = performance.now();
     const tick = (now) => {
       const p = Math.min((now - startTime) / duration, 1);
       const ease = p < 0.5 ? 2*p*p : -1+(4-2*p)*p;
-      const cur = start + diff * ease;
-      setDisplay(decimals ? cur.toFixed(decimals) : Math.round(cur));
-      if (p < 1) requestAnimationFrame(tick);
-      else { prev.current = value; setDisplay(value); }
+      setDisplay(Math.round(startVal + (target - startVal) * ease));
+      if (p < 1) { raf.current = requestAnimationFrame(tick); }
+      else { setDisplay(target); }
     };
-    requestAnimationFrame(tick);
-  }, [value, duration, decimals]);
-  return <>{display.toLocaleString()}</>;
+    raf.current = requestAnimationFrame(tick);
+    return () => { if (raf.current) cancelAnimationFrame(raf.current); };
+  }, [value, duration]);
+  return <>{(Math.round(Number(display) || 0)).toLocaleString()}</>;
 }
 
 // ─── FACEBOOK ICON ───────────────────────────────────────────────────────────
@@ -1680,13 +1680,13 @@ export default function ListoBid() {
                   </>);
                 })():(<>
                   <div className="rl">{t.yourPrice}</div>
-                  <div className="rp"><span className="rp-dollar">$</span><AnimatedNumber value={parseFloat(result.price)||0} duration={900}/></div>
+                  <div className="rp"><span className="rp-dollar">$</span><AnimatedNumber value={Math.round(parseFloat(result.price)||0)} duration={900}/></div>
                   <div className="rrow">
                     <div className="ri"><div className="ri-l">{t.yourCost}</div><div className="ri-v">${Math.round(result.cost)}</div></div>
                     <div className="ri">
                       <div className="ri-l">{t.yourProfit}</div>
                       <div className="ri-v" style={{color:qMarginMode==="dollar"?"#3DC43C":"#fff"}}>
-                        $<AnimatedNumber value={Math.round(result.profit)||0} duration={900}/>
+                        $<AnimatedNumber value={Math.round(result.profit||0)} duration={900}/>
                       </div>
                     </div>
                   </div>
