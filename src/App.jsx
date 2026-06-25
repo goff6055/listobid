@@ -208,7 +208,7 @@ const TX = {
     editQuote: "Edit", deleteQuote: "Delete",
     settings: "Settings", version: "ListoBid",
     trialLabel: "Free Trial", trialDaysRemaining: "days remaining",
-    language: "Language", editProfile: "Edit My Defaults", manageJobs: "Job Library",
+    language: "Language", editProfile: "Edit Default Inputs", manageJobs: "Job Library",
     industryLabel: "Industry",
     support: "Support", supportEmail: "support@listobid.com",
     legal: "Legal",
@@ -298,7 +298,7 @@ const TX = {
     editQuote: "Editar", deleteQuote: "Eliminar",
     settings: "Ajustes", version: "ListoBid",
     trialLabel: "Prueba Gratis", trialDaysRemaining: "días restantes",
-    language: "Idioma", editProfile: "Editar Mis Valores", manageJobs: "Tipos de Trabajo",
+    language: "Idioma", editProfile: "Editar Mis Datos", manageJobs: "Tipos de Trabajo",
     industryLabel: "Industria",
     support: "Soporte", supportEmail: "support@listobid.com",
     legal: "Legal",
@@ -335,7 +335,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--g100);color:var
 .st{font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;font-size:23px;color:var(--navy);margin-bottom:3px}
 .ss{font-size:13px;color:var(--g400);margin-bottom:17px}
 .card{background:var(--w);border:1px solid var(--g200);border-radius:var(--rad);padding:15px;margin-bottom:11px;box-shadow:var(--sh)}
-.ct2{font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:13px;letter-spacing:.5px;text-transform:uppercase;color:#2A3F54;margin-bottom:12px}
+.ct2{font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:13px;letter-spacing:.2px;text-transform:none;color:#2A3F54;margin-bottom:12px}
 .fi{margin-bottom:13px}.fi:last-child{margin-bottom:0}
 .lb{display:block;font-size:13px;font-weight:600;color:var(--g600);margin-bottom:5px}
 .ht{font-size:11px;color:var(--g400);margin-top:3px}
@@ -872,7 +872,6 @@ export default function ListoBid() {
   const [mats,       setMats]       = useState("");
   const [matsRaw,    setMatsRaw]    = useState("");
   const [markupPct,  setMarkupPct]  = useState("20");
-  const [showMarkup, setShowMarkup] = useState(false);
   const [tier,    setTier]    = useState("short");
   const [exactMi, setExactMi] = useState("");
   const [vehs,    setVehs]    = useState(() => LS.get("lb_profile", { vehicles: "1" }).vehicles || "1");
@@ -1164,7 +1163,7 @@ export default function ListoBid() {
     if (j) { setHours(String(j.hours)); setMats(String(j.materials)); }
   };
 
-  const reset = () => { setSelJob(""); setHours(""); setMats(""); setMatsRaw(""); setMarkupPct("20"); setShowMarkup(false); setTier("short"); setExactMi(""); setVehs(profile.vehicles); setMargin(pf(profile.targetMargin, 40)); setResult(null); setShowAct(false); setCadence("once"); setCustomCadence(""); setResultView("single"); };
+  const reset = () => { setSelJob(""); setHours(""); setMats(""); setMatsRaw(""); setMarkupPct("20"); setTier("short"); setExactMi(""); setVehs(profile.vehicles); setMargin(pf(profile.targetMargin, 40)); setResult(null); setShowAct(false); setCadence("once"); setCustomCadence(""); setResultView("single"); };
 
   const saveQuote = async () => {
     if (!saveName.trim() || !result) return;
@@ -1562,26 +1561,7 @@ export default function ListoBid() {
               <div className="r2">
                 <div className="fi" style={{marginBottom:0}}><label className="lb">{t.hoursOnSite}</label><input type="number" min="0" step="0.5" value={hours} onChange={e=>{setHours(e.target.value);setResult(null);}} placeholder="2"/></div>
                 <div className="fi" style={{marginBottom:0}}>
-                  <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:4}}>
-                    <label className="lb" style={{margin:0}}>{t.materialsCost}</label>
-                    <button onClick={()=>setShowMarkup(s=>!s)} style={{fontSize:10,fontWeight:700,color:"var(--green)",background:"none",border:"1px solid var(--green)",borderRadius:5,padding:"2px 6px",cursor:"pointer",fontFamily:"inherit"}}>{showMarkup?"- Markup":"+ Markup"}</button>
-                  </div>
-                  {showMarkup?(
-                    <div style={{display:"flex",flexDirection:"column",gap:6}}>
-                      <div className="r2" style={{gap:6}}>
-                        <div>
-                          <div style={{fontSize:10,color:"var(--g400)",fontWeight:600,marginBottom:3}}>{lang==="es"?"Costo Pagado":"Cost Paid"}</div>
-                          <div className="px"><span className="pxs">$</span><input type="number" min="0" value={matsRaw} onChange={e=>{setMatsRaw(e.target.value);const v=parseFloat(e.target.value)||0;const m=parseFloat(markupPct)||20;setMats(String(Math.round(v*(1+m/100))));setResult(null);}} placeholder="0"/></div>
-                        </div>
-                        <div>
-                          <div style={{fontSize:10,color:"var(--g400)",fontWeight:600,marginBottom:3}}>{lang==="es"?"Margen":"Markup"}</div>
-                          <div className="px"><input type="number" min="0" max="200" value={markupPct} onChange={e=>{setMarkupPct(e.target.value);const v=parseFloat(matsRaw)||0;const m=parseFloat(e.target.value)||0;setMats(String(Math.round(v*(1+m/100))));setResult(null);}}/><span style={{padding:"0 8px",color:"var(--g400)",fontWeight:700,fontSize:13}}>%</span></div>
-                        </div>
-                      </div>
-                      {parseFloat(matsRaw)>0&&<div style={{fontSize:11,color:"var(--green)",fontWeight:700,textAlign:"right"}}>{lang==="es"?"Total":"Total"}: ${Math.round((parseFloat(matsRaw)||0)*(1+(parseFloat(markupPct)||0)/100))}</div>}
-                    </div>
-                  ):(
-                    <div className="px"><span className="pxs">$</span><input type="number" min="0" value={mats} onChange={e=>{setMats(e.target.value);setResult(null);}} placeholder="0"/></div>
+                  <div className="px"><span className="pxs">$</span><input type="number" min="0" value={mats} onChange={e=>{setMats(e.target.value);setResult(null);}} placeholder="0"/></div>
                   )}
                 </div>
               </div>
@@ -1665,9 +1645,9 @@ export default function ListoBid() {
                 </div>
               )}
               <div className="rc" style={{position:"relative"}}>
-                <div style={{position:"absolute",top:12,right:12,display:"flex",alignItems:"baseline",gap:0,opacity:.35}}>
-                  <span style={{fontWeight:800,fontSize:11,color:"#fff"}}>Listo</span>
-                  <span style={{fontWeight:800,fontSize:11,color:"var(--green)"}}>Bid</span>
+                <div style={{position:"absolute",top:14,right:14,display:"flex",alignItems:"baseline",gap:0,opacity:.5}}>
+                  <span style={{fontWeight:800,fontSize:18,color:"#fff"}}>Listo</span>
+                  <span style={{fontWeight:800,fontSize:18,color:"var(--green)"}}>Bid</span>
                 </div>
                 {resultView==="recurring"&&cadence!=="once"?(()=>{
                   const mult=cadence==="weekly"?52:cadence==="biweekly"?26:cadence==="monthly"?12:1;
@@ -1706,7 +1686,9 @@ export default function ListoBid() {
                   <div className="tg" style={{width:"auto",gap:5}}>
                     <button className={`tb ${qMarginMode==="pct"?"on":""}`} style={{padding:"4px 10px",flex:"none",fontSize:11}} onClick={()=>{
                       setQMarginMode("pct");
-                      const newP = {...buildP(margin), marginMode:"pct"};
+                      const curMargin = result ? Math.round(result.margin) : margin;
+                      setMargin(curMargin);
+                      const newP = {...buildP(curMargin), marginMode:"pct"};
                       if(canCalc){const r=calcQuote(newP);setResult(r);setMargin(Math.round(r.margin));}
                     }}> % </button>
                     <button className={`tb ${qMarginMode==="dollar"?"on":""}`} style={{padding:"4px 10px",flex:"none",fontSize:11}} onClick={()=>{
@@ -1737,12 +1719,8 @@ export default function ListoBid() {
 
               {/* Post-result */}
               {!showAct
-                ? <button className="btn bp" onClick={()=>{ setShowAct(true); setTimeout(()=>{ document.getElementById("quote-actions")?.scrollIntoView({behavior:"smooth",block:"start"}); },100); }}>{lang==="es"?"Guardar en Registro":"Save to Log"}</button>
-                : <div className="ac" id="quote-actions">
-                    <div className="ac-s">
-                      <button className="btn bp" onClick={()=>{setShowAct(false);setShowSave(true);}}>{lang==="es"?"Guardar en Registro":"Save to Log"}</button>
-                    </div>
-                  </div>
+                ? <button className="btn bp" onClick={()=>setShowSave(true)}>{lang==="es"?"Guardar en Registro":"Save to Log"}</button>
+                : null
               }
             </>}
           {trial.softLock && <button className="btn bn mt8" onClick={()=>setTab("log")}>{t.viewLog}</button>}
