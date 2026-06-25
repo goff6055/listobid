@@ -23,14 +23,12 @@ const INDUSTRY_TEMPLATES = {
       en: [
         { id: 1, name: "Weekly Maintenance", hours: 1.5, materials: 0 },
         { id: 2, name: "Full Cleanup",        hours: 3,   materials: 20 },
-        { id: 3, name: "Desert Install",      hours: 6,   materials: 150 },
         { id: 4, name: "Irrigation Check",    hours: 1,   materials: 10 },
         { id: 5, name: "Tree Trimming",       hours: 2.5, materials: 0 },
       ],
       es: [
         { id: 1, name: "Mantenimiento Semanal", hours: 1.5, materials: 0 },
         { id: 2, name: "Limpieza Completa",      hours: 3,   materials: 20 },
-        { id: 3, name: "Instalación Desértica",  hours: 6,   materials: 150 },
         { id: 4, name: "Revisión de Irrigación", hours: 1,   materials: 10 },
         { id: 5, name: "Poda de Árboles",        hours: 2.5, materials: 0 },
       ],
@@ -180,7 +178,7 @@ const TX = {
     jobName2: "Job Type Name", defHours: "Default Hours", defMats: "Default Materials ($)",
     saveJob: "Save", editJob: "Edit", deleteJob: "Delete",
     preloaded: "Preloaded defaults - edit or add your own",
-    priceJob: "Price a Job", fillDetails: "Fill in details - get your price.",
+    priceJob: "Price Your Job",
     jobType: "Job Type", selectJob: "Select a job type...",
     crewWage: "Crew & Wage", perPerson: "per person / hr",
     jobDetails: "Job Details", hoursOnSite: "Hours on Site", materialsCost: "Materials Cost",
@@ -210,7 +208,7 @@ const TX = {
     editQuote: "Edit", deleteQuote: "Delete",
     settings: "Settings", version: "ListoBid",
     trialLabel: "Free Trial", trialDaysRemaining: "days remaining",
-    language: "Language", editProfile: "Edit Profile", manageJobs: "Job Library",
+    language: "Language", editProfile: "Edit My Defaults", manageJobs: "Job Library",
     industryLabel: "Industry",
     support: "Support", supportEmail: "support@listobid.com",
     legal: "Legal",
@@ -270,7 +268,7 @@ const TX = {
     jobName2: "Nombre del Tipo", defHours: "Horas por Defecto", defMats: "Materiales ($)",
     saveJob: "Guardar", editJob: "Editar", deleteJob: "Eliminar",
     preloaded: "Tipos precargados - edita o agrega los tuyos",
-    priceJob: "Cotizar Trabajo", fillDetails: "Llena los datos - obtén tu precio.",
+    priceJob: "Cotizar Tu Trabajo",
     jobType: "Tipo de Trabajo", selectJob: "Selecciona un tipo...",
     crewWage: "Equipo y Salario", perPerson: "por persona / hr",
     jobDetails: "Detalles del Trabajo", hoursOnSite: "Horas en Sitio", materialsCost: "Materiales",
@@ -300,7 +298,7 @@ const TX = {
     editQuote: "Editar", deleteQuote: "Eliminar",
     settings: "Ajustes", version: "ListoBid",
     trialLabel: "Prueba Gratis", trialDaysRemaining: "días restantes",
-    language: "Idioma", editProfile: "Editar Perfil", manageJobs: "Tipos de Trabajo",
+    language: "Idioma", editProfile: "Editar Mis Valores", manageJobs: "Tipos de Trabajo",
     industryLabel: "Industria",
     support: "Soporte", supportEmail: "support@listobid.com",
     legal: "Legal",
@@ -337,7 +335,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--g100);color:var
 .st{font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;font-size:23px;color:var(--navy);margin-bottom:3px}
 .ss{font-size:13px;color:var(--g400);margin-bottom:17px}
 .card{background:var(--w);border:1px solid var(--g200);border-radius:var(--rad);padding:15px;margin-bottom:11px;box-shadow:var(--sh)}
-.ct2{font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:var(--g400);margin-bottom:12px}
+.ct2{font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:13px;letter-spacing:.5px;text-transform:uppercase;color:#2A3F54;margin-bottom:12px}
 .fi{margin-bottom:13px}.fi:last-child{margin-bottom:0}
 .lb{display:block;font-size:13px;font-weight:600;color:var(--g600);margin-bottom:5px}
 .ht{font-size:11px;color:var(--g400);margin-top:3px}
@@ -879,7 +877,7 @@ export default function ListoBid() {
   const [exactMi, setExactMi] = useState("");
   const [vehs,    setVehs]    = useState(() => LS.get("lb_profile", { vehicles: "1" }).vehicles || "1");
   const [margin,  setMargin]  = useState(() => pf(LS.get("lb_profile", { targetMargin: "40" }).targetMargin, 40));
-  const [gasPrice, setGasPrice] = useState(() => LS.get("lb_gas_price", "5.00"));
+  const [gasPrice, setGasPrice] = useState(() => LS.get("lb_gas_price", "4.00"));
   const [qMarginMode, setQMarginMode] = useState(() => LS.get("lb_profile", { marginMode: "pct" }).marginMode || "pct");
   const [qTargetDollar, setQTargetDollar] = useState(() => LS.get("lb_profile", { targetDollar: "50" }).targetDollar || "50");
   const [qOverheadMode, setQOverheadMode] = useState(() => LS.get("lb_profile", { overheadMode: "none" }).overheadMode || "none");
@@ -1532,7 +1530,7 @@ export default function ListoBid() {
         {/* ══ QUOTE ══ */}
         {tab==="quote" && <div className="tab-fade" key="quote">
           <div className="st">{t.priceJob}</div>
-          <div className="ss">{t.fillDetails}</div>
+          <div className="ss"></div>
 
           {trial.softLock && <div style={{background:"var(--ylt)",border:"1px solid #FCD34D",borderRadius:10,padding:"12px 14px",marginBottom:14,fontSize:13,color:"var(--yellow)",lineHeight:1.5}}>{t.softLockBody}</div>}
 
@@ -1599,7 +1597,7 @@ export default function ListoBid() {
               </div>
               <div className="fi" style={{marginBottom:0}}>
                 <label className="lb" style={{fontSize:12}}>{t.exactMiles}</label>
-                <input type="number" min="0" value={exactMi} onChange={e=>{setExactMi(e.target.value);setResult(null);}} placeholder={`Default: ${TIER_ONE_WAY[tier]} mi one-way`}/>
+                <input type="number" min="0" value={exactMi} onChange={e=>{setExactMi(e.target.value);setResult(null);}} placeholder={lang==="es"?`Por defecto: ${TIER_ONE_WAY[tier]} mi de ida`:`Default: ${TIER_ONE_WAY[tier]} mi one-way`}/>
                 <div className="ht">{t.exactHint}</div>
               </div>
             </div>
@@ -1634,7 +1632,7 @@ export default function ListoBid() {
                     </button>
                   ))}
                 </div>
-                {cadence==="custom"&&<div className="fi" style={{marginBottom:0,marginTop:10}}><input type="text" value={customCadence} onChange={e=>{setCustomCadence(e.target.value);setResult(null);}} placeholder="e.g. Every 3 weeks"/></div>}
+                {cadence==="custom"&&<div className="fi" style={{marginBottom:0,marginTop:10}}><input type="text" value={customCadence} onChange={e=>{setCustomCadence(e.target.value);setResult(null);}} placeholder={lang==="es"?"ej. Cada 3 semanas":"e.g. Every 3 weeks"}/></div>}
               </div>
 
             {/* 6 Gas */}
@@ -1666,7 +1664,11 @@ export default function ListoBid() {
                   </button>
                 </div>
               )}
-              <div className="rc">
+              <div className="rc" style={{position:"relative"}}>
+                <div style={{position:"absolute",top:12,right:12,display:"flex",alignItems:"baseline",gap:0,opacity:.35}}>
+                  <span style={{fontWeight:800,fontSize:11,color:"#fff"}}>Listo</span>
+                  <span style={{fontWeight:800,fontSize:11,color:"var(--green)"}}>Bid</span>
+                </div>
                 {resultView==="recurring"&&cadence!=="once"?(()=>{
                   const mult=cadence==="weekly"?52:cadence==="biweekly"?26:cadence==="monthly"?12:1;
                   const period=cadence==="weekly"?lang==="es"?"Anual (Semanal)":"Annual (Weekly)":cadence==="biweekly"?lang==="es"?"Anual (Quincenal)":"Annual (Bi-Weekly)":cadence==="monthly"?lang==="es"?"Anual (Mensual)":"Annual (Monthly)":(customCadence||"Recurring").toUpperCase();
@@ -1684,8 +1686,8 @@ export default function ListoBid() {
                   <div className="rrow">
                     <div className="ri"><div className="ri-l">{t.yourCost}</div><div className="ri-v">${Math.round(result.cost)}</div></div>
                     <div className="ri">
-                      <div className="ri-l">{t.yourProfit}</div>
-                      <div className="ri-v" style={{color:qMarginMode==="dollar"?"#3DC43C":"#fff"}}>
+                      <div className="ri-l" style={{color:"var(--green)",fontWeight:700}}>{t.yourProfit}</div>
+                      <div className="ri-v" style={{color:"#3DC43C",fontWeight:800,fontSize:20}}>
                         $<AnimatedNumber value={Math.round(result.profit||0)} duration={900}/>
                       </div>
                     </div>
@@ -1693,7 +1695,7 @@ export default function ListoBid() {
                 </>)}
                 <div className="mpill" style={{background:mc.bg}}>
                   <div className="mdot" style={{background:mc.fg}}/>
-                  <span style={{color:mc.fg}}>{roundPct(result.margin)}% {t.marginLabel} - {lang==="es"?mc.es:mc.en}</span>
+                  <span style={{color:mc.fg}}>{roundPct(margin)}% {t.marginLabel} - {lang==="es"?mc.es:mc.en}</span>
                 </div>
               </div>
 
@@ -1702,13 +1704,21 @@ export default function ListoBid() {
                 <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
                   <div className="ct2" style={{marginBottom:0}}>{t.adjustMargin}</div>
                   <div className="tg" style={{width:"auto",gap:5}}>
-                    <button className={`tb ${qMarginMode==="pct"?"on":""}`} style={{padding:"4px 10px",flex:"none",fontSize:11}} onClick={()=>{setQMarginMode("pct");if(canCalc)setResult(calcQuote(buildP(margin)));}}> % </button>
-                    <button className={`tb ${qMarginMode==="dollar"?"on":""}`} style={{padding:"4px 10px",flex:"none",fontSize:11}} onClick={()=>{setQMarginMode("dollar");if(canCalc)setResult(calcQuote({...buildP(margin),marginMode:"dollar"}));}}> $ </button>
+                    <button className={`tb ${qMarginMode==="pct"?"on":""}`} style={{padding:"4px 10px",flex:"none",fontSize:11}} onClick={()=>{
+                      setQMarginMode("pct");
+                      const newP = {...buildP(margin), marginMode:"pct"};
+                      if(canCalc){const r=calcQuote(newP);setResult(r);setMargin(Math.round(r.margin));}
+                    }}> % </button>
+                    <button className={`tb ${qMarginMode==="dollar"?"on":""}`} style={{padding:"4px 10px",flex:"none",fontSize:11}} onClick={()=>{
+                      setQMarginMode("dollar");
+                      const newP = {...buildP(margin), marginMode:"dollar", targetDollar:qTargetDollar};
+                      if(canCalc){const r=calcQuote(newP);setResult(r);setMargin(Math.round(r.margin));}
+                    }}> $ </button>
                   </div>
                 </div>
                 {qMarginMode==="pct"
                   ? <><div className="sl-pct">{roundPct(margin)}%</div><input type="range" min="1" max="99" step="0.5" value={margin} onChange={e=>onSlider(parseFloat(e.target.value))}/><div className="sl-ends"><span>1%</span><span>99%</span></div><div className="sl-hint">{t.slideHint}</div></>
-                  : <><label className="lb">{t.targetDollar}</label><div className="px"><span className="pxs">$</span><input type="number" min="0" value={qTargetDollar} onChange={e=>{setQTargetDollar(e.target.value);if(canCalc)setResult(calcQuote({...buildP(margin),marginMode:"dollar",targetDollar:e.target.value}));}}/></div><div className="ht" style={{marginTop:6}}>{t.slideHint}</div></>
+                  : <><label className="lb">{t.targetDollar}</label><div className="px"><span className="pxs">$</span><input type="number" min="0" value={qTargetDollar} onChange={e=>{setQTargetDollar(e.target.value);if(canCalc){const r=calcQuote({...buildP(margin),marginMode:"dollar",targetDollar:e.target.value});setResult(r);setMargin(Math.round(r.margin));}}}/></div><div className="ht" style={{marginTop:6}}>{t.slideHint}</div></>
                 }
               </div>
 
@@ -1730,8 +1740,7 @@ export default function ListoBid() {
                 ? <button className="btn bp" onClick={()=>{ setShowAct(true); setTimeout(()=>{ document.getElementById("quote-actions")?.scrollIntoView({behavior:"smooth",block:"start"}); },100); }}>{lang==="es"?"Guardar en Registro":"Save to Log"}</button>
                 : <div className="ac" id="quote-actions">
                     <div className="ac-s">
-                      <button className="btn bp" onClick={()=>setShowSave(true)}>{lang==="es"?"Guardar en Registro":"Save to Log"}</button>
-                      <button className="btn bg" style={{marginTop:8,fontSize:13,color:"var(--g400)",background:"none",border:"1.5px solid var(--g200)"}} onClick={()=>setShowAct(false)}>{lang==="es"?"Seguir Editando":"Keep Editing"}</button>
+                      <button className="btn bp" onClick={()=>{setShowAct(false);setShowSave(true);}}>{lang==="es"?"Guardar en Registro":"Save to Log"}</button>
                     </div>
                   </div>
               }
@@ -1908,7 +1917,7 @@ export default function ListoBid() {
             <div className="card">
               <div className="sr" style={{cursor:"pointer"}} onClick={()=>setSettView("account")}><span className="sr-l">{lang==="es"?"Cuenta":"Account"}</span><span className="sr-v">›</span></div>
               <div className="sr" style={{cursor:"pointer"}} onClick={()=>setSettView("profile")}><span className="sr-l">{t.editProfile}</span><span className="sr-v">›</span></div>
-              <div className="sr" style={{cursor:"pointer"}} onClick={()=>setSettView("jobs")}><span className="sr-l">{t.manageJobs}</span><span className="sr-v">{jobs.length} types ›</span></div>
+              <div className="sr" style={{cursor:"pointer"}} onClick={()=>setSettView("jobs")}><span className="sr-l">{t.manageJobs}</span><span className="sr-v">{lang==="es"?`${jobs.length} tipos`:`${jobs.length} types`} ›</span></div>
               <div className="sr" style={{cursor:"pointer"}} onClick={()=>setSettView("industry")}><span className="sr-l">{t.industryLabel}</span><span className="sr-v">{INDUSTRY_TEMPLATES[industry]?.[lang]?.name||INDUSTRY_TEMPLATES[industry]?.en.name} ›</span></div>
               <div className="sr" style={{cursor:"default"}}>
                 <span className="sr-l">{t.language}</span>
@@ -2100,7 +2109,7 @@ export default function ListoBid() {
           <div className="fi"><label className="lb">{t.addressLabel} <span style={{color:"var(--g400)",fontWeight:400}}>{t.addressOpt}</span></label><AddressInput value={saveAddress} onChange={setSaveAddress}/></div>
           <div className="fi" style={{marginBottom:0}}><label className="lb">{t.notes} <span style={{color:"var(--g400)",fontWeight:400}}>{t.notesOpt}</span></label><textarea rows={3} value={saveNotes} onChange={e=>setSaveNotes(e.target.value)} placeholder={t.notesPlaceholder}/></div>
           <div className="mo-b">
-            <button className="btn bg" onClick={()=>{setShowSave(false);setSaveNotes("");setSaveAddress("");}}>{t.cancel}</button>
+            <button className="btn bg" onClick={()=>{setShowSave(false);setSaveNotes("");setSaveAddress("");}}>{lang==="es"?"Volver a Editar":"Back to Editing"}</button>
             <button className="btn bp" style={{opacity:saveName.trim()?1:.45}} onClick={saveQuote}>{t.save}</button>
           </div>
         </div>
