@@ -1561,8 +1561,8 @@ export default function ListoBid() {
               <div className="r2">
                 <div className="fi" style={{marginBottom:0}}><label className="lb">{t.hoursOnSite}</label><input type="number" min="0" step="0.5" value={hours} onChange={e=>{setHours(e.target.value);setResult(null);}} placeholder="2"/></div>
                 <div className="fi" style={{marginBottom:0}}>
+                  <label className="lb">{t.matsLabel}</label>
                   <div className="px"><span className="pxs">$</span><input type="number" min="0" value={mats} onChange={e=>{setMats(e.target.value);setResult(null);}} placeholder="0"/></div>
-                  )}
                 </div>
               </div>
             </div>
