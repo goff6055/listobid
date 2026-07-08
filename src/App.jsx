@@ -4,7 +4,7 @@ import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js
 // ─── CONFIG ───────────────────────────────────────────────────────────────────
 const STRIPE_LINK        = "https://buy.stripe.com/5kQ3cx5GAdQp9VH0wFgw000";
 const STRIPE_PORTAL_LINK = {STRIPE_PORTAL_LINK};
-const TRIAL_DAYS       = 14;
+const TRIAL_DAYS       = 7;
 const SOFT_LOCK_DAYS   = 5;
 const ADMIN_PASSWORD   = "Ready2bid$";
 const ADMIN_EMAIL      = "support@listobid.com";
@@ -1153,6 +1153,28 @@ export default function ListoBid() {
     if (!canCalc) return;
     const r = calcQuote(buildP(mg));
     setMargin(Math.round(r.margin)); setResult(r); setShowAct(false); incrementQuotes();
+    // Log calculation to Supabase
+    if (currentUser?.id) {
+      const jobName = jobs.find(j => String(j.id) === String(selJob))?.name || "Unknown";
+      sb.from("quote_events").insert({
+        user_id: currentUser.id,
+        job_type: jobName,
+        industry: currentUser.industry || industry,
+        price: r.price,
+        cost: Math.round(r.cost),
+        profit: Math.round(r.profit),
+        margin: Math.round(r.margin),
+        crew_size: parseInt(crewSize) || 1,
+        hours: parseFloat(hours) || 0,
+        saved: false,
+      }).then(() => {}).catch(() => {});
+      // Track first calc timestamp
+      if (!currentUser.first_calc_at) {
+        sb.from("profiles").update({ first_calc_at: new Date().toISOString() }).eq("id", currentUser.id)
+          .then(() => { setCurrentUser(u => ({...u, first_calc_at: new Date().toISOString()})); })
+          .catch(() => {});
+      }
+    }
   };
 
   const onSlider = (val) => { setMargin(val); if (canCalc) setResult(calcQuote(buildP(val))); };
