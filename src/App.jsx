@@ -154,10 +154,10 @@ const TX = {
     softLockBody: "You can view saved quotes but cannot create new ones.",
     softLockDays: "days until full lock",
     viewLog: "View My Quotes",
-    reminderDay10Title: "4 days left in your trial",
-    reminderDay10Body: "Your free trial ends in 4 days. Subscribe to keep full access.",
-    reminderDay13Title: "Trial ending tomorrow",
-    reminderDay13Body: "Your free trial ends tomorrow. Subscribe to avoid losing access.",
+    reminderDay4Title: "3 days left in your trial",
+    reminderDay4Body: "Your free trial ends in 3 days. Subscribe to keep full access.",
+    reminderDay6Title: "Your trial ends tomorrow",
+    reminderDay6Body: "Your free trial ends tomorrow. Subscribe to keep your quotes and pricing.",
     subscribeBtn: "Subscribe - $9.99/mo", remindLater: "Remind Me Later",
     chooseLanguage: "Choose your language",
     chooseIndustry: "What industry are you in?",
@@ -244,10 +244,10 @@ const TX = {
     softLockBody: "Puedes ver cotizaciones guardadas pero no crear nuevas.",
     softLockDays: "días hasta bloqueo total",
     viewLog: "Ver Mis Cotizaciones",
-    reminderDay10Title: "4 días en tu prueba",
-    reminderDay10Body: "Tu prueba gratuita termina en 4 días.",
-    reminderDay13Title: "La prueba termina mañana",
-    reminderDay13Body: "Tu prueba gratuita termina mañana.",
+    reminderDay4Title: "3 días restantes en tu prueba",
+    reminderDay4Body: "Tu prueba gratis termina en 3 días. Suscríbete para mantener acceso.",
+    reminderDay6Title: "Tu prueba termina mañana",
+    reminderDay6Body: "Tu prueba gratis termina mañana. Suscríbete para conservar tus cotizaciones.",
     subscribeBtn: "Suscribirse - $9.99/mes", remindLater: "Recordarme Después",
     chooseLanguage: "Elige tu idioma",
     chooseIndustry: "¿En qué industria trabajas?",
@@ -903,7 +903,7 @@ export default function ListoBid() {
   const [settView, setSettView] = useState("main");
   const [showLegal, setShowLegal] = useState(false);
   const [showReminder, setShowReminder] = useState(false);
-  const [reminderShown, setReminderShown] = useState(() => LS.get("lb_reminder_shown", { d10: false, d13: false }));
+  const [reminderShown, setReminderShown] = useState(() => LS.get("lb_reminder_shown", { d4: false, d6: false }));
 
   // ── Tab ──
   const [tab, setTab] = useState("quote");
@@ -977,7 +977,7 @@ export default function ListoBid() {
   useEffect(() => {
     if (!currentUser || currentUser.accountType !== "trial") return;
     const days = Math.floor((Date.now() - new Date(currentUser.signupDate)) / 86400000);
-    if (days >= 11 && !LS.get("lb_trial_reminder_sent", false)) {
+    if (days >= 5 && !LS.get("lb_trial_reminder_sent", false)) {
       sb.functions.invoke("send-trial-reminder", {
         body: { email: currentUser.email, daysLeft: TRIAL_DAYS - days, lang }
       }).then(() => { LS.set("lb_trial_reminder_sent", true); }).catch(() => {});
@@ -988,8 +988,8 @@ export default function ListoBid() {
   useEffect(() => {
     if (!currentUser || currentUser.accountType !== "trial") return;
     const d = Math.floor((Date.now() - new Date(currentUser.signupDate)) / 86400000);
-    if (d >= 13 && !reminderShown.d13) setShowReminder("d13");
-    else if (d >= 10 && !reminderShown.d10) setShowReminder("d10");
+    if (d >= 6 && !reminderShown.d6) setShowReminder("d6");
+    else if (d >= 4 && !reminderShown.d4) setShowReminder("d4");
   }, [currentUser, reminderShown]);
 
   // ── Trial ──
@@ -1145,7 +1145,7 @@ export default function ListoBid() {
   }, [currentUser]);
 
   // ── Quote ──
-  const canCalc = !!hours && pf(hours) > 0 && !!gasPrice && pf(gasPrice) > 0;
+  const canCalc = !!hours && pf(hours) > 0 && !!gasPrice && pf(gasPrice) > 0 && pf(profile.laborRate) > 0;
   const [showRequired, setShowRequired] = useState(false);
   const buildP = (mg = margin) => ({ laborRate: profile.laborRate, crewSize: profile.crewSize, hours, materials: mats, exactMiles: exactMi, tier, vehicles: vehs, gasPrice, margin: mg, marginMode: qMarginMode, targetDollar: qTargetDollar, overheadMode: qOverheadMode, overheadPct: qOverheadPct, overheadFlat: qOverheadFlat });
 
@@ -1164,7 +1164,7 @@ export default function ListoBid() {
         cost: Math.round(r.cost),
         profit: Math.round(r.profit),
         margin: Math.round(r.margin),
-        crew_size: parseInt(crewSize) || 1,
+        crew_size: parseInt(profile.crewSize) || parseInt(crewSize) || 1,
         hours: parseFloat(hours) || 0,
         saved: false,
       }).then(() => {}).catch(() => {});
@@ -1536,8 +1536,8 @@ export default function ListoBid() {
         <div className="reminder-ov">
           <div className="reminder-box">
             
-            <div style={{fontFamily:"'Plus Jakarta Sans',sans-serif",fontWeight:800,fontSize:22,color:"var(--navy)",marginBottom:8}}>{showReminder==="d13"?t.reminderDay13Title:t.reminderDay10Title}</div>
-            <div style={{fontSize:14,color:"var(--g600)",marginBottom:20,lineHeight:1.5}}>{showReminder==="d13"?t.reminderDay13Body:t.reminderDay10Body}</div>
+            <div style={{fontFamily:"'Plus Jakarta Sans',sans-serif",fontWeight:800,fontSize:22,color:"var(--navy)",marginBottom:8}}>{showReminder==="d6"?t.reminderDay6Title:t.reminderDay4Title}</div>
+            <div style={{fontSize:14,color:"var(--g600)",marginBottom:20,lineHeight:1.5}}>{showReminder==="d6"?t.reminderDay6Body:t.reminderDay4Body}</div>
             <div style={{display:"flex",flexDirection:"column",gap:8}}>
               <a href={STRIPE_LINK} target="_blank" rel="noopener noreferrer" style={{display:"block",padding:13,background:"linear-gradient(135deg,var(--green),var(--gdk))",color:"#fff",borderRadius:12,fontFamily:"'Plus Jakarta Sans',sans-serif",fontSize:15,fontWeight:700,textDecoration:"none",textAlign:"center"}} onClick={dismissReminder}>{t.subscribeBtn}</a>
               <button className="btn bg" onClick={dismissReminder}>{t.remindLater}</button>
