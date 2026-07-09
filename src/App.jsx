@@ -883,7 +883,9 @@ export default function ListoBid() {
   const [qOverheadPct,  setQOverheadPct]  = useState(() => LS.get("lb_profile", { overheadPct: "15" }).overheadPct || "15");
   const [qOverheadFlat, setQOverheadFlat] = useState(() => LS.get("lb_profile", { overheadFlat: "10" }).overheadFlat || "10");
   const [result,  setResult]  = useState(null);
-  const [showAct, setShowAct] = useState(false);
+  const [showAct,    setShowAct]    = useState(false);
+  const [showAdjust, setShowAdjust] = useState(false);
+  const [defaultsBannerDismissed, setDefaultsBannerDismissed] = useState(false);
   const [welcomeDismissed, setWelcomeDismissed] = useState(() => LS.get("lb_welcome_seen", false));
 
   // ── Log ──
@@ -949,6 +951,7 @@ export default function ListoBid() {
           signupDate: profile.signup_date || new Date().toISOString(),
           accountType: profile.account_type || "trial",
           industry: profile.industry || null,
+          first_calc_at: profile.first_calc_at || null,
           quotesGenerated: profile.quotes_generated || 0,
           lastActive: new Date().toISOString(),
         };
@@ -1076,6 +1079,7 @@ export default function ListoBid() {
         signupDate: profile?.signup_date || new Date().toISOString(),
         accountType: profile?.account_type || "trial",
         industry: profile?.industry || null,
+        first_calc_at: profile?.first_calc_at || null,
         quotesGenerated: profile?.quotes_generated || 0,
         lastActive: new Date().toISOString(),
       };
@@ -1178,6 +1182,15 @@ export default function ListoBid() {
   };
 
   const onSlider = (val) => { setMargin(val); if (canCalc) setResult(calcQuote(buildP(val))); };
+
+  useEffect(() => {
+    if (!result || !canCalc) return;
+    const timer = setTimeout(() => {
+      const r = calcQuote(buildP(margin));
+      setResult(r);
+    }, 250);
+    return () => clearTimeout(timer);
+  }, [hours, mats, gasPrice, crewSize, selJob]);
 
   const selectJob = (id) => {
     setSelJob(id); setResult(null); setShowAct(false);
@@ -1413,7 +1426,38 @@ export default function ListoBid() {
                 }
                 // Save industry to Supabase
                 if (upd.id) sb.from("profiles").update({ industry: key }).eq("id", upd.id).then(() => {});
-                setStep(1); setRoute("setup");
+
+                // Smart defaults if no labor rate set
+                const needsDefaults = !profile.laborRate;
+                if (needsDefaults) {
+                  const defaultJobs = getJobs(INDUSTRY_TEMPLATES[key], lang || "en");
+                  const firstJob = defaultJobs[0];
+                  const smartProfile = {
+                    laborRate: "18", crewSize: "2", gasPrice: "4.00",
+                    vehicles: "1", marginMode: "pct", targetMargin: "40",
+                    overheadMode: "none", overheadPct: "15", overheadFlat: "10",
+                    targetDollar: "50", businessName: "", zipCode: "",
+                    fuelType: "gas", includeOneTime: true
+                  };
+                  setProfile(p => ({...p, ...smartProfile}));
+                  // Persist to Supabase
+                  if (upd.id) {
+                    sb.from("profiles").update({
+                      profile_data: {...(profile || {}), ...smartProfile}
+                    }).eq("id", upd.id).then(() => {}).catch(() => {});
+                  }
+                  // Pre-select first job
+                  if (firstJob) {
+                    setSelJob(String(firstJob.id));
+                    setHours(String(firstJob.hours || "1"));
+                    // Auto-set cadence for weekly jobs
+                    const jname = (firstJob.name || "").toLowerCase();
+                    if (jname.includes("weekly") || jname.includes("semanal")) {
+                      setCadence("weekly");
+                    }
+                  }
+                }
+                setStep(0); setTab("quote"); setRoute("app");
               }}
               onMouseEnter={e => { e.currentTarget.style.borderColor = "var(--green)"; e.currentTarget.style.background = "var(--glt)"; }}
               onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--g200)"; e.currentTarget.style.background = "var(--w)"; }}>
@@ -1556,6 +1600,16 @@ export default function ListoBid() {
           {trial.softLock && <div style={{background:"var(--ylt)",border:"1px solid #FCD34D",borderRadius:10,padding:"12px 14px",marginBottom:14,fontSize:13,color:"var(--yellow)",lineHeight:1.5}}>{t.softLockBody}</div>}
 
           {!trial.softLock && <>
+            {/* Defaults banner */}
+            {!defaultsBannerDismissed && !currentUser?.first_calc_at && (
+              <div style={{background:"var(--g50)",border:"1.5px solid var(--g200)",borderRadius:10,padding:"10px 14px",marginBottom:10,display:"flex",alignItems:"center",justifyContent:"space-between",gap:8}}>
+                <div style={{fontSize:12,color:"var(--g600)",fontWeight:500,flex:1}}>
+                  {lang==="es"?"Estos son valores predeterminados. Actualízalos en Configuración.":"These are defaults. Update them in Settings anytime."}
+                </div>
+                <button onClick={()=>setDefaultsBannerDismissed(true)} style={{background:"none",border:"none",color:"var(--g400)",fontSize:18,cursor:"pointer",flexShrink:0,lineHeight:1,padding:"0 4px"}}>×</button>
+              </div>
+            )}
+
             {/* 1 Job Type */}
             <div className="card">
               <div className="ct2">{t.jobType}</div>
@@ -1588,6 +1642,18 @@ export default function ListoBid() {
                 </div>
               </div>
             </div>
+
+            {/* Adjust Details Accordion */}
+            <div style={{marginBottom:8}}>
+              <button onClick={()=>setShowAdjust(a=>!a)} style={{width:"100%",background:"var(--g50)",border:"1.5px solid var(--g200)",borderRadius:10,padding:"10px 14px",display:"flex",alignItems:"center",justifyContent:"space-between",cursor:"pointer",fontFamily:"inherit"}}>
+                <span style={{fontSize:13,fontWeight:700,color:"var(--g800)"}}>{lang==="es"?"Ajustar Detalles":"Adjust Details"}</span>
+                <div style={{display:"flex",alignItems:"center",gap:8}}>
+                  <span style={{fontSize:11,color:"var(--g400)",fontWeight:500}}>{tier==="short"?lang==="es"?"Corta":"Short":tier==="medium"?lang==="es"?"Media":"Medium":lang==="es"?"Larga":"Long"} · {vehs} {lang==="es"?"camión":"truck"}{vehs!=="1"?"s":""} · {lang==="es"?"Gas":"Gas"} ${gasPrice||"4.00"}</span>
+                  <span style={{fontSize:14,color:"var(--g400)",transform:showAdjust?"rotate(180deg)":"none",transition:"transform .2s"}}>▾</span>
+                </div>
+              </button>
+              {showAdjust&&(
+                <div style={{border:"1.5px solid var(--g200)",borderTop:"none",borderRadius:"0 0 10px 10px",padding:"12px 0 0"}}>
 
             {/* 4 Distance */}
             <div className="card">
@@ -1648,11 +1714,22 @@ export default function ListoBid() {
 
             </div>
 
+                </div>
+              )}
+            </div>
+
             {/* Calculate */}
-            <button className="btn bn" onClick={()=>{ if(!canCalc){ setShowRequired(true); return; } setShowRequired(false); doCalc(); setTimeout(()=>{document.getElementById("quote-result")?.scrollIntoView({behavior:"smooth",block:"start"})},150); }}>{t.calculate}</button>
+            <button className="btn bn" onClick={()=>{ if(!canCalc){ setShowRequired(true); if(!gasPrice||pf(gasPrice)<=0) setShowAdjust(true); return; } setShowRequired(false); doCalc(); setTimeout(()=>{document.getElementById("quote-result")?.scrollIntoView({behavior:"smooth",block:"start"})},150); }}>{t.calculate}</button>
 
             {result && <>
               <div id="quote-result" style={{height:6}}/>
+              {currentUser?.first_calc_at && !currentUser?._shownFirstMoment && (
+                <div style={{padding:"14px 16px",marginBottom:10,borderRadius:10,background:"var(--navy)"}}>
+                  <div style={{fontSize:14,fontWeight:700,color:"#fff",marginBottom:4,lineHeight:1.4}}>
+                    {lang==="es"?"La mayoría hubiera cobrado menos. Esa diferencia es tu ganancia.":"Most new operators would have guessed lower. That gap is your profit."}
+                  </div>
+                </div>
+              )}
               <div style={{background:"var(--green)",borderRadius:10,padding:"12px 16px",marginBottom:12,display:"flex",alignItems:"center",gap:10}}>
                 <span style={{color:"#fff",fontWeight:700,fontSize:14}}>{lang==="es"?"Tu cotización lista. Ver abajo.":"Your quote is ready. See below."}</span>
               </div>
@@ -1909,6 +1986,13 @@ export default function ListoBid() {
           {settView==="main" && <>
             <div className="st">{t.settings}</div>
             <div className="ss">{t.version}</div>
+            {(!profile.businessName||!profile.laborRate)&&(
+              <div style={{background:"var(--navy)",borderRadius:14,padding:"18px",marginBottom:14}}>
+                <div style={{fontWeight:800,fontSize:15,color:"#fff",marginBottom:6}}>{lang==="es"?"Completa tu Perfil":"Complete Your Profile"}</div>
+                <div style={{fontSize:13,color:"rgba(255,255,255,.5)",marginBottom:14,lineHeight:1.4}}>{lang==="es"?"Agrega tu nombre y tarifa para cotizaciones más precisas.":"Add your business name and rate for more accurate quotes."}</div>
+                <button className="btn bp" style={{fontSize:13}} onClick={()=>setSettView("profile")}>{lang==="es"?"Configurar Ahora":"Set Up Now"} ›</button>
+              </div>
+            )}
 
             {currentUser.accountType==="paid"&&<div style={{background:"var(--glt)",border:"1px solid #A7F3D0",borderRadius:10,padding:"12px 16px",marginBottom:12,fontSize:13,color:"var(--gdk)",fontWeight:600}}>Active Subscriber</div>}
             {currentUser.accountType !== "paid" && (
