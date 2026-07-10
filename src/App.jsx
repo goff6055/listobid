@@ -1190,7 +1190,7 @@ export default function ListoBid() {
       setResult(r);
     }, 250);
     return () => clearTimeout(timer);
-  }, [hours, mats, gasPrice, selJob]);
+  }, [hours, mats, gasPrice, crewSize, selJob]);
 
   const selectJob = (id) => {
     setSelJob(id); setResult(null); setShowAct(false);
@@ -1648,7 +1648,7 @@ export default function ListoBid() {
               <button onClick={()=>setShowAdjust(a=>!a)} style={{width:"100%",background:"var(--g50)",border:"1.5px solid var(--g200)",borderRadius:10,padding:"10px 14px",display:"flex",alignItems:"center",justifyContent:"space-between",cursor:"pointer",fontFamily:"inherit"}}>
                 <span style={{fontSize:13,fontWeight:700,color:"var(--g800)"}}>{lang==="es"?"Ajustar Detalles":"Adjust Details"}</span>
                 <div style={{display:"flex",alignItems:"center",gap:8}}>
-                  <span style={{fontSize:11,color:"var(--g400)",fontWeight:500}}>{tier==="short"?lang==="es"?"Corta":"Short":tier==="medium"?lang==="es"?"Media":"Medium":lang==="es"?"Larga":"Long"} · {vehs} {lang==="es"?"camión":"truck"}{vehs!=="1"?"s":""} · {lang==="es"?"Gas":"Gas"} ${gasPrice||"4.00"}</span>
+                  <span style={{fontSize:11,color:"var(--g400)",fontWeight:500}}>{lang==="es"?"Combustible · Gastos · Frecuencia":"Fuel · Overhead · Frequency"}</span>
                   <span style={{fontSize:14,color:"var(--g400)",transform:showAdjust?"rotate(180deg)":"none",transition:"transform .2s"}}>▾</span>
                 </div>
               </button>
@@ -1750,7 +1750,7 @@ export default function ListoBid() {
                 </div>
                 {resultView==="recurring"&&cadence!=="once"?(()=>{
                   const mult=cadence==="weekly"?52:cadence==="biweekly"?26:cadence==="monthly"?12:1;
-                  const period=cadence==="weekly"?lang==="es"?"Anual (Semanal)":"Annual (Weekly)":cadence==="biweekly"?lang==="es"?"Anual (Quincenal)":"Annual (Bi-Weekly)":cadence==="monthly"?lang==="es"?"Anual (Mensual)":"Annual (Monthly)":(customCadence||"Recurring").toUpperCase();
+                  const period=cadence==="weekly"?lang==="es"?"Anual (Semanal)":lang==="es"?"Valor Anual (Semanal)":"52-Week Value":cadence==="biweekly"?lang==="es"?"Anual (Quincenal)":lang==="es"?"Valor Anual (Quincenal)":"26-Week Value":cadence==="monthly"?lang==="es"?"Anual (Mensual)":lang==="es"?"Valor Anual (Mensual)":"12-Month Value":(customCadence||"Recurring").toUpperCase();
                   return(<>
                     <div className="rl">PROJECTED {period.toUpperCase()}</div>
                     <div className="rp"><span className="rp-dollar">$</span>{Math.round(result.price*mult).toLocaleString()}</div>
@@ -1799,7 +1799,15 @@ export default function ListoBid() {
                 </div>
                 {qMarginMode==="pct"
                   ? <><div className="sl-pct">{roundPct(margin)}%</div><input type="range" min="1" max="99" step="0.5" value={margin} onChange={e=>onSlider(parseFloat(e.target.value))}/><div className="sl-ends"><span>1%</span><span>99%</span></div><div className="sl-hint">{t.slideHint}</div></>
-                  : <><label className="lb">{t.targetDollar}</label><div className="px"><span className="pxs">$</span><input type="number" min="0" value={qTargetDollar} onChange={e=>{setQTargetDollar(e.target.value);if(canCalc){const r=calcQuote({...buildP(margin),marginMode:"dollar",targetDollar:e.target.value});setResult(r);setMargin(Math.round(r.margin));}}}/></div><div className="ht" style={{marginTop:6}}>{t.slideHint}</div></>
+                  : <><label className="lb">{t.targetDollar}</label><div className="px"><span className="pxs">$</span><input type="number" min="0" value={qTargetDollar} onChange={e=>{
+                      const v=e.target.value;
+                      setQTargetDollar(v);
+                      if(canCalc){
+                        const r=calcQuote({...buildP(margin),marginMode:"dollar",targetDollar:v});
+                        setResult({...r,profit:parseFloat(v)||0});
+                        setMargin(Math.round(r.margin));
+                      }
+                    }}/></div><div className="ht" style={{marginTop:6}}>{t.slideHint}</div></>
                 }
               </div>
 
@@ -1826,13 +1834,20 @@ export default function ListoBid() {
 
           {/* Post-save success message */}
           {saveSuccess && (
-            <div style={{position:"fixed",bottom:80,left:"50%",transform:"translateX(-50%)",background:"var(--navy)",borderRadius:14,padding:"14px 20px",boxShadow:"0 8px 32px rgba(0,0,0,.25)",zIndex:400,display:"flex",alignItems:"center",gap:12,minWidth:260,maxWidth:340}}>
-              <div style={{width:36,height:36,background:"var(--green)",borderRadius:10,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center"}}>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            <div style={{position:"fixed",bottom:80,left:"50%",transform:"translateX(-50%)",background:"var(--navy)",borderRadius:14,padding:"16px 20px",boxShadow:"0 8px 32px rgba(0,0,0,.25)",zIndex:400,minWidth:280,maxWidth:360}}>
+              <div style={{display:"flex",alignItems:"center",gap:12,marginBottom:14}}>
+                <div style={{width:36,height:36,background:"var(--green)",borderRadius:10,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center"}}>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                </div>
+                <div style={{fontWeight:700,fontSize:14,color:"#fff"}}>{lang==="es"?"Cotización guardada.":"Quote saved."}</div>
               </div>
-              <div>
-                <div style={{color:"#fff",fontWeight:700,fontSize:14,marginBottom:2}}>Nice work. Quote saved.</div>
-                <div style={{color:"rgba(255,255,255,.6)",fontSize:12}}>${saveSuccess.price} price · ${saveSuccess.profit} profit · {saveSuccess.margin}% margin</div>
+              <div style={{display:"flex",gap:8}}>
+                <button className="btn bp" style={{flex:1,fontSize:12,padding:"8px 10px"}} onClick={()=>{setSaveSuccess(null);reset();setTab("quote");}}>
+                  {lang==="es"?"Nueva Cotización":"Price Another Job"}
+                </button>
+                <button className="btn bg" style={{flex:1,fontSize:12,padding:"8px 10px",borderColor:"rgba(255,255,255,.2)",color:"rgba(255,255,255,.7)"}} onClick={()=>{setSaveSuccess(null);setTab("log");}}>
+                  {lang==="es"?"Ver Registro":"View My Log"}
+                </button>
               </div>
             </div>
           )}
