@@ -1190,7 +1190,7 @@ export default function ListoBid() {
       setResult(r);
     }, 250);
     return () => clearTimeout(timer);
-  }, [hours, mats, gasPrice, crewSize, selJob]);
+  }, [hours, mats, gasPrice, selJob]);
 
   const selectJob = (id) => {
     setSelJob(id); setResult(null); setShowAct(false);
