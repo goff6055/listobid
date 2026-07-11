@@ -1298,9 +1298,7 @@ export default function ListoBid() {
             {lang==="es"?"Para Jardineros y Técnicos de Oficio":"For Landscapers and Trade Operators"}
           </div>
           <h1 style={{fontSize:32,fontWeight:800,color:"#fff",lineHeight:1.15,margin:"0 0 32px",maxWidth:340,marginLeft:"auto",marginRight:"auto"}}>
-            {lang==="es"?"Conoce tu precio.
-Conoce tu ganancia.":"Know your price.
-Know your profit."}
+            {lang==="es"?"Conoce tu precio. Conoce tu ganancia.":"Know your price. Know your profit."}
           </h1>
 
           {/* Animated mockup */}
