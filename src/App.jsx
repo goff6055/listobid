@@ -817,7 +817,7 @@ export default function ListoBid() {
     const ind = LS.get("lb_industry", null);
     if (u && ind) return "app";
     if (u) return "industry";
-    return "register";
+    return "landing";
   });
   const [sbLoading, setSbLoading] = useState(false);
 
@@ -972,7 +972,7 @@ export default function ListoBid() {
       });
     });
     sb.auth.onAuthStateChange((event) => {
-      if (event === "SIGNED_OUT") { LS.del("lb_current_user"); setCurrentUser(null); setRoute("login"); }
+      if (event === "SIGNED_OUT") { LS.del("lb_current_user"); setCurrentUser(null); setRoute("landing"); }
     });
   }, []);
 
@@ -1262,6 +1262,128 @@ export default function ListoBid() {
       </div>
     </div></>
   );
+
+  // ── Landing Page ──
+  if (route === "landing") return (
+    <><style>{CSS}</style>
+    <style>{`
+      .lb-lang-btn{background:none;border:1.5px solid rgba(255,255,255,.4);border-radius:6px;padding:4px 10px;color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:color .15s,border-color .15s}
+      .lb-lang-btn:hover{color:var(--green);border-color:var(--green)}
+      .lb-signin-btn{background:none;border:none;color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:color .15s}
+      .lb-signin-btn:hover{color:var(--green)}
+    `}</style>
+    <div style={{minHeight:"100dvh",background:"#fff",fontFamily:"'Plus Jakarta Sans',sans-serif",overflowX:"hidden"}}>
+
+      {/* Nav */}
+      <div style={{background:"var(--navy)",padding:"16px 24px",display:"flex",alignItems:"center",justifyContent:"space-between",position:"sticky",top:0,zIndex:100}}>
+        <img src="/logo.PNG" alt="ListoBid" style={{height:32,objectFit:"contain"}}/>
+        <div style={{display:"flex",alignItems:"center",gap:12}}>
+          <button className="lb-lang-btn" onClick={()=>setLang(lang==="en"?"es":"en")}>
+            {lang==="en"?"Español":"English"}
+          </button>
+          <button className="lb-signin-btn" onClick={()=>setRoute("login")}>
+            {lang==="es"?"Iniciar Sesión":"Sign In"}
+          </button>
+        </div>
+      </div>
+
+      {/* Hero */}
+      <div style={{background:"var(--navy)",padding:"48px 24px 56px",textAlign:"center",position:"relative",overflow:"hidden"}}>
+        {/* Beams */}
+        {[...Array(4)].map((_,i)=>(
+          <div key={i} style={{position:"absolute",top:`${15+i*20}%`,left:"-20%",width:"60%",height:"2px",background:`linear-gradient(90deg,transparent,rgba(61,196,60,${0.07+i*0.03}),transparent)`,transform:"rotate(25deg)",animation:`beamMove ${3+i*0.7}s linear ${i*0.6}s infinite`,pointerEvents:"none"}}/>
+        ))}
+        <div style={{position:"relative",zIndex:1}}>
+          <div style={{display:"inline-block",background:"rgba(61,196,60,.15)",border:"1px solid rgba(61,196,60,.3)",borderRadius:20,padding:"4px 14px",fontSize:11,fontWeight:700,color:"var(--green)",letterSpacing:"1px",textTransform:"uppercase",marginBottom:20}}>
+            {lang==="es"?"Para Jardineros y Técnicos de Oficio":"For Landscapers and Trade Operators"}
+          </div>
+          <h1 style={{fontSize:32,fontWeight:800,color:"#fff",lineHeight:1.15,margin:"0 0 32px",maxWidth:340,marginLeft:"auto",marginRight:"auto"}}>
+            {lang==="es"?"Conoce tu precio.
+Conoce tu ganancia.":"Know your price.
+Know your profit."}
+          </h1>
+
+          {/* Animated mockup */}
+          <div style={{background:"rgba(255,255,255,.05)",border:"1px solid rgba(255,255,255,.1)",borderRadius:16,padding:"20px",maxWidth:320,margin:"0 auto 32px",textAlign:"left"}}>
+            <div style={{fontSize:11,fontWeight:700,letterSpacing:"1px",textTransform:"uppercase",color:"rgba(255,255,255,.4)",marginBottom:8}}>
+              {lang==="es"?"Precio Recomendado":"Recommended Price"}
+            </div>
+            <div style={{display:"flex",alignItems:"baseline",gap:2,marginBottom:12}}>
+              <span style={{fontSize:22,fontWeight:800,color:"rgba(255,255,255,.6)"}}>$</span>
+              <span style={{fontSize:52,fontWeight:800,color:"#fff",lineHeight:1,animation:"countUp .9s ease-out both"}}>185</span>
+            </div>
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}}>
+              <div style={{background:"rgba(255,255,255,.07)",borderRadius:8,padding:"10px 12px"}}>
+                <div style={{fontSize:16,fontWeight:800,color:"var(--green)"}}>+$74</div>
+                <div style={{fontSize:9,fontWeight:700,letterSpacing:".6px",textTransform:"uppercase",color:"rgba(255,255,255,.3)",marginTop:2}}>{lang==="es"?"Ganancia":"Profit"}</div>
+              </div>
+              <div style={{background:"rgba(255,255,255,.07)",borderRadius:8,padding:"10px 12px"}}>
+                <div style={{fontSize:16,fontWeight:800,color:"#fff"}}>40%</div>
+                <div style={{fontSize:9,fontWeight:700,letterSpacing:".6px",textTransform:"uppercase",color:"rgba(255,255,255,.3)",marginTop:2}}>{lang==="es"?"Margen":"Margin"}</div>
+              </div>
+            </div>
+            <div style={{marginTop:10,fontSize:11,color:"rgba(255,255,255,.3)"}}>Weekly Maintenance · 1.5 hrs · 2 crew</div>
+          </div>
+
+          <button onClick={()=>setRoute("register")} style={{background:"var(--green)",color:"#fff",border:"none",borderRadius:12,padding:"16px 32px",fontSize:16,fontWeight:800,cursor:"pointer",fontFamily:"inherit",width:"100%",maxWidth:320}}>
+            {lang==="es"?"Cotiza tu Primer Trabajo":"Price Your First Job"}
+          </button>
+
+        </div>
+      </div>
+
+      {/* How It Works */}
+      <div style={{padding:"48px 24px",maxWidth:480,margin:"0 auto"}}>
+        <div style={{fontSize:11,fontWeight:700,letterSpacing:"1.5px",textTransform:"uppercase",color:"var(--g400)",textAlign:"center",marginBottom:8}}>
+          {lang==="es"?"Cómo Funciona":"How It Works"}
+        </div>
+        <h2 style={{fontSize:22,fontWeight:800,color:"var(--navy)",textAlign:"center",marginBottom:32,lineHeight:1.25}}>
+          {lang==="es"?"Cotiza cualquier trabajo en 30 segundos":"Price any job in 30 seconds"}
+        </h2>
+        {[
+          {n:"1",en:"Pick your job type",es:"Elige el tipo de trabajo",sub_en:"Weekly maintenance, cleanup, tree trimming and more.",sub_es:"Mantenimiento semanal, limpieza, poda y más."},
+          {n:"2",en:"Enter your hours and crew",es:"Ingresa horas y cuadrilla",sub_en:"Tell ListoBid your labor rate, hours on site, and crew size.",sub_es:"Ingresa tu tarifa, horas en sitio y tamaño de cuadrilla."},
+          {n:"3",en:"Get your price and profit",es:"Obtén tu precio y ganancia",sub_en:"See exactly what to charge and what you keep on every job.",sub_es:"Ve exactamente qué cobrar y qué te queda en cada trabajo."},
+        ].map(s=>(
+          <div key={s.n} style={{display:"flex",gap:16,marginBottom:28}}>
+            <div style={{width:36,height:36,borderRadius:"50%",background:"var(--navy)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:14,fontWeight:800,color:"#fff",flexShrink:0,marginTop:2}}>{s.n}</div>
+            <div>
+              <div style={{fontSize:16,fontWeight:700,color:"var(--navy)",marginBottom:4}}>{lang==="es"?s.es:s.en}</div>
+              <div style={{fontSize:13,color:"var(--g400)",lineHeight:1.5}}>{lang==="es"?s.sub_es:s.sub_en}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Bottom CTA */}
+      <div style={{background:"var(--navy)",padding:"48px 24px",textAlign:"center"}}>
+        <div style={{fontSize:22,fontWeight:800,color:"#fff",marginBottom:8,lineHeight:1.25}}>
+          {lang==="es"?"Listo para cotizar.":"Ready to bid."}
+        </div>
+        <div style={{fontSize:14,color:"rgba(255,255,255,.5)",marginBottom:24}}>
+          {lang==="es"?"$9.99/mes después de tu prueba.":"$9.99/month after your trial."}
+        </div>
+        <button onClick={()=>setRoute("register")} style={{background:"var(--green)",color:"#fff",border:"none",borderRadius:12,padding:"16px 32px",fontSize:16,fontWeight:800,cursor:"pointer",fontFamily:"inherit",width:"100%",maxWidth:320}}>
+          {lang==="es"?"Cotiza tu Primer Trabajo":"Price Your First Job"}
+        </button>
+      </div>
+
+      {/* Footer */}
+      <div style={{padding:"20px 24px",textAlign:"center",background:"#fff"}}>
+        <div style={{display:"flex",justifyContent:"center",alignItems:"center",gap:20,marginBottom:10}}>
+          <a href="https://www.facebook.com/profile.php?id=61590502810704" target="_blank" rel="noopener noreferrer" style={{display:"flex",alignItems:"center",justifyContent:"center",width:36,height:36,borderRadius:8,background:"var(--g100)",color:"var(--g600)",textDecoration:"none"}}>
+            <IcoFacebook size={18} color="var(--g600)"/>
+          </a>
+          <a href="https://instagram.com/listobid" target="_blank" rel="noopener noreferrer" style={{display:"flex",alignItems:"center",justifyContent:"center",width:36,height:36,borderRadius:8,background:"var(--g100)",color:"var(--g600)",textDecoration:"none"}}>
+            <IcoInstagram size={18} color="var(--g600)"/>
+          </a>
+        </div>
+        <div style={{fontSize:11,color:"var(--g400)"}}>© 2026 ListoBid · listobid.com</div>
+      </div>
+
+    </div></>
+  );
+
 
   // ── Set New Password screen (from email reset link) ──
   if (route === "resetNewPass") return (
