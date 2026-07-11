@@ -3,7 +3,7 @@ import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js
 
 // ─── CONFIG ───────────────────────────────────────────────────────────────────
 const STRIPE_LINK        = "https://buy.stripe.com/5kQ3cx5GAdQp9VH0wFgw000";
-const STRIPE_PORTAL_LINK = {STRIPE_PORTAL_LINK};
+const STRIPE_PORTAL_LINK = "https://billing.stripe.com/p/login/5kQ3cx5GAdQp9VH0wFgw000";
 const TRIAL_DAYS       = 7;
 const SOFT_LOCK_DAYS   = 5;
 const ADMIN_PASSWORD   = "Ready2bid$";
@@ -461,23 +461,6 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
 
 // ─── ICONS ────────────────────────────────────────────────────────────────────
 // ListoBid logo SVG recreated from brand asset
-// ─── COUNT UP HOOK ───────────────────────────────────────────────────────────
-function useCountUp(target, duration=900, active=true) {
-  const [val, setVal] = useState(0);
-  useEffect(() => {
-    if (!active || !target) return;
-    let start = 0;
-    const step = target / (duration / 16);
-    const timer = setInterval(() => {
-      start += step;
-      if (start >= target) { setVal(target); clearInterval(timer); }
-      else setVal(Math.round(start));
-    }, 16);
-    return () => clearInterval(timer);
-  }, [target, active]);
-  return active ? val : target;
-}
-
 // ─── ANIMATED NUMBER ─────────────────────────────────────────────────────────
 function AnimatedNumber({ value, duration=900 }) {
   const [display, setDisplay] = useState(0);
@@ -870,8 +853,6 @@ export default function ListoBid() {
   const [resultView, setResultView] = useState("single"); // single | recurring
   const [hours,   setHours]   = useState("");
   const [mats,       setMats]       = useState("");
-  const [matsRaw,    setMatsRaw]    = useState("");
-  const [markupPct,  setMarkupPct]  = useState("20");
   const [tier,    setTier]    = useState("short");
   const [exactMi, setExactMi] = useState("");
   const [vehs,    setVehs]    = useState(() => LS.get("lb_profile", { vehicles: "1" }).vehicles || "1");
@@ -1149,10 +1130,8 @@ export default function ListoBid() {
 
   const incrementQuotes = useCallback(() => {
     if (!currentUser) return;
-    const key = `lb_user_${currentUser.email.replace(/[^a-z0-9]/gi, "_")}`;
     const updated = { ...currentUser, quotesGenerated: (currentUser.quotesGenerated || 0) + 1, lastActive: new Date().toISOString() };
-    LS.set(key, updated); LS.set("lb_current_user", updated); setCurrentUser(updated);
-    LS.set("lb_all_users", LS.get("lb_all_users", []).map(u => u.email === currentUser.email ? updated : u));
+    LS.set("lb_current_user", updated); setCurrentUser(updated);
   }, [currentUser]);
 
   // ── Quote ──
@@ -1205,7 +1184,7 @@ export default function ListoBid() {
     if (j) { setHours(String(j.hours)); setMats(String(j.materials)); }
   };
 
-  const reset = () => { setSelJob(""); setHours(""); setMats(""); setMatsRaw(""); setMarkupPct("20"); setTier("short"); setExactMi(""); setVehs(profile.vehicles); setMargin(pf(profile.targetMargin, 40)); setResult(null); setShowAct(false); setCadence("once"); setCustomCadence(""); setResultView("single"); };
+  const reset = () => { setSelJob(""); setHours(""); setMats(""); setTier("short"); setExactMi(""); setVehs(profile.vehicles); setMargin(pf(profile.targetMargin, 40)); setResult(null); setShowAct(false); setCadence("once"); setCustomCadence(""); setResultView("single"); };
 
   const saveQuote = async () => {
     if (!saveName.trim() || !result) return;
@@ -1613,9 +1592,8 @@ export default function ListoBid() {
             <button key={key}
               style={{ flex: 1, padding: "18px 6px", background: "var(--w)", border: "2px solid var(--g200)", borderRadius: "var(--rad)", cursor: "pointer", fontFamily: "'Plus Jakarta Sans',sans-serif", boxShadow: "var(--sh)", transition: "all .15s" }}
               onClick={() => {
-                const uk = `lb_user_${currentUser.email.replace(/[^a-z0-9]/gi, "_")}`;
                 const upd = { ...currentUser, industry: key };
-                LS.set("lb_industry", key); LS.set(uk, upd); LS.set("lb_current_user", upd);
+                LS.set("lb_industry", key); LS.set("lb_current_user", upd);
                 setCurrentUser(upd); setIndustry(key);
                 // Initialize job library in correct language if not already set
                 const existing = LS.get("lb_all_jobs", null);
