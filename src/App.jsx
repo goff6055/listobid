@@ -1168,7 +1168,7 @@ export default function ListoBid() {
         cost: Math.round(r.cost),
         profit: Math.round(r.profit),
         margin: Math.round(r.margin),
-        crew_size: parseInt(profile.crewSize) || parseInt(crewSize) || 1,
+        crew_size: parseInt(profile.crewSize) || 1,
         hours: parseFloat(hours) || 0,
         saved: false,
       }).then(() => {}).catch(() => {});
@@ -1190,7 +1190,7 @@ export default function ListoBid() {
       setResult(r);
     }, 250);
     return () => clearTimeout(timer);
-  }, [hours, mats, gasPrice, crewSize, selJob]);
+  }, [hours, mats, gasPrice, selJob]);
 
   const selectJob = (id) => {
     setSelJob(id); setResult(null); setShowAct(false);
