@@ -909,6 +909,13 @@ export default function ListoBid() {
 
   // ── Tab ──
   const [tab, setTab] = useState("quote");
+  // ── Landing page live calculator ──
+  const [lpJob, setLpJob]       = useState("weekly");
+  const [lpHours, setLpHours]   = useState(1.5);
+  const [lpCrew, setLpCrew]     = useState(2);
+  const [lpMode, setLpMode]     = useState("pct");
+  const [lpMargin, setLpMargin] = useState(40);
+  const [lpProfit, setLpProfit] = useState(74);
 
   const t = TX[lang] || TX.en;
   const TOTAL_STEPS = 4;
@@ -1264,126 +1271,198 @@ export default function ListoBid() {
   );
 
   // ── Landing Page ──
-  if (route === "landing") return (
-    <><style>{CSS}</style>
-    <style>{`
-      .lb-lang-btn{background:none;border:1.5px solid rgba(255,255,255,.4);border-radius:6px;padding:4px 10px;color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:color .15s,border-color .15s}
-      .lb-lang-btn:hover{color:var(--green);border-color:var(--green)}
-      .lb-signin-btn{background:none;border:none;color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:color .15s}
-      .lb-signin-btn:hover{color:var(--green)}
-    `}</style>
-    <div style={{minHeight:"100dvh",background:"#fff",fontFamily:"'Plus Jakarta Sans',sans-serif",overflowX:"hidden"}}>
+  if (route === "landing") {
+    // Live calculator math (logged-out demo defaults)
+    const LP_WAGE = 32, LP_OH = 8, LP_FUEL = 7;
+    const lpCost = lpCrew * lpHours * LP_WAGE + LP_OH + LP_FUEL;
+    let lpPrice, lpProfitCalc, lpMarginShown;
+    if (lpMode === "pct") {
+      lpPrice = lpCost / (1 - lpMargin / 100);
+      lpProfitCalc = lpPrice - lpCost;
+      lpMarginShown = Math.round(lpMargin);
+    } else {
+      lpProfitCalc = lpProfit;
+      lpPrice = lpCost + lpProfit;
+      lpMarginShown = lpPrice > 0 ? Math.round((lpProfitCalc / lpPrice) * 100) : 0;
+    }
+    const lpJobs = [
+      { k: "weekly",   h: 1.5, en: "Weekly",   es: "Semanal" },
+      { k: "cleanup",  h: 4,   en: "Cleanup",  es: "Limpieza" },
+      { k: "trimming", h: 3,   en: "Trimming", es: "Poda" },
+    ];
+    const lpStepBtn = { width: 38, height: 38, borderRadius: 10, background: "rgba(255,255,255,.05)", border: "1px solid rgba(255,255,255,.15)", color: "#fff", fontSize: 20, fontWeight: 600, cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", justifyContent: "center" };
+    const lpFieldLbl = { fontSize: 11, fontWeight: 600, color: "rgba(255,255,255,.4)", textTransform: "uppercase", letterSpacing: ".5px" };
 
-      {/* Nav */}
-      <div style={{background:"var(--navy)",padding:"16px 24px",display:"flex",alignItems:"center",justifyContent:"space-between",position:"sticky",top:0,zIndex:100}}>
-        <img src="/logo.PNG" alt="ListoBid" style={{height:32,objectFit:"contain"}}/>
-        <div style={{display:"flex",alignItems:"center",gap:12}}>
-          <button className="lb-lang-btn" onClick={()=>setLang(lang==="en"?"es":"en")}>
-            {lang==="en"?"Español":"English"}
-          </button>
-          <button className="lb-signin-btn" onClick={()=>setRoute("login")}>
-            {lang==="es"?"Iniciar Sesión":"Sign In"}
-          </button>
-        </div>
-      </div>
+    return (
+      <><style>{CSS}</style>
+      <style>{`
+        .lb-lang-btn{background:none;border:1.5px solid rgba(255,255,255,.4);border-radius:6px;padding:4px 10px;color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:color .15s,border-color .15s}
+        .lb-lang-btn:hover{color:var(--green);border-color:var(--green)}
+        .lb-signin-btn{background:none;border:none;color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:color .15s}
+        .lb-signin-btn:hover{color:var(--green)}
+      `}</style>
+      <div style={{minHeight:"100dvh",background:"#fff",fontFamily:"'Plus Jakarta Sans',sans-serif",overflowX:"hidden"}}>
 
-      {/* Hero */}
-      <div style={{background:"var(--navy)",padding:"48px 24px 56px",textAlign:"center",position:"relative",overflow:"hidden"}}>
-        {/* Beams */}
-        {[...Array(4)].map((_,i)=>(
-          <div key={i} style={{position:"absolute",top:`${15+i*20}%`,left:"-20%",width:"60%",height:"2px",background:`linear-gradient(90deg,transparent,rgba(61,196,60,${0.07+i*0.03}),transparent)`,transform:"rotate(25deg)",animation:`beamMove ${3+i*0.7}s linear ${i*0.6}s infinite`,pointerEvents:"none"}}/>
-        ))}
-        <div style={{position:"relative",zIndex:1}}>
-          <div style={{display:"inline-block",background:"rgba(61,196,60,.15)",border:"1px solid rgba(61,196,60,.3)",borderRadius:20,padding:"4px 14px",fontSize:11,fontWeight:700,color:"var(--green)",letterSpacing:"1px",textTransform:"uppercase",marginBottom:20}}>
-            {lang==="es"?"Para Jardineros y Técnicos de Oficio":"For Landscapers and Trade Operators"}
+        {/* Nav */}
+        <div style={{background:"var(--navy)",padding:"18px 24px 14px",display:"flex",alignItems:"center",justifyContent:"space-between",position:"sticky",top:0,zIndex:100}}>
+          <LogoWordmark size={22}/>
+          <div style={{display:"flex",alignItems:"center",gap:14}}>
+            <button className="lb-lang-btn" onClick={()=>{const nl=lang==="en"?"es":"en";setLang(nl);LS.set("lb_lang",nl);}}>
+              {lang==="en"?"Español":"English"}
+            </button>
+            <button className="lb-signin-btn" onClick={()=>setRoute("login")}>
+              {lang==="es"?"Iniciar Sesión":"Sign In"}
+            </button>
           </div>
-          <h1 style={{fontSize:32,fontWeight:800,color:"#fff",lineHeight:1.15,margin:"0 0 32px",maxWidth:340,marginLeft:"auto",marginRight:"auto"}}>
-            {lang==="es"?"Conoce tu precio. Conoce tu ganancia.":"Know your price. Know your profit."}
-          </h1>
+        </div>
 
-          {/* Animated mockup */}
-          <div style={{background:"rgba(255,255,255,.05)",border:"1px solid rgba(255,255,255,.1)",borderRadius:16,padding:"20px",maxWidth:320,margin:"0 auto 32px",textAlign:"left"}}>
-            <div style={{fontSize:11,fontWeight:700,letterSpacing:"1px",textTransform:"uppercase",color:"rgba(255,255,255,.4)",marginBottom:8}}>
-              {lang==="es"?"Precio Recomendado":"Recommended Price"}
-            </div>
-            <div style={{display:"flex",alignItems:"baseline",gap:2,marginBottom:12}}>
-              <span style={{fontSize:22,fontWeight:800,color:"rgba(255,255,255,.6)"}}>$</span>
-              <span style={{fontSize:52,fontWeight:800,color:"#fff",lineHeight:1,animation:"countUp .9s ease-out both"}}>185</span>
-            </div>
-            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}}>
-              <div style={{background:"rgba(255,255,255,.07)",borderRadius:8,padding:"10px 12px"}}>
-                <div style={{fontSize:16,fontWeight:800,color:"var(--green)"}}>+$74</div>
-                <div style={{fontSize:9,fontWeight:700,letterSpacing:".6px",textTransform:"uppercase",color:"rgba(255,255,255,.3)",marginTop:2}}>{lang==="es"?"Ganancia":"Profit"}</div>
+        {/* Hero */}
+        <div style={{background:"var(--navy)",padding:"32px 24px 52px",textAlign:"center",position:"relative",overflow:"hidden"}}>
+          {[...Array(4)].map((_,i)=>(
+            <div key={i} style={{position:"absolute",top:`${15+i*20}%`,left:"-20%",width:"60%",height:"2px",background:`linear-gradient(90deg,transparent,rgba(61,196,60,${0.06+i*0.02}),transparent)`,transform:"rotate(25deg)",animation:`beamMove ${3+i*0.7}s linear ${i*0.6}s infinite`,pointerEvents:"none"}}/>
+          ))}
+          <div style={{position:"relative",zIndex:1}}>
+            <h1 style={{fontSize:33,fontWeight:800,color:"#fff",lineHeight:1.1,letterSpacing:"-0.5px",margin:"0 0 12px",maxWidth:340,marginLeft:"auto",marginRight:"auto"}}>
+              {lang==="es"
+                ? <><span>Conoce tu precio. </span><span style={{color:"var(--green)"}}>Conoce tu ganancia.</span></>
+                : <><span>Know your price. </span><span style={{color:"var(--green)"}}>Know your profit.</span></>}
+            </h1>
+
+            {/* Live calculator */}
+            <div style={{background:"rgba(255,255,255,.05)",border:"1px solid rgba(255,255,255,.1)",borderRadius:16,padding:"18px",maxWidth:340,margin:"0 auto 26px",textAlign:"left"}}>
+              <div style={{fontSize:10.5,fontWeight:700,letterSpacing:"1px",textTransform:"uppercase",color:"rgba(255,255,255,.4)",marginBottom:14,display:"flex",alignItems:"center",gap:6}}>
+                <span style={{width:7,height:7,borderRadius:"50%",background:"var(--green)",display:"inline-block"}}/>
+                {lang==="es"?"Vista en vivo":"Live preview"}
               </div>
-              <div style={{background:"rgba(255,255,255,.07)",borderRadius:8,padding:"10px 12px"}}>
-                <div style={{fontSize:16,fontWeight:800,color:"#fff"}}>40%</div>
-                <div style={{fontSize:9,fontWeight:700,letterSpacing:".6px",textTransform:"uppercase",color:"rgba(255,255,255,.3)",marginTop:2}}>{lang==="es"?"Margen":"Margin"}</div>
+
+              {/* Job chips */}
+              <div style={{...lpFieldLbl,marginBottom:8}}>{lang==="es"?"Tipo de trabajo":"Job type"}</div>
+              <div style={{display:"flex",gap:6,marginBottom:16}}>
+                {lpJobs.map(j=>(
+                  <button key={j.k} onClick={()=>{setLpJob(j.k);setLpHours(j.h);}}
+                    style={{flex:1,padding:"9px 4px",borderRadius:9,border:`1px solid ${lpJob===j.k?"var(--green)":"rgba(255,255,255,.15)"}`,background:lpJob===j.k?"var(--green)":"rgba(255,255,255,.03)",color:lpJob===j.k?"#06210a":"rgba(255,255,255,.75)",fontFamily:"inherit",fontSize:12.5,fontWeight:700,cursor:"pointer"}}>
+                    {lang==="es"?j.es:j.en}
+                  </button>
+                ))}
+              </div>
+
+              {/* Hours slider */}
+              <div style={{display:"flex",justifyContent:"space-between",alignItems:"baseline",marginBottom:6}}>
+                <span style={lpFieldLbl}>{lang==="es"?"Horas en sitio":"Hours on site"}</span>
+                <span style={{fontSize:14,fontWeight:700,color:"#fff"}}>{lpHours}</span>
+              </div>
+              <input type="range" min="0.5" max="8" step="0.5" value={lpHours} onChange={e=>setLpHours(parseFloat(e.target.value))} style={{width:"100%",margin:"0 0 16px"}}/>
+
+              {/* Crew stepper */}
+              <div style={{...lpFieldLbl,marginBottom:8}}>{lang==="es"?"Tamaño del equipo":"Crew size"}</div>
+              <div style={{display:"flex",alignItems:"center",marginBottom:16}}>
+                <button onClick={()=>setLpCrew(c=>Math.max(1,c-1))} style={lpStepBtn}>−</button>
+                <div style={{flex:1,textAlign:"center",color:"#fff",fontWeight:700,fontSize:15}}>{lpCrew}</div>
+                <button onClick={()=>setLpCrew(c=>Math.min(6,c+1))} style={lpStepBtn}>+</button>
+              </div>
+
+              {/* Margin control */}
+              <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
+                <span style={lpFieldLbl}>{lang==="es"?"Tu margen objetivo":"Your target margin"}</span>
+                <div style={{display:"flex",background:"rgba(255,255,255,.05)",border:"1px solid rgba(255,255,255,.15)",borderRadius:8,padding:2}}>
+                  <button onClick={()=>setLpMode("pct")} style={{width:32,height:26,border:"none",borderRadius:6,background:lpMode==="pct"?"var(--green)":"transparent",color:lpMode==="pct"?"#06210a":"rgba(255,255,255,.5)",fontWeight:700,fontSize:13,cursor:"pointer",fontFamily:"inherit"}}>%</button>
+                  <button onClick={()=>setLpMode("usd")} style={{width:32,height:26,border:"none",borderRadius:6,background:lpMode==="usd"?"var(--green)":"transparent",color:lpMode==="usd"?"#06210a":"rgba(255,255,255,.5)",fontWeight:700,fontSize:13,cursor:"pointer",fontFamily:"inherit"}}>$</button>
+                </div>
+              </div>
+              <div style={{display:"flex",justifyContent:"space-between",alignItems:"baseline",marginBottom:8}}>
+                <span style={{fontSize:12,color:"rgba(255,255,255,.4)"}}>
+                  {lpMode==="pct"?(lang==="es"?"Fija el margen que quieres":"Set the margin you want"):(lang==="es"?"Fija la ganancia que quieres":"Set the profit you want")}
+                </span>
+                <span style={{fontSize:14,fontWeight:700,color:"#fff"}}>{lpMode==="pct"?`${lpMargin}%`:`$${lpProfit}`}</span>
+              </div>
+              {lpMode==="pct"
+                ? <input type="range" min="15" max="65" step="5" value={lpMargin} onChange={e=>setLpMargin(parseInt(e.target.value))} style={{width:"100%",margin:0}}/>
+                : <input type="range" min="30" max="300" step="10" value={lpProfit} onChange={e=>setLpProfit(parseInt(e.target.value))} style={{width:"100%",margin:0}}/>
+              }
+
+              <div style={{height:1,background:"rgba(255,255,255,.1)",margin:"16px 0"}}/>
+
+              {/* Result */}
+              <div style={{fontSize:11,fontWeight:700,letterSpacing:"1px",textTransform:"uppercase",color:"rgba(255,255,255,.4)",marginBottom:4}}>{lang==="es"?"Precio recomendado":"Recommended price"}</div>
+              <div style={{display:"flex",alignItems:"baseline",gap:2,marginBottom:14}}>
+                <span style={{fontSize:24,fontWeight:800,color:"rgba(255,255,255,.6)"}}>$</span>
+                <span style={{fontSize:50,fontWeight:800,color:"#fff",lineHeight:1}}><AnimatedNumber value={Math.round(lpPrice)} duration={450}/></span>
+              </div>
+              <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}}>
+                <div style={{background:"rgba(255,255,255,.07)",borderRadius:8,padding:"10px 12px"}}>
+                  <div style={{fontSize:16,fontWeight:800,color:"var(--green)"}}>+$<AnimatedNumber value={Math.round(lpProfitCalc)} duration={450}/></div>
+                  <div style={{fontSize:9,fontWeight:700,letterSpacing:".6px",textTransform:"uppercase",color:"rgba(255,255,255,.3)",marginTop:2}}>{lang==="es"?"Ganancia":"Profit"}</div>
+                </div>
+                <div style={{background:"rgba(255,255,255,.07)",borderRadius:8,padding:"10px 12px"}}>
+                  <div style={{fontSize:16,fontWeight:800,color:"#fff"}}>{lpMarginShown}%</div>
+                  <div style={{fontSize:9,fontWeight:700,letterSpacing:".6px",textTransform:"uppercase",color:"rgba(255,255,255,.3)",marginTop:2}}>{lang==="es"?"Margen":"Margin"}</div>
+                </div>
               </div>
             </div>
-            <div style={{marginTop:10,fontSize:11,color:"rgba(255,255,255,.3)"}}>Weekly Maintenance · 1.5 hrs · 2 crew</div>
+
+            <button onClick={()=>setRoute("register")} style={{background:"var(--green)",color:"#fff",border:"none",borderRadius:12,padding:"16px 32px",fontSize:16,fontWeight:800,cursor:"pointer",fontFamily:"inherit",width:"100%",maxWidth:340}}>
+              {lang==="es"?"Cotiza tu Primer Trabajo":"Price Your First Job"}
+            </button>
           </div>
-
-          <button onClick={()=>setRoute("register")} style={{background:"var(--green)",color:"#fff",border:"none",borderRadius:12,padding:"16px 32px",fontSize:16,fontWeight:800,cursor:"pointer",fontFamily:"inherit",width:"100%",maxWidth:320}}>
-            {lang==="es"?"Cotiza tu Primer Trabajo":"Price Your First Job"}
-          </button>
-
         </div>
-      </div>
 
-      {/* How It Works */}
-      <div style={{padding:"48px 24px",maxWidth:480,margin:"0 auto"}}>
-        <div style={{fontSize:11,fontWeight:700,letterSpacing:"1.5px",textTransform:"uppercase",color:"var(--g400)",textAlign:"center",marginBottom:8}}>
-          {lang==="es"?"Cómo Funciona":"How It Works"}
-        </div>
-        <h2 style={{fontSize:22,fontWeight:800,color:"var(--navy)",textAlign:"center",marginBottom:32,lineHeight:1.25}}>
-          {lang==="es"?"Cotiza cualquier trabajo en 30 segundos":"Price any job in 30 seconds"}
-        </h2>
-        {[
-          {n:"1",en:"Pick your job type",es:"Elige el tipo de trabajo",sub_en:"Weekly maintenance, cleanup, tree trimming and more.",sub_es:"Mantenimiento semanal, limpieza, poda y más."},
-          {n:"2",en:"Enter your hours and crew",es:"Ingresa horas y cuadrilla",sub_en:"Tell ListoBid your labor rate, hours on site, and crew size.",sub_es:"Ingresa tu tarifa, horas en sitio y tamaño de cuadrilla."},
-          {n:"3",en:"Get your price and profit",es:"Obtén tu precio y ganancia",sub_en:"See exactly what to charge and what you keep on every job.",sub_es:"Ve exactamente qué cobrar y qué te queda en cada trabajo."},
-        ].map(s=>(
-          <div key={s.n} style={{display:"flex",gap:16,marginBottom:28}}>
-            <div style={{width:36,height:36,borderRadius:"50%",background:"var(--navy)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:14,fontWeight:800,color:"#fff",flexShrink:0,marginTop:2}}>{s.n}</div>
-            <div>
-              <div style={{fontSize:16,fontWeight:700,color:"var(--navy)",marginBottom:4}}>{lang==="es"?s.es:s.en}</div>
-              <div style={{fontSize:13,color:"var(--g400)",lineHeight:1.5}}>{lang==="es"?s.sub_es:s.sub_en}</div>
+        {/* How It Works */}
+        <div style={{padding:"48px 24px",maxWidth:480,margin:"0 auto"}}>
+          <div style={{fontSize:11,fontWeight:700,letterSpacing:"1.5px",textTransform:"uppercase",color:"var(--g400)",textAlign:"center",marginBottom:8}}>
+            {lang==="es"?"Cómo Funciona":"How It Works"}
+          </div>
+          <h2 style={{fontSize:22,fontWeight:800,color:"var(--navy)",textAlign:"center",marginBottom:32,lineHeight:1.25}}>
+            {lang==="es"?"Cotiza cualquier trabajo en 30 segundos":"Price any job in 30 seconds"}
+          </h2>
+          {[
+            {n:"1",en:"Pick your job type",es:"Elige el tipo de trabajo",sub_en:"Weekly maintenance, cleanup, tree trimming and more.",sub_es:"Mantenimiento semanal, limpieza, poda y más."},
+            {n:"2",en:"Enter your hours and crew",es:"Ingresa horas y cuadrilla",sub_en:"Tell ListoBid your labor rate, hours on site, and crew size.",sub_es:"Ingresa tu tarifa, horas en sitio y tamaño de cuadrilla."},
+            {n:"3",en:"Get your price and profit",es:"Obtén tu precio y ganancia",sub_en:"See exactly what to charge and what you keep on every job.",sub_es:"Ve exactamente qué cobrar y qué te queda en cada trabajo."},
+          ].map(s=>(
+            <div key={s.n} style={{display:"flex",gap:16,marginBottom:28}}>
+              <div style={{width:36,height:36,borderRadius:"50%",background:"var(--navy)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:14,fontWeight:800,color:"#fff",flexShrink:0,marginTop:2}}>{s.n}</div>
+              <div>
+                <div style={{fontSize:16,fontWeight:700,color:"var(--navy)",marginBottom:4}}>{lang==="es"?s.es:s.en}</div>
+                <div style={{fontSize:13,color:"var(--g400)",lineHeight:1.5}}>{lang==="es"?s.sub_es:s.sub_en}</div>
+              </div>
             </div>
+          ))}
+        </div>
+
+        {/* Closing */}
+        <div style={{background:"var(--navy)",padding:"44px 24px 40px",textAlign:"center"}}>
+          <div style={{display:"inline-block",background:"#fff",borderRadius:12,padding:"10px 16px",marginBottom:20,lineHeight:0,boxShadow:"0 6px 18px rgba(0,0,0,.28)"}}>
+            <img src="/logo.PNG" alt="ListoBid" style={{height:46,width:"auto",display:"block"}}/>
           </div>
-        ))}
-      </div>
-
-      {/* Bottom CTA */}
-      <div style={{background:"var(--navy)",padding:"48px 24px",textAlign:"center"}}>
-        <div style={{fontSize:22,fontWeight:800,color:"#fff",marginBottom:8,lineHeight:1.25}}>
-          {lang==="es"?"Listo para cotizar.":"Ready to bid."}
+          <div style={{fontSize:26,fontWeight:800,color:"#fff",marginBottom:8,lineHeight:1.2}}>
+            {lang==="es"?"Deja de dejar dinero en la mesa.":"Stop leaving money on the table."}
+          </div>
+          <div style={{fontSize:14,color:"rgba(255,255,255,.6)",marginBottom:24}}>
+            {lang==="es"?"Tu proxima cotizacion esta a 30 segundos.":"Your next quote is 30 seconds away."}
+          </div>
+          <button onClick={()=>setRoute("register")} style={{background:"transparent",color:"var(--green)",border:"1.5px solid rgba(61,196,60,.5)",borderRadius:12,padding:"15px 32px",fontSize:16,fontWeight:800,cursor:"pointer",fontFamily:"inherit",width:"100%",maxWidth:340}}>
+            {lang==="es"?"Mira cuanto deberias cobrar":"See what you should charge"}
+          </button>
         </div>
-        <div style={{fontSize:14,color:"rgba(255,255,255,.5)",marginBottom:24}}>
-          {lang==="es"?"$9.99/mes después de tu prueba.":"$9.99/month after your trial."}
+
+        {/* Footer */}
+        <div style={{padding:"22px 24px 30px",textAlign:"center",background:"#fff"}}>
+          <div style={{display:"flex",justifyContent:"center",alignItems:"center",gap:20,marginBottom:10}}>
+            <a href="https://www.facebook.com/profile.php?id=61590502810704" target="_blank" rel="noopener noreferrer" style={{display:"flex",alignItems:"center",justifyContent:"center",width:36,height:36,borderRadius:8,background:"var(--g100)",color:"var(--g600)",textDecoration:"none"}}>
+              <IcoFacebook size={18} color="var(--g600)"/>
+            </a>
+            <a href="https://instagram.com/listobid" target="_blank" rel="noopener noreferrer" style={{display:"flex",alignItems:"center",justifyContent:"center",width:36,height:36,borderRadius:8,background:"var(--g100)",color:"var(--g600)",textDecoration:"none"}}>
+              <IcoInstagram size={18} color="var(--g600)"/>
+            </a>
+          </div>
+          <div style={{fontSize:11,color:"var(--g400)"}}>© 2026 ListoBid · listobid.com</div>
         </div>
-        <button onClick={()=>setRoute("register")} style={{background:"var(--green)",color:"#fff",border:"none",borderRadius:12,padding:"16px 32px",fontSize:16,fontWeight:800,cursor:"pointer",fontFamily:"inherit",width:"100%",maxWidth:320}}>
-          {lang==="es"?"Cotiza tu Primer Trabajo":"Price Your First Job"}
-        </button>
-      </div>
 
-      {/* Footer */}
-      <div style={{padding:"20px 24px",textAlign:"center",background:"#fff"}}>
-        <div style={{display:"flex",justifyContent:"center",alignItems:"center",gap:20,marginBottom:10}}>
-          <a href="https://www.facebook.com/profile.php?id=61590502810704" target="_blank" rel="noopener noreferrer" style={{display:"flex",alignItems:"center",justifyContent:"center",width:36,height:36,borderRadius:8,background:"var(--g100)",color:"var(--g600)",textDecoration:"none"}}>
-            <IcoFacebook size={18} color="var(--g600)"/>
-          </a>
-          <a href="https://instagram.com/listobid" target="_blank" rel="noopener noreferrer" style={{display:"flex",alignItems:"center",justifyContent:"center",width:36,height:36,borderRadius:8,background:"var(--g100)",color:"var(--g600)",textDecoration:"none"}}>
-            <IcoInstagram size={18} color="var(--g600)"/>
-          </a>
-        </div>
-        <div style={{fontSize:11,color:"var(--g400)"}}>© 2026 ListoBid · listobid.com</div>
-      </div>
+      </div></>
+    );
+  }
 
-    </div></>
-  );
-
-
-  // ── Set New Password screen (from email reset link) ──
+    // ── Set New Password screen (from email reset link) ──
   if (route === "resetNewPass") return (
     <><style>{CSS}</style>
     <div style={{minHeight:"100dvh",background:"#fff",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:"32px 24px"}}>
