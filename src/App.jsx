@@ -953,6 +953,8 @@ export default function ListoBid() {
           if (user.industry) { LS.set("lb_industry", user.industry); setIndustry(user.industry); }
         LS.set("lb_current_user", user);
         setCurrentUser(user);
+        // Update last_active on every session restore
+        sb.from("profiles").update({ last_active: new Date().toISOString() }).eq("id", session.user.id).then(()=>{}).catch(()=>{});
         const l = LS.get("lb_lang", null);
         if (l && user.industry) setRoute("app");
         else if (l) setRoute("industry");
@@ -1130,13 +1132,16 @@ export default function ListoBid() {
 
   const incrementQuotes = useCallback(() => {
     if (!currentUser) return;
-    const updated = { ...currentUser, quotesGenerated: (currentUser.quotesGenerated || 0) + 1, lastActive: new Date().toISOString() };
+    const newCount = (currentUser.quotesGenerated || 0) + 1;
+    const updated = { ...currentUser, quotesGenerated: newCount, lastActive: new Date().toISOString() };
     LS.set("lb_current_user", updated); setCurrentUser(updated);
+    sb.from("profiles").update({ quotes_generated: newCount }).eq("id", currentUser.id).then(()=>{}).catch(()=>{});
   }, [currentUser]);
 
   // ── Quote ──
   const canCalc = !!hours && pf(hours) > 0 && !!gasPrice && pf(gasPrice) > 0 && pf(profile.laborRate) > 0;
   const [showRequired, setShowRequired] = useState(false);
+  const [showFirstMoment, setShowFirstMoment] = useState(false);
   const buildP = (mg = margin) => ({ laborRate: profile.laborRate, crewSize: profile.crewSize, hours, materials: mats, exactMiles: exactMi, tier, vehicles: vehs, gasPrice, margin: mg, marginMode: qMarginMode, targetDollar: qTargetDollar, overheadMode: qOverheadMode, overheadPct: qOverheadPct, overheadFlat: qOverheadFlat });
 
   const doCalc = (mg = margin) => {
@@ -1160,6 +1165,7 @@ export default function ListoBid() {
       }).then(() => {}).catch(() => {});
       // Track first calc timestamp
       if (!currentUser.first_calc_at) {
+        setShowFirstMoment(true);
         sb.from("profiles").update({ first_calc_at: new Date().toISOString() }).eq("id", currentUser.id)
           .then(() => { setCurrentUser(u => ({...u, first_calc_at: new Date().toISOString()})); })
           .catch(() => {});
@@ -1176,7 +1182,7 @@ export default function ListoBid() {
       setResult(r);
     }, 250);
     return () => clearTimeout(timer);
-  }, [hours, mats, gasPrice, selJob]);
+  }, [hours, mats, gasPrice, selJob, profile.crewSize, profile.laborRate]);
 
   const selectJob = (id) => {
     setSelJob(id); setResult(null); setShowAct(false);
@@ -1184,7 +1190,7 @@ export default function ListoBid() {
     if (j) { setHours(String(j.hours)); setMats(String(j.materials)); }
   };
 
-  const reset = () => { setSelJob(""); setHours(""); setMats(""); setTier("short"); setExactMi(""); setVehs(profile.vehicles); setMargin(pf(profile.targetMargin, 40)); setResult(null); setShowAct(false); setCadence("once"); setCustomCadence(""); setResultView("single"); };
+  const reset = () => { setSelJob(""); setHours(""); setMats(""); setTier("short"); setExactMi(""); setVehs(profile.vehicles); setMargin(pf(profile.targetMargin, 40)); setResult(null); setShowAct(false); setCadence("once"); setCustomCadence(""); setResultView("single"); setShowFirstMoment(false); };
 
   const saveQuote = async () => {
     if (!saveName.trim() || !result) return;
@@ -1617,6 +1623,7 @@ export default function ListoBid() {
                     fuelType: "gas", includeOneTime: true
                   };
                   setProfile(p => ({...p, ...smartProfile}));
+                  LS.set("lb_profile", {...profile, ...smartProfile});
                   // Persist to Supabase
                   if (upd.id) {
                     sb.from("profiles").update({
@@ -1798,11 +1805,11 @@ export default function ListoBid() {
               <div className="ct2">{t.crewWage}</div>
               <div className="fi">
                 <label className="lb">{t.crewSize}</label>
-                <div className="tg">{[1,2,3,4,5,6,7,8,9,10].map(x=><button key={x} className={`tb ${profile.crewSize===String(x)?"on":""}`} style={{flex:"0 0 calc(20% - 6px)",minWidth:36}} onClick={()=>{ps("crewSize",String(x));setResult(null);}}>{x}</button>)}</div>
+                <div className="tg">{[1,2,3,4,5,6,7,8,9,10].map(x=><button key={x} className={`tb ${profile.crewSize===String(x)?"on":""}`} style={{flex:"0 0 calc(20% - 6px)",minWidth:36}} onClick={()=>ps("crewSize",String(x))}>{x}</button>)}</div>
               </div>
               <div className="fi" style={{marginBottom:0}}>
                 <label className="lb">{t.laborRate}</label>
-                <div className="px" style={{borderColor:showRequired&&!pf(profile.laborRate)?"var(--red)":undefined}}><span className="pxs">$</span><input type="number" min="0" value={profile.laborRate} onChange={e=>{ps("laborRate",e.target.value);setResult(null);setShowRequired(false);}} placeholder="18.00"/></div>
+                <div className="px" style={{borderColor:showRequired&&!pf(profile.laborRate)?"var(--red)":undefined}}><span className="pxs">$</span><input type="number" min="0" value={profile.laborRate} onChange={e=>{ps("laborRate",e.target.value);setShowRequired(false);}} placeholder="18.00"/></div>
                 {showRequired&&!pf(profile.laborRate)&&<div style={{fontSize:11,color:"var(--red)",marginTop:3}}>Hourly rate required</div>}
                 <div className="ht">{t.perPerson}</div>
               </div>
@@ -1812,10 +1819,10 @@ export default function ListoBid() {
             <div className="card">
               <div className="ct2">{t.jobDetails}</div>
               <div className="r2">
-                <div className="fi" style={{marginBottom:0}}><label className="lb">{t.hoursOnSite}</label><input type="number" min="0" step="0.5" value={hours} onChange={e=>{setHours(e.target.value);setResult(null);}} placeholder="2"/></div>
+                <div className="fi" style={{marginBottom:0}}><label className="lb">{t.hoursOnSite}</label><input type="number" min="0" step="0.5" value={hours} onChange={e=>setHours(e.target.value)} placeholder="2"/></div>
                 <div className="fi" style={{marginBottom:0}}>
                   <label className="lb">{t.matsLabel}</label>
-                  <div className="px"><span className="pxs">$</span><input type="number" min="0" value={mats} onChange={e=>{setMats(e.target.value);setResult(null);}} placeholder="0"/></div>
+                  <div className="px"><span className="pxs">$</span><input type="number" min="0" value={mats} onChange={e=>setMats(e.target.value)} placeholder="0"/></div>
                 </div>
               </div>
             </div>
@@ -1885,7 +1892,7 @@ export default function ListoBid() {
               <div className="ct2">{t.gasPriceLabel}</div>
               <div className="px" style={{borderColor:showRequired&&!pf(gasPrice)?"var(--red)":undefined}}>
                 <span className="pxs">$</span>
-                <input type="number" step="0.01" min="0" value={gasPrice} onChange={e=>{setGasPrice(e.target.value);setResult(null);setShowRequired(false);}} placeholder={t.enterManual}/>
+                <input type="number" step="0.01" min="0" value={gasPrice} onChange={e=>{setGasPrice(e.target.value);setShowRequired(false);}} placeholder={t.enterManual}/>
               </div>
               {showRequired&&!pf(gasPrice)&&<div style={{fontSize:11,color:"var(--red)",marginTop:3}}>{lang==="es"?"Precio de combustible requerido":"Fuel price required"}</div>}
 
@@ -1900,7 +1907,7 @@ export default function ListoBid() {
 
             {result && <>
               <div id="quote-result" style={{height:6}}/>
-              {currentUser?.first_calc_at && !currentUser?._shownFirstMoment && (
+              {showFirstMoment && (
                 <div style={{padding:"14px 16px",marginBottom:10,borderRadius:10,background:"var(--navy)"}}>
                   <div style={{fontSize:14,fontWeight:700,color:"#fff",marginBottom:4,lineHeight:1.4}}>
                     {lang==="es"?"La mayoría hubiera cobrado menos. Esa diferencia es tu ganancia.":"Most new operators would have guessed lower. That gap is your profit."}
