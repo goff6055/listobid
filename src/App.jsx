@@ -880,6 +880,7 @@ export default function ListoBid() {
   const [historyJobType, setHistoryJobType] = useState(null);
   const [statPeriod,   setStatPeriod]   = useState("monthly");
   const [editingQuote,  setEditingQuote]  = useState(null);
+  const [expandedQuote, setExpandedQuote] = useState(null);
   const [sharingQuote,  setSharingQuote]  = useState(null);
 
   // ── Settings ──
@@ -1084,7 +1085,8 @@ export default function ListoBid() {
       if (remoteQuotes && remoteQuotes.length > 0) {
         const mapped = remoteQuotes.map(q => ({
           id: q.id, name: q.name, address: q.address || "", notes: q.notes || "",
-          price: q.price, margin: q.margin, profit: q.profit,
+          price: q.price, margin: q.margin, profit: q.profit, cost: q.cost,
+          hours: q.hours, crewSize: q.crew_size, materials: q.materials,
           date: new Date(q.created_at).toLocaleDateString(),
           jobType: q.job_type, industry: q.industry, converted: q.converted || false,
         }));
@@ -1196,7 +1198,9 @@ export default function ListoBid() {
     if (!saveName.trim() || !result) return;
     const entry = {
       id: Date.now(), name: saveName.trim(), notes: saveNotes.trim(),
-      address: saveAddress.trim(), price: result.price, margin: result.margin,
+      address: saveAddress.trim(),
+      hours: pf(hours), crewSize: pi(profile.crewSize),
+      materials: pf(mats), cost: result.cost, price: result.price, margin: result.margin,
       profit: result.profit, date: new Date().toLocaleDateString(),
       jobType: jobs.find(j => String(j.id) === String(selJob))?.name || "-",
       industry: industry || "landscaping", converted: false,
@@ -1340,9 +1344,9 @@ export default function ListoBid() {
 
               {/* Crew stepper */}
               <div style={{...lpFieldLbl,marginBottom:8}}>{lang==="es"?"Tamaño del equipo":"Crew size"}</div>
-              <div style={{display:"flex",alignItems:"center",marginBottom:16}}>
+              <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:16}}>
                 <button onClick={()=>setLpCrew(c=>Math.max(1,c-1))} style={lpStepBtn}>−</button>
-                <div style={{flex:1,textAlign:"center",color:"#fff",fontWeight:700,fontSize:15}}>{lpCrew}</div>
+                <div style={{width:36,textAlign:"center",color:"#fff",fontWeight:700,fontSize:15}}>{lpCrew}</div>
                 <button onClick={()=>setLpCrew(c=>Math.min(6,c+1))} style={lpStepBtn}>+</button>
               </div>
 
@@ -1369,7 +1373,7 @@ export default function ListoBid() {
 
               {/* Result */}
               <div style={{fontSize:11,fontWeight:700,letterSpacing:"1px",textTransform:"uppercase",color:"rgba(255,255,255,.4)",marginBottom:4}}>{lang==="es"?"Precio recomendado":"Recommended price"}</div>
-              <div style={{display:"flex",alignItems:"baseline",gap:2,marginBottom:14}}>
+              <div style={{display:"flex",alignItems:"baseline",gap:2,marginBottom:14,justifyContent:"center"}}>
                 <span style={{fontSize:24,fontWeight:800,color:"rgba(255,255,255,.6)"}}>$</span>
                 <span style={{fontSize:50,fontWeight:800,color:"#fff",lineHeight:1}}><AnimatedNumber value={Math.round(lpPrice)} duration={450}/></span>
               </div>
@@ -1417,7 +1421,7 @@ export default function ListoBid() {
         {/* Closing */}
         <div style={{background:"var(--navy)",padding:"44px 24px 40px",textAlign:"center"}}>
           <div style={{display:"inline-block",background:"#fff",borderRadius:12,padding:"10px 16px",marginBottom:20,lineHeight:0,boxShadow:"0 6px 18px rgba(0,0,0,.28)"}}>
-            <img src="/logo.PNG" alt="ListoBid" style={{height:46,width:"auto",display:"block"}}/>
+            <img src="/logo.PNG" alt="ListoBid" style={{height:64,width:"auto",display:"block"}}/>
           </div>
           <div style={{fontSize:26,fontWeight:800,color:"#fff",marginBottom:8,lineHeight:1.2}}>
             {lang==="es"?"Deja de dejar dinero en la mesa.":"Stop leaving money on the table."}
@@ -2139,15 +2143,35 @@ export default function ListoBid() {
                   const qm=marginMeta(q.margin);
                   return (
                     <div className="li" key={q.id} style={{border:q.converted?"2px solid var(--green)":"1px solid var(--g200)",background:q.converted?"var(--glt)":"var(--g50)"}}>
-                      <div className="li-hdr">
+                      <div className="li-hdr" style={{cursor:"pointer"}} onClick={()=>setExpandedQuote(expandedQuote===q.id?null:q.id)}>
                         <div style={{flex:1,minWidth:0}}>
                           <div className="li-name">{q.name}</div>
                           <div className="li-meta">{q.jobType} · {q.date}</div>
                           {q.address&&<div style={{fontSize:11,color:"var(--g400)",marginTop:2}}>📍 {q.address}</div>}
                           {q.industry&&q.industry!=="landscaping"&&<div style={{fontSize:11,color:"var(--g400)",marginTop:2}}>{INDUSTRY_TEMPLATES[q.industry]?.en.name}</div>}
                         </div>
-                        <div className="li-price">${q.price}</div>
+                        <div style={{display:"flex",alignItems:"center",gap:8}}>
+                          <div className="li-price">${q.price}</div>
+                          <span style={{fontSize:12,color:"var(--g400)",transform:expandedQuote===q.id?"rotate(180deg)":"none",transition:"transform .2s",display:"inline-block"}}>▾</span>
+                        </div>
                       </div>
+                      {expandedQuote===q.id&&(
+                        <div style={{background:"var(--g100)",borderRadius:8,padding:"10px 12px",marginBottom:8,display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:8}}>
+                          {[
+                            {label:lang==="es"?"Horas":"Hours",val:q.hours||"-"},
+                            {label:lang==="es"?"Equipo":"Crew",val:q.crewSize||"-"},
+                            {label:lang==="es"?"Precio":"Price",val:`$${q.price}`},
+                            {label:lang==="es"?"Costo":"Cost",val:`$${Math.round(q.cost||0)}`},
+                            {label:lang==="es"?"Ganancia":"Profit",val:`$${Math.round(q.profit||0)}`,green:true},
+                            {label:lang==="es"?"Margen":"Margin",val:`${Math.round(q.margin||0)}%`},
+                          ].map((s,i)=>(
+                            <div key={i} style={{textAlign:"center"}}>
+                              <div style={{fontSize:13,fontWeight:700,color:s.green?"var(--green)":"var(--g800)"}}>{s.val}</div>
+                              <div style={{fontSize:10,color:"var(--g400)",marginTop:2}}>{s.label}</div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
                       <div className="li-pills" style={{marginBottom:8}}>
                         <span className="pill" style={{background:qm.bg,color:qm.fg}}>{roundPct(q.margin)}% margin</span>
                         <span style={{fontSize:12,color:"var(--g400)"}}>${Math.round(q.profit)} profit</span>
@@ -2166,7 +2190,7 @@ export default function ListoBid() {
           }
           {editingQuote&&(
             <div className="ov" onClick={()=>setEditingQuote(null)}>
-              <div className="mo" onClick={e=>e.stopPropagation()} style={{maxHeight:"85dvh",overflowY:"auto"}}>
+              <div className="mo" onClick={e=>e.stopPropagation()} style={{maxHeight:"85dvh",overflowY:"auto",marginTop:"auto"}}>
                 <div className="mo-t">Edit Quote</div>
                 <div className="fi"><label className="lb">{t.jobLabel}</label><input type="text" value={editingQuote.name} onChange={e=>setEditingQuote(q=>({...q,name:e.target.value}))}/></div>
                 <div className="fi"><label className="lb">{t.addressLabel} <span style={{color:"var(--g400)",fontWeight:400}}>{t.addressOpt}</span></label><AddressInput value={editingQuote.address||""} onChange={v=>setEditingQuote(q=>({...q,address:v}))}/></div>
