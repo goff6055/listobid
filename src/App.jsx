@@ -929,6 +929,7 @@ export default function ListoBid() {
   useEffect(() => {
     sb.auth.getSession().then(({ data: { session } }) => {
       if (!session) return;
+      sb.from("profiles").update({ last_active: new Date().toISOString() }).eq("id", session.user.id).then(()=>{}).catch(()=>{});
       if (LS.get("lb_current_user", null)) return; // already loaded from cache
       setSbLoading(true);
       sb.from("profiles").select("*").eq("id", session.user.id).single().then(({ data: profile }) => {
@@ -1075,8 +1076,8 @@ export default function ListoBid() {
         lastActive: new Date().toISOString(),
       };
       // Restore profile settings and jobs from Supabase
-      if (profile?.profile_data) LS.set("lb_profile", profile.profile_data);
-      if (profile?.jobs_data)    LS.set("lb_all_jobs", profile.jobs_data);
+      if (profile?.profile_data) { LS.set("lb_profile", profile.profile_data); setProfile(p => ({...p, ...profile.profile_data})); }
+      if (profile?.jobs_data)    { LS.set("lb_all_jobs", profile.jobs_data); setAllJobsRaw(profile.jobs_data); }
       if (user.industry)         LS.set("lb_industry", user.industry);
       // Update last active in Supabase
       await sb.from("profiles").update({ last_active: new Date().toISOString() }).eq("id", data.user.id);
@@ -1225,12 +1226,7 @@ export default function ListoBid() {
           converted: false,
         });
         if (qErr) console.error("Quote save error:", qErr);
-        await sb.from("profiles").update({
-          quotes_generated: (currentUser.quotesGenerated || 0) + 1
-        }).eq("id", currentUser.id);
-        const updatedUser = { ...currentUser, quotesGenerated: (currentUser.quotesGenerated || 0) + 1 };
-        LS.set("lb_current_user", updatedUser);
-        setCurrentUser(updatedUser);
+
       } catch (e) { console.error("Quote save exception:", e); }
     }
     setShowSave(false); setSaveName(""); setSaveNotes(""); setSaveAddress(""); setShowAct(false);
@@ -1638,6 +1634,7 @@ export default function ListoBid() {
                   if (firstJob) {
                     setSelJob(String(firstJob.id));
                     setHours(String(firstJob.hours || "1"));
+                    setMats(String(firstJob.materials ?? "0"));
                     // Auto-set cadence for weekly jobs
                     const jname = (firstJob.name || "").toLowerCase();
                     if (jname.includes("weekly") || jname.includes("semanal")) {
@@ -1690,7 +1687,7 @@ export default function ListoBid() {
       <div key="s2">
         <div className="st">{t.setup}</div><div className="ss">{t.step} 2 {t.of} {TOTAL_STEPS} - Fuel Cost</div>
         <div className="fi">
-          <label className="lb">{t.gasPriceLabel}</label>
+          <label className="lb">{t.gasPriceLabel} <span style={{color:"#ef4444"}}>*</span></label>
           <div className="px"><span className="pxs">$</span>
             <input type="number" step="0.01" min="0" value={gasPrice} onChange={e=>setGasPrice(e.target.value)} placeholder="3.42"/>
           </div>
@@ -1812,7 +1809,7 @@ export default function ListoBid() {
                 <div className="tg">{[1,2,3,4,5,6,7,8,9,10].map(x=><button key={x} className={`tb ${profile.crewSize===String(x)?"on":""}`} style={{flex:"0 0 calc(20% - 6px)",minWidth:36}} onClick={()=>ps("crewSize",String(x))}>{x}</button>)}</div>
               </div>
               <div className="fi" style={{marginBottom:0}}>
-                <label className="lb">{t.laborRate}</label>
+                <label className="lb">{t.laborRate} <span style={{color:"#ef4444"}}>*</span></label>
                 <div className="px" style={{borderColor:showRequired&&!pf(profile.laborRate)?"var(--red)":undefined}}><span className="pxs">$</span><input type="number" min="0" value={profile.laborRate} onChange={e=>{ps("laborRate",e.target.value);setShowRequired(false);}} placeholder="18.00"/></div>
                 {showRequired&&!pf(profile.laborRate)&&<div style={{fontSize:11,color:"var(--red)",marginTop:3}}>Hourly rate required</div>}
                 <div className="ht">{t.perPerson}</div>
@@ -1837,7 +1834,7 @@ export default function ListoBid() {
                 <span style={{fontSize:13,fontWeight:700,color:"var(--g800)"}}>{lang==="es"?"Ajustar Detalles":"Adjust Details"}</span>
                 <div style={{display:"flex",alignItems:"center",gap:8}}>
                   <span style={{fontSize:11,color:"var(--g400)",fontWeight:500}}>{lang==="es"?"Combustible · Gastos · Frecuencia":"Fuel · Overhead · Frequency"}</span>
-                  <span style={{fontSize:14,color:"var(--g400)",transform:showAdjust?"rotate(180deg)":"none",transition:"transform .2s"}}>▾</span>
+                  <span style={{fontSize:18,color:showAdjust?"var(--green)":"var(--g600)",transform:showAdjust?"rotate(180deg)":"none",transition:"transform .2s",fontWeight:700}}>▾</span>
                 </div>
               </button>
               {showAdjust&&(
@@ -1908,6 +1905,9 @@ export default function ListoBid() {
 
             {/* Calculate */}
             <button className="btn bn" onClick={()=>{ if(!canCalc){ setShowRequired(true); if(!gasPrice||pf(gasPrice)<=0) setShowAdjust(true); return; } setShowRequired(false); doCalc(); setTimeout(()=>{document.getElementById("quote-result")?.scrollIntoView({behavior:"smooth",block:"start"})},150); }}>{t.calculate}</button>
+            {!canCalc&&<div style={{fontSize:12,color:"var(--g400)",textAlign:"center",marginTop:6}}>
+              {lang==="es"?"Ingresa tarifa y precio de combustible para calcular":"Enter wage and fuel price to calculate"}
+            </div>}
 
             {result && <>
               <div id="quote-result" style={{height:6}}/>
